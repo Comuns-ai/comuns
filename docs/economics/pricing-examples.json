@@ -1,0 +1,145 @@
+{
+  "note": "FIXTURE — not an adopted price. All inputs are illustrative/UNVERIFIED unless a source field cites the evidence register. All calculated expectations are derived/UNVERIFIED. Integer wei and decimal quantities are strings. No mainnet parameter is set here.",
+  "fixtures": [
+    {
+      "id": "formula-exact", "kind": "formula",
+      "inputTokens": "2000000", "outputTokens": "3000000",
+      "priceInPerMillion": "4", "priceOutPerMillion": "5",
+      "expectedWei": "23", "expectedRemainder": "0"
+    },
+    {
+      "id": "formula-zero-output", "kind": "formula",
+      "inputTokens": "7", "outputTokens": "0",
+      "priceInPerMillion": "333333", "priceOutPerMillion": "666667",
+      "expectedWei": "2", "expectedRemainder": "333331"
+    },
+    {
+      "id": "formula-floor-remainder", "kind": "formula",
+      "inputTokens": "1000", "outputTokens": "500",
+      "priceInPerMillion": "1000001", "priceOutPerMillion": "2000003",
+      "expectedWei": "2000", "expectedRemainder": "2500"
+    },
+    {
+      "id": "session-two-prompts-partial-chunks", "kind": "session",
+      "N": "2", "chunkTokens": "4",
+      "priceInPerMillion": "333333", "priceOutPerMillion": "666667",
+      "depositWei": "20", "maxSpendWei": "25",
+      "jobs": [
+        {"jobId": "job-1", "promptTokens": "2", "grantedContextTokens": "1", "outputChunks": ["4", "1"]},
+        {"jobId": "job-2", "promptTokens": "2", "grantedContextTokens": "0", "outputChunks": ["4", "2"]}
+      ],
+      "vouchers": [
+        {"seq": "1", "inputTokens": "3", "outputTokens": "0", "cumulativeWei": "0", "final": false, "action": "sign", "expectedPayoutWei": "0"},
+        {"seq": "2", "inputTokens": "3", "outputTokens": "4", "cumulativeWei": "3", "final": false, "action": "redeemVoucher", "expectedPayoutWei": "3"},
+        {"seq": "3", "inputTokens": "3", "outputTokens": "5", "cumulativeWei": "4", "final": false, "action": "sign", "expectedPayoutWei": "0"},
+        {"seq": "4", "inputTokens": "5", "outputTokens": "5", "cumulativeWei": "5", "final": false, "action": "sign", "expectedPayoutWei": "0"},
+        {"seq": "5", "inputTokens": "5", "outputTokens": "9", "cumulativeWei": "7", "final": false, "action": "sign", "expectedPayoutWei": "0"},
+        {"seq": "6", "inputTokens": "5", "outputTokens": "11", "cumulativeWei": "9", "final": false, "action": "sign", "expectedPayoutWei": "0"},
+        {"seq": "7", "inputTokens": "5", "outputTokens": "11", "cumulativeWei": "9", "final": true, "action": "closeWithVoucher", "expectedPayoutWei": "6"}
+      ],
+      "expectedInputTokens": "5", "expectedOutputTokens": "11",
+      "expectedSettledWei": "9", "expectedRefundWei": "11", "expectedCapWei": "20"
+    },
+    {
+      "id": "session-over-cap", "kind": "session",
+      "N": "1", "chunkTokens": "4",
+      "priceInPerMillion": "333333", "priceOutPerMillion": "666667",
+      "depositWei": "8", "maxSpendWei": "10",
+      "jobs": [{"jobId": "job-1", "promptTokens": "4", "grantedContextTokens": "1", "outputChunks": ["4", "4", "3"]}],
+      "vouchers": [
+        {"seq": "1", "inputTokens": "5", "outputTokens": "0", "cumulativeWei": "1", "final": false, "action": "sign", "expectedPayoutWei": "0"},
+        {"seq": "2", "inputTokens": "5", "outputTokens": "4", "cumulativeWei": "4", "final": false, "action": "sign", "expectedPayoutWei": "0"},
+        {"seq": "3", "inputTokens": "5", "outputTokens": "8", "cumulativeWei": "7", "final": false, "action": "redeemVoucher", "expectedPayoutWei": "7"},
+        {"seq": "4", "inputTokens": "5", "outputTokens": "11", "cumulativeWei": "9", "final": false, "action": "sign", "expectedPayoutWei": "0"},
+        {"seq": "5", "inputTokens": "5", "outputTokens": "11", "cumulativeWei": "9", "final": true, "action": "closeWithVoucher", "expectedPayoutWei": "1"}
+      ],
+      "expectedInputTokens": "5", "expectedOutputTokens": "11",
+      "expectedSettledWei": "8", "expectedRefundWei": "0", "expectedCapWei": "8",
+      "expectOverCap": true
+    },
+    {
+      "id": "bands-T1-illegal-M-quote", "kind": "bands", "tier": "T1",
+      "bands": {
+        "S": {"floorIn": "1000000", "ceilingIn": "3000000", "floorOut": "2000000", "ceilingOut": "4000000"},
+        "M": {"floorIn": "4000000", "ceilingIn": "6000000", "floorOut": "5000000", "ceilingOut": "7000000"},
+        "L": {"floorIn": "7000000", "ceilingIn": "9000000", "floorOut": "8000000", "ceilingOut": "10000000"},
+        "X": {"floorIn": "10000000", "ceilingIn": "12000000", "floorOut": "11000000", "ceilingOut": "13000000"}
+      },
+      "quotes": [
+        {"hardwareClass": "S", "priceInPerMillion": "2000000", "priceOutPerMillion": "3000000", "expectedAccepted": true, "expectedReason": "inside-band"},
+        {"hardwareClass": "M", "priceInPerMillion": "2000000", "priceOutPerMillion": "3000000", "expectedAccepted": false, "expectedReason": "outside-band"}
+      ]
+    },
+    {
+      "id": "class-S-on-T4-band", "kind": "bands", "tier": "T4", "maxTier": "T0",
+      "bands": {
+        "S": {"floorIn": "10000000", "ceilingIn": "20000000", "floorOut": "20000000", "ceilingOut": "40000000"},
+        "M": {"floorIn": "21000000", "ceilingIn": "30000000", "floorOut": "41000000", "ceilingOut": "60000000"},
+        "L": {"floorIn": "31000000", "ceilingIn": "40000000", "floorOut": "61000000", "ceilingOut": "80000000"},
+        "X": {"floorIn": "41000000", "ceilingIn": "50000000", "floorOut": "81000000", "ceilingOut": "100000000"}
+      },
+      "quotes": [
+        {"hardwareClass": "S", "priceInPerMillion": "15000000", "priceOutPerMillion": "30000000", "expectedAccepted": true, "expectedReason": "inside-band"},
+        {"hardwareClass": "S", "priceInPerMillion": "20000001", "priceOutPerMillion": "30000000", "expectedAccepted": false, "expectedReason": "outside-band"}
+      ]
+    },
+    {
+      "id": "operator-4090-owned-electricity-only", "kind": "operator", "accounting": "owned",
+      "source": "docs/evidence-register.md §6: 450 W [V], electricity 18.8 cents/kWh [L], 128 tok/s single-stream Q4_K_M 8B (2024) [V]. Pairing these snapshots and every calculation is derived/UNVERIFIED.",
+      "activeWatts": "450", "idleWatts": "0", "dollarsPerKWh": "0.188",
+      "acquisitionDollars": "0", "residualDollars": "0", "amortizationHours": "1",
+      "utilization": "1", "tokensPerActiveSecond": "128", "throughputMode": "single-stream",
+      "expectedActiveKilowatts": "0.45", "expectedElectricityPerActiveHour": "0.0846",
+      "expectedCostPerPaidHour": "0.0846", "expectedTokensPerPaidHour": "460800",
+      "expectedDollarsPerMillion": "0.183593750000"
+    },
+    {
+      "id": "operator-H100-rented-single-stream", "kind": "operator", "accounting": "rented",
+      "source": "docs/evidence-register.md §6: RunPod H100 SXM community 2.69 dollars/h (Oct 2026) [V]; H100 PCIe Q4_K_M 8B 144 tok/s (2024) [V]. Different devices and dates: the pairing is illustrative/UNVERIFIED, not a measured rental yield.",
+      "rentalDollarsPerHour": "2.69", "utilization": "1", "tokensPerActiveSecond": "144", "throughputMode": "single-stream",
+      "expectedCostPerPaidHour": "2.69", "expectedTokensPerPaidHour": "518400",
+      "expectedDollarsPerMillion": "5.189043209877"
+    },
+    {
+      "id": "operator-H100-rented-batched", "kind": "operator", "accounting": "rented",
+      "source": "docs/evidence-register.md §6: RunPod H100 SXM community 2.69 dollars/h (Oct 2026) [V]; H100 TensorRT-LLM FP8 8B batched 27569 tok/s [V]. Pairing different workloads and snapshots is illustrative/UNVERIFIED, not measured rental yield or single-stream latency.",
+      "rentalDollarsPerHour": "2.69", "utilization": "1", "tokensPerActiveSecond": "27569", "throughputMode": "batched",
+      "expectedCostPerPaidHour": "2.69", "expectedTokensPerPaidHour": "99248400",
+      "expectedDollarsPerMillion": "0.027103711496"
+    },
+    {
+      "id": "operator-H100-rented-half-utilization", "kind": "operator", "accounting": "rented",
+      "source": "docs/evidence-register.md §6: rental 2.69 dollars/h [V] and single-stream 144 tok/s [V]; their pairing and utilization of 0.5 are illustrative/UNVERIFIED.",
+      "rentalDollarsPerHour": "2.69", "utilization": "0.5", "tokensPerActiveSecond": "144", "throughputMode": "single-stream",
+      "expectedCostPerPaidHour": "2.69", "expectedTokensPerPaidHour": "259200",
+      "expectedDollarsPerMillion": "10.378086419753"
+    },
+    {
+      "id": "collective-answer-three-answerers", "kind": "collective",
+      "k": "3", "P": "100", "A": "50", "C": "20", "S": "60",
+      "reviewPasses": "2", "combinedCapWei": "5200",
+      "sessions": [
+        {"sessionId": "answer-1", "node": "node-1", "modelId": "fixture-model-a", "role": "answerer", "priceInPerMillion": "1003333", "priceOutPerMillion": "2007777", "inputTokens": "100", "outputTokens": "50", "capWei": "300", "expectedWei": "200"},
+        {"sessionId": "answer-2", "node": "node-2", "modelId": "fixture-model-b", "role": "answerer", "priceInPerMillion": "1505555", "priceOutPerMillion": "2509999", "inputTokens": "100", "outputTokens": "50", "capWei": "400", "expectedWei": "276"},
+        {"sessionId": "answer-3", "node": "node-3", "modelId": "fixture-model-c", "role": "answerer", "priceInPerMillion": "2008888", "priceOutPerMillion": "3011111", "inputTokens": "100", "outputTokens": "50", "capWei": "500", "expectedWei": "351"},
+        {"sessionId": "review-1", "node": "node-4", "modelId": "fixture-model-a", "role": "reviewer", "priceInPerMillion": "1003333", "priceOutPerMillion": "2007777", "inputTokens": "500", "outputTokens": "20", "capWei": "600", "expectedWei": "541"},
+        {"sessionId": "review-2", "node": "node-5", "modelId": "fixture-model-b", "role": "reviewer", "priceInPerMillion": "1505555", "priceOutPerMillion": "2509999", "inputTokens": "500", "outputTokens": "20", "capWei": "900", "expectedWei": "802"},
+        {"sessionId": "review-3", "node": "node-6", "modelId": "fixture-model-c", "role": "reviewer", "priceInPerMillion": "2008888", "priceOutPerMillion": "3011111", "inputTokens": "500", "outputTokens": "20", "capWei": "1200", "expectedWei": "1064"},
+        {"sessionId": "synthesis", "node": "node-7", "modelId": "fixture-model-d", "role": "synthesizer", "priceInPerMillion": "3013333", "priceOutPerMillion": "4017777", "inputTokens": "310", "outputTokens": "60", "capWei": "1300", "expectedWei": "1175"}
+      ],
+      "baseline": {"priceInPerMillion": "1003333", "priceOutPerMillion": "2007777", "inputTokens": "100", "outputTokens": "50", "expectedWei": "200"},
+      "expectedInputTokens": "2110", "expectedOutputTokens": "270",
+      "expectedTotalWei": "4409", "expectedSumCapsWei": "5200", "expectedMultiplier": "22.045",
+      "expectedHappyPathTransactionPairs": "7"
+    },
+    {
+      "id": "session-L2-amortization-illustration", "kind": "amortization",
+      "source": "docs/evidence-register.md §6: Llama-3.1-8B from 0.02/0.04 dollars per 1M input/output [V]; §1 Arbiscan 2026-10-13 ETH-transfer estimate 0.001 dollars [U]. Contract transaction costs are not measured; the per-transaction proxy and every calculation are derived/UNVERIFIED.",
+      "inputTokens": "1000", "outputTokens": "500", "prompts": "100",
+      "dollarsInPerMillion": "0.02", "dollarsOutPerMillion": "0.04", "transactionProxyDollars": "0.001",
+      "expectedInferencePerPromptDollars": "0.00004", "expectedTransactionPairDollars": "0.002",
+      "expectedSinglePromptGasRatio": "50", "expectedSessionInferenceDollars": "0.004",
+      "expectedGasPerPromptDollars": "0.00002"
+    }
+  ]
+}

@@ -1,0 +1,241 @@
+# Threat model — prompts, contexts and escrow
+
+Author: Comuns contributors
+Status: Draft
+Category: Analysis
+Created: 2026-10-12
+
+**Reference:** docs/evidence-register.md, docs/protocol/contracts-and-settlement.md, docs/protocol/off-chain-api.md, docs/node/node-design.md, docs/product/dapp-and-sdk.md, docs/adr/0003-hpke-and-the-executor-plaintext-limit.md
+
+---
+
+## 1. Summary
+
+Comuns is a proposal for open-source decentralized LLM inference settled on Arbitrum One with Rust nodes. Nothing runs yet and no audit of any part of the design has been performed. This document lists what the proposal must protect, who could attack it, what each party can see, and what the v1 design does about each threat. It is deliberately blunt about the central limit: in standard mode the node chosen to execute a request reads the prompt, the granted context and the completion in plaintext, because an executor must see plaintext unless FHE, MPC or a TEE is used [L]. Strict owner-only confidentiality against the chosen remote operator is therefore an unmet requirement; local execution is the only owner-only option.
+
+What v1 does defend is the boundary around that chosen party: nobody else decrypts (two-way HPKE), nobody else can submit work to the user's session (every job envelope is signed by the session's `sessionSigner`), the user knows exactly how many nodes and operators will read the prompt before paying (the disclosure sheet), nothing widens that set silently (fail-closed and re-show rules), and escrowed funds can only be spent through vouchers the user's session signer actually signed. Multi-node execution features multiply readers; the design's answer is not to hide this but to count it, show it, and bind the user's confirmation into every envelope.
+
+## 2. Scope
+
+In scope: the confidentiality and integrity of prompts, completions and contexts; the keys that protect them; the escrow and voucher flow that pays for inference; node bonds; the integrity of the model weights a node claims to run; and availability of the settlement path. Both single-node execution and the multi-node execution features defined in docs/security/privacy-and-contexts.md are covered.
+
+Out of scope: see section 7. Mitigations referenced here are specified in docs/security/privacy-and-contexts.md (cryptography, modes, disclosure sheet), docs/protocol/contracts-and-settlement.md (escrow, vouchers, bonds) and docs/security/inference-verification.md (verifiable mode).
+
+## 3. Assets
+
+| Asset | Why it matters | Where it lives |
+|---|---|---|
+| Prompt | The user's question and any pasted material; often the most sensitive thing in the system | Client; selected node(s) in plaintext during execution |
+| Completion | The answer; may restate the prompt | Node during generation; client |
+| Context | Transcripts, documents, system prompts, versioned and reused across requests | Client; owner-chosen host (ciphertext); granted node (plaintext during a job) |
+| Client identity HPKE secret | Unwraps every context version key `K_v` the client owns; the backup export (identity key plus every key-wrap record, no ciphertext) is what restores the keys on a new device | Client, encrypted at rest; encrypted backup file |
+| Client per-job HPKE secret | Decrypts the completion of one job | Client, in memory for the job |
+| Session commit key `commitKey` | Random 32-byte key per session; keys the `outputCommitment` of every voucher of the session; opening it discloses the session's output | Client and node, until the session is settled; sent once, sealed in the session's first job envelope |
+| Context version keys `K_v` | One per context version; open exactly that version | Client; wrapped to the identity key beside the ciphertext and in the backup export; wrapped to granted nodes |
+| Context ciphertext | The only copy of a version's content; neither the registry (hashes only) nor the backup (keys only) can recreate it | Client device; owner-chosen host or second device, if any |
+| Node HPKE secret(s) | Decrypt every request sealed to the node; a keyring holds every key of an unsettled session | Operator machine, encrypted at rest; inside the TEE in attested mode |
+| Ethereum keys (user, operator) | Authorize sessions, grants, registry entries, bond withdrawals | Wallets |
+| Session signer key | Signs every job envelope on the session and every voucher up to the session cap | Client application |
+| Escrowed ETH | The user's deposit in `SessionEscrow` | Chain |
+| Node bond | The operator's stake in `NodeRegistry` | Chain |
+| Weight integrity | Whether the node runs the model it advertises | Node |
+| Availability | Whether users can get answers and nodes can get paid | Nodes, sequencer, RPC providers |
+
+## 4. Actors
+
+| Actor | Capability | Trust in v1 |
+|---|---|---|
+| User | Owns prompt, contexts, escrow; chooses nodes, modes and features | Trusted with own data; may run a compromised client |
+| Chosen operator | Runs the selected node; reads plaintext in standard mode | Trusted by the user's choice; paid; bonded |
+| Other operators | Run unselected nodes; observe the chain and possibly the network | Untrusted; see ciphertext only |
+| Sequencer | Orders Arbitrum One transactions; single sequencer with roughly one day to force inclusion [V] | Untrusted for confidentiality; semi-trusted for liveness |
+| RPC provider | Serves chain reads and relays transactions | Untrusted; user-chosen |
+| Network observer | Sees traffic sizes and timing between client and node | Untrusted |
+| Context host | Stores context ciphertext | Untrusted for content; trusted for availability only if the owner chooses so |
+| Verifier (verifiable mode) | User-chosen second node that receives the full prompt and re-executes it under a demonstrated deterministic profile | Trusted as a second plaintext reader |
+| Planner or assessor node (any feature, including task decomposition) | Receives the full prompt to decompose or assess it | Trusted as a plaintext reader and counted as a full-prompt reader; its plan is data |
+| Sub-task node or sub-task reviewer (task decomposition) | Receives sub-task text that may quote the prompt | Counted as a full-prompt reader unless the client verified its payload contains no prompt text |
+| Peer answerer (collective answer) | Receives the full prompt; answers independently | Trusted as a plaintext reader |
+| Reviewer or synthesizer (collective answer, parallel planning) | Receives the prompt plus all anonymized answers or plans, and for the synthesizer all critiques | Trusted as a plaintext reader; may bias the synthesis |
+| Merge node (task decomposition) | Receives all sub-task outputs it merges; assumed to quote the prompt | Counted as a full-prompt reader |
+| Optional orchestrator node | Receives the full prompt whenever it plans, merges or synthesizes, and the plan when the user delegates planning | Trusted as a plaintext reader; holds no session signer in v1 |
+| Session injector | Any party that can reach a node's endpoint and knows a public `sessionId` | Untrusted; stopped by the `sessionSigner` envelope signature |
+| Shard holder (model sharding, experimental) | Receives activations of a layer range | Treated as a full-prompt reader (evidence register §10) |
+| Draft node (cross-node speculation, experimental) | Receives the prompt; produces draft tokens | Treated as a full-prompt reader |
+| Target node (cross-node speculation, experimental) | Receives the prompt plus draft tokens | Trusted as a plaintext reader; can substitute drafts undetectably |
+| Physical attacker | Has hands on a node machine | Defeats attested mode (TEE.fail) [L] |
+| Malicious weights | A model that leaks or misbehaves by construction | Not detectable by the protocol |
+| Compromised client | Wallet extension, SDK or dapp under attacker control | Defeats every client-side guarantee |
+
+## 5. Visibility table
+
+Each cell states what the party sees. "Ciphertext" means the party may observe an HPKE envelope or a TLS stream but cannot decrypt it. "Public" means readable from the chain by anyone. The column "other selected nodes" covers every node named on the disclosure sheet besides the chosen executor — planner, peer answerers, reviewers, synthesizer, merge node, orchestrator node, shard holders, draft and target node. Each of them sees exactly what the sheet's `receives` array lists for it and is treated as a plaintext reader of what it receives.¹
+
+| Data | Chain | Chosen operator | Other operators¹ | Other selected nodes (named on the disclosure sheet) | Context host | Network observer |
+|---|---|---|---|---|---|---|
+| Prompt body | Never | Plaintext (standard); plaintext inside the TEE (attested) | Ciphertext | Plaintext, for those whose sheet entry lists "full prompt" (assessor or planner in any feature, peer answerer, reviewer, synthesizer, plan reviewer, plan synthesizer, merge node, orchestrator node, verifier, draft node, target node; shard holder by inversion; a sub-task node or sub-task reviewer whose payload contains prompt text, which is assumed unless the client verified otherwise). The list is a floor: the sheet counts whoever the actual payloads reach | Never | Ciphertext, sizes, timing |
+| Completion body | `outputCommitment` only — keyed under a secret known to client and node, so it reveals nothing, not even a one-word answer | Plaintext | Ciphertext | Plaintext for the node that produced it; answers of peers for reviewers and synthesizer | Never | Ciphertext, sizes, timing |
+| Context body | `contentHash` only (keccak256 of the ciphertext blob), head in state and history in `ContextSet` events | Plaintext for granted versions only; each version has its own key | Ciphertext | Plaintext for granted versions, if the sheet lists context versions for that node | Ciphertext and key-wrap records it cannot open | Ciphertext, sizes |
+| Sub-task text | Never | Not applicable (single-node) | Ciphertext | Plaintext for the sub-task node, the merge node (via outputs that may quote it) and the optional reviewer of that sub-task | Never | Ciphertext, sizes |
+| The plan | Never | Not applicable | Ciphertext | Plaintext for the planner that wrote it, the orchestrator node if delegated, and the client; sub-task nodes see only their task | Never | Ciphertext |
+| All answers and critiques | Never | Not applicable | Ciphertext | Plaintext for reviewers (answers) and the synthesizer (answers and critiques) | Never | Ciphertext, sizes |
+| Activations (layers a–b) | Never | Not applicable | Never (not on the wire to them) | Plaintext for each shard holder of its own layer range, received from and returned to the client over mutual TLS 1.3 only, no HPKE, never holder to holder; invertible to the prompt (evidence register §10) | Never | TLS stream, sizes |
+| Draft tokens | Never | Not applicable | Ciphertext | Plaintext for the draft node (produces them) and the target node (verifies them) | Never | Ciphertext, sizes |
+| Token counts | Public (cumulative, in redeemed vouchers) | Known | Public | Known for own session | Never | Inferable from sizes |
+| Model id | Public (per session) | Known | Public | Public | Never | Never directly |
+| Payer | Public | Known | Public | Public | Never | IP address of client, unless the client uses a relay |
+| Node | Public | Known | Public | Public | Never | Node endpoint |
+| Prices | Public | Known | Public | Public | Never | Never directly |
+
+¹ Operators whose nodes were not selected for a request never receive an envelope for it; if they observe the wire they see only ciphertext and the public metadata of docs/security/privacy-and-contexts.md section 9.
+
+## 6. Threats and v1 response
+
+Each entry gives the threat, then the v1 response. Where the response is "none" the document says so.
+
+**T1 — Ciphertext replay.** An attacker replays a captured request envelope to the same or another node, or replays a completion frame into another job, hoping to make a node re-execute a prompt or a client accept stale output. *Response:* the AAD binds `chainId`, the `SessionEscrow` address, `sessionId`, `jobId`, `requestId`, sheet version, `planId`, `taskId`, `role`, `contextId`, `contextVersion`, direction and frame sequence number, with an `endOfJob` last-frame flag; replays and truncations fail AEAD verification or sequence checks and are rejected. Replay into another session is additionally stopped by the envelope signature of T25.
+
+**T2 — Model substitution.** The node runs a cheaper model than the `modelId` it was paid for. *Response:* invisible on-chain in standard mode. Mitigated by operator reputation and bonds, and by opt-in verifiable mode, in which a user-chosen second node re-executes the request under a demonstrated deterministic profile and the outputs are compared, at the cost of a second plaintext reader. Draft substitution in cross-node speculation is a special case, see T21.
+
+**T3 — Dishonest token counts.** The node reports more tokens than it produced or consumed. *Response:* input and output are bounded separately. Input: before prefill the node sends a node-signed input receipt `(sessionId, jobId, jobInputTokens, cumulativeInputTokensAfter)`; the client checks `jobInputTokens` against its own tokenization of this job's prompt and granted context with the tokenizer pinned in the model manifest, checks `cumulativeInputTokensAfter = lastInputTokens + jobInputTokens`, and signs the input voucher — which carries the cumulative total — only if both hold, so an inflated input count, for this job or smuggled into the running total, is never paid. Output: the client checks each chunk's node-signed receipt (session-cumulative counts and the chunk hash) against the chunk it decrypted, signs cumulative vouchers one chunk at a time, and refuses to sign beyond what it received; the node can over-claim at most the chunk the client declines to sign. The residual that remains, stated plainly: the node can redeem the input voucher and never run the prompt; the loss is bounded by that prompt's input fee, the remedy is to stop signing and record a reputation event (R13). Automatic signing checks counts, not quality (T8).
+
+**T4 — Abandoned session.** The node or the client disappears mid-session. *Response:* the node redeems only vouchers the session signer actually signed; every payment and refund is credited to an internal balance and collected with `withdraw()`, so a wallet that cannot receive ETH can never lock funds. If the client disappears, its last voucher is almost always non-final, and `closeWithVoucher` rejects a voucher whose `final` is false, so the node never relies on it: the node redeems its highest non-final voucher with `redeemVoucher` while that is legal (`open`, or `closing` before `closeDeadline`), then calls `closeSession`; `finalize` after `closeDeadline` credits the remainder `depositWei − settledWei` to the user, and `finalize` itself pays the node nothing, which is why the redemption must come first. The node is owed nothing beyond its last voucher. If the node disappears, nothing refunds automatically: the user calls `closeSession` and then `finalize` after `closeDeadline`, and the unspent deposit is credited for withdrawal. A node that disappears is still paid for the work the client acknowledged, as long as it redeems while the session is `open` or `closing` before `closeDeadline`. Either the user or the node may call `closeSession` at any time; nothing closes a session automatically, so a session both parties abandon stays `open` with its deposit until one of them does (T30).
+
+**T5 — Sequencer outage.** The single Arbitrum sequencer stops including transactions; force inclusion takes roughly one day [V]. *Response:* vouchers stay redeemable while the session is `open`, or `closing` before `closeDeadline`; `CLOSE_WINDOW` must exceed an expected outage plus about one day of force inclusion; docs/protocol/contracts-and-settlement.md owns the value. Nodes should redeem promptly, since `redeemVoucher` is allowed at any time while legal. Residual risk, with no guarantee offered: an outage that starts shortly before `closeDeadline` can still cost a node its unredeemed vouchers (R8).
+
+**T6 — Stolen session signer key.** Malware on the client obtains the `sessionSigner` key. *Response:* the key can sign job envelopes and vouchers up to the effective cap `min(depositWei, maxSpendWei)` for sessions it is registered to, until the session is settled. `closeSession` does not stop it: vouchers stay redeemable until `closeDeadline`, so a thief can hand the node a voucher for the whole cap during the close window. There is no signer rotation or revocation in v1 (open question 2). The mitigation is small per-session caps, which is why caps are shown on the disclosure sheet and summed as `totalCapWei`.
+
+**T7 — Hostile RPC provider.** The RPC lies about chain state: a wrong node key, a wrong registry entry, a wrong context hash. *Response:* the RPC is user-chosen, and the client may use several and compare. A hostile RPC cannot read content, but it can direct the client to seal to an attacker-registered key, which is why the registration is signed by the operator's Ethereum account with proof of possession and why clients should pin node keys across sessions.
+
+**T8 — Automatic voucher signing pays for garbage.** The client signs vouchers as frames arrive; a node that streams nonsense gets paid. *Response:* none in v1 beyond the cap and reputation. Automatic signing checks token counts, not answer quality. A user who wants quality assurance opts into verifiable mode.
+
+**T9 — Operator legal compulsion.** An operator is ordered to hand over prompts or to log them. *Response:* none that the protocol can offer in standard mode; the operator reads plaintext. The no-logging policy is a policy, not a protection. Attested mode raises the bar to a build-measured node but does not defeat an operator who has physical access (T10). Users choose operators by jurisdiction at their own judgement.
+
+**T10 — TEE physical attack.** An operator or intruder with physical access uses a DDR5 interposer to extract TDX or SEV-SNP keys including attestation keys, and can undermine GPU confidential-computing attestation (TEE.fail) [L]. *Response:* none; vendors treat physical attacks as out of scope [L]. Attested mode is documented as protection against a remote or software-level compromise of the operator, never against the operator's own physical access.
+
+**T11 — Benchmark proxying.** A node answers verification or benchmark requests by forwarding them to a stronger model or a different machine, then runs something cheaper for real traffic. *Response:* verifiable mode on real requests, chosen by the user without notice to the node, is the only check; reputation systems should weigh verified requests, not self-reported benchmarks.
+
+**T12 — Key loss.** The user loses the client identity HPKE key or its backup, or the only device holding a context's ciphertext; the operator loses the node key. *Response:* every context version key `K_v` is wrapped to the identity key, and the backup export contains the identity key and every key-wrap record, so restoring it on a new device restores the keys of every version whose ciphertext can still be fetched from a context host or a second device. The backup holds no ciphertext: a context stored only on a lost device is gone even with the backup, and the recommendation is at least one host or a second device for ciphertext. Losing both the key and the export loses every context, permanently. A node key loss means a registry update; sessions sealed to the old key cannot be served, and nothing refunds them automatically. The node first redeems its highest non-final voucher with `redeemVoucher` while that is legal, then either party calls `closeSession`, and `finalize` after `closeDeadline` credits the remainder to the user for `withdraw()`; `closeWithVoucher` is used only if the client had already signed a voucher with `final` set, never otherwise.
+
+**T13 — Prompts pasted into public issues.** Users or operators paste prompts, contexts or decrypted frames into issue trackers, logs or chat when debugging. *Response:* client and node redact content from error output by default; the contributing guidelines must forbid including prompt material in issues. This is a process control, not a technical one.
+
+**T14 — Multi-node execution features multiply readers.** `collective_answer`, `task_decomposition`, `parallel_planning`, `model_sharding` and `cross_node_speculation` each add nodes that read the prompt or parts of it. *Response:* bounded by the disclosure sheet and the user's signature. Every non-empty feature set is opt-in per request; the sheet lists every recipient with its roles and `receives` array; `readersOfFullPrompt` counts distinct nodes and distinct operators, is derived from the actual payloads, and treats the named reader list as a floor, never a ceiling — any remote assessor or planner in any feature, and any sub-task executor or reviewer whose payload contains prompt text (assumed unless the client verified otherwise), is counted; `requestId` and sheet version are bound into every envelope's AAD; a pool that cannot fill the confirmed set fails closed.
+
+**T15 — Disclosure sheet skipped or under-counted.** A client (buggy, forked or malicious) omits the sheet, shows a stale one, or counts fewer readers than it actually sends to. *Response:* the sheet is a client-side control, so a compromised client defeats it. Mitigations: open-source reference clients, a conformance test that replays the client's envelope log against the sheet it displayed, and the AAD binding, which makes an under-counted sheet detectable after the fact by anyone holding the log. No on-chain enforcement exists, because `executionFeatures` is never stored on-chain.
+
+**T16 — Planner-induced over-disclosure.** A planner node writes a plan that routes more of the prompt into sub-tasks than needed, for example by quoting it wholesale into every sub-task, so that nodes meant to see a fragment see everything. *Response:* the plan returns sealed to the client; the sheet is re-shown before execution sessions when a planner ran first, with the `receives` array of every sub-task node reflecting what the plan actually sends; the remote planner or assessor is always counted as a full-prompt reader, a merge node is always counted as one (its inputs are assumed to quote the prompt), and a sub-task node or sub-task reviewer is counted as one unless the client has verified that the payload it will seal contains no prompt text — the default assumption is that it does. The user can reject the plan. The client must compute `counts` and `readersOfFullPrompt` from the plan's actual payloads, not from the planner's claims; the reader list in docs/security/privacy-and-contexts.md section 8 is a minimum, never a ceiling.
+
+**T17 — Prompt injection through intermediate results.** A sub-task output or a peer answer contains text that tries to instruct the merge node, the synthesizer, the orchestrator node or the client — to change recipients, raise caps, open sessions or exfiltrate the prompt. *Response:* intermediate text is data, never authority over recipients or spending. Recipients and caps come only from the confirmed sheet; the client re-seals only approved parts; no node holds a session signer except the client; the orchestrator node holds none in v1. A node that acts on injected instructions can at most produce a bad answer within its own cap.
+
+**T18 — Colluding peer or reviewer biases the synthesis.** In `collective_answer` an answerer and a reviewer, or the synthesizer itself, collude to suppress a correct answer. *Response:* the synthesizer must list the splits among answers and critiques rather than silently choosing, and the client shows each original answer to the user alongside the synthesis. Anonymization of answers before review reduces, but cannot remove, collusion by operators who recognize each other's style.
+
+**T19 — Stale consent.** Between the user's confirmation and transmission, the node, model, data scope or cap of some recipient changes — a node rotates its key, a pool reassigns, a plan grows. *Response:* any such change invalidates the sheet before transmission; the client must re-show and obtain a new confirmation with a new sheet version; a funded session never implies consent to a new request, and a request that reuses open sessions still gets its own sheet and confirmation. Envelopes carry the sheet version in the AAD so that no envelope can be attributed to an outdated confirmation.
+
+**T20 — Shard holders invert prompts from activations.** In `model_sharding` every shard holder receives activations. The evidence register §10 records that text embeddings can be inverted to recover 92 % of 32-token inputs exactly [V], that a malicious participant in split inference recovers the prompt from received activations at 88.4 % token accuracy on a 65B model [V], and that a 4,112-token medical prompt was nearly fully inverted (86.88 token F1) from a middle layer, with four practical defenses failing [V]. *Response:* sharding never offers more privacy than standard mode; every shard holder is treated and counted as a full-prompt reader on the disclosure sheet; activations travel between the client and each sheet-listed holder over mutual TLS 1.3 only, never holder to holder, and the sheet says so; the feature stays an experimental Phase 3 spike. v1 nodes do not use llama.cpp's RPC backend, whose documentation calls it a proof of concept, fragile and insecure, and says never to run it on an open network (evidence register §10 [V]).
+
+**T21 — Cross-node speculative decoding.** In `cross_node_speculation` both the draft node (which receives the prompt to draft) and the target node (which receives the prompt plus the drafts to verify them) read the full prompt, since both drafting and verifying require it. Draft substitution — the target accepting drafts from a different model than advertised — is undetectable by TOPLOC (evidence register §5 [V]). *Response:* both nodes are counted as full-prompt readers; the feature is incompatible with verifiable mode, because verifiable mode is re-execution under a demonstrated deterministic profile that needs byte-identical output, which speculative engines do not guarantee (mistral.rs states that token-for-token equivalence is not guaranteed, evidence register §9 [V]), and TOPLOC, a candidate checker, cannot detect speculative decoding either; it stays an experimental Phase 3 spike. "Speculation at a Distance" states that at WAN round-trip times the cloud round trip remains too large for pipelined distributed speculative decoding to beat co-located speculative decoding (evidence register §9, the quote is [V], the result is not independently replicated [U]), so no WAN speed-up is promised.
+
+**T22 — Orchestrator node sees the prompt when it plans, merges or synthesizes.** A user who delegates planning to an orchestrator node gives it the full prompt and the resulting plan; an orchestrator node that merges or synthesizes receives prompt text through the material it combines. *Response:* the orchestrator node is listed on the sheet with role `orchestrator node` and a `receives` array naming the full prompt and, when planning is delegated, the plan, and it is counted as a full-prompt reader in every one of those roles; it is paid through an ordinary session; its only authority is that session — it holds no session signer, cannot open sessions for the user and cannot add recipients; the plan it produces returns sealed to the client and is subject to T16 and T19.
+
+**T23 — Context grant misuse.** A node granted a context for versions a–b tries to read other versions, keeps the keys past expiry, or passes them to another node. *Response:* every context version has its own key `K_v`, and a grant wraps exactly the keys of the versions it names, so a node granted versions 5–6 holds nothing that opens version 4 or version 7, whether it obtains their ciphertext from the host or anywhere else; the grant names the range, an `expiresAt` in unix seconds and the hash of the node key it was wrapped to; later versions are unreadable to a revoked node because their keys were never wrapped to it; a node that already decrypted the granted versions cannot be made to forget them, and the design says so. Passing a key to another node is a policy violation that the protocol cannot detect in standard mode.
+
+**T24 — Wrong-key sealing through a registry race.** A client seals to a node key that was rotated between its read and the node's receipt. *Response:* the node keeps a keyring of every HPKE key used by any session that is not yet settled, however many rotations have happened since, and deletes a key only after every session that used it is settled, so a second rotation never strands a session opened under the first key; the AAD includes the session, so a node cannot serve an envelope it cannot decrypt and the client retries after refreshing the registry.
+
+**T25 — Job injection into an open session.** HPKE base mode does not authenticate the sender, and `sessionId`, `chainId` and the escrow address are public from `SessionOpened`. A third party opens TLS to the node, seals an envelope to its registered key under the victim's `sessionId` with its own `clientJobPublicKey`, and would get the prompt executed and returned to it while the victim's own envelope for that `jobId` fails the sequence check. *Response:* every job envelope carries a signature by the session's `sessionSigner` over `(chainId, escrow, sessionId, jobId, requestId, sheetVersion, keccak256(enc ‖ ciphertext))`; the node rejects any envelope whose signature does not verify against the `sessionSigner` recorded on-chain for that session, before decrypting or scheduling it. HPKE stays base mode; the signature is what stops third parties injecting jobs into someone else's session.
+
+**T26 — Low-entropy output recovered from the chain.** An observer hashes the possible answers of a yes/no or classification prompt and compares them with what the voucher commits to on-chain. *Response:* `outputCommitment = keccak256(commitKey ‖ sessionId ‖ seq ‖ transcriptHash)`, where `commitKey` is a random 32-byte key the client generates for the session and sends sealed inside the session's first job envelope, kept by client and node until the session is settled and known to nobody else, and `transcriptHash = keccak256(prev ‖ chunkHash)` is chained from zero over every output chunk of every job in the session; without `commitKey` no candidate answer can be tested. Because the key is per session rather than per job, every voucher of a multi-job session commits under the same key to one chain. The commitment is not checked on-chain, and opening `commitKey` to anyone discloses the session's whole output to them; it is a binding record, never a proof without disclosure.
+
+**T27 — Price change between confirmation and inclusion.** The operator calls `updateNode` with a changed in-band price — one wei is enough — after the user confirmed the sheet and before `openSession` is included, hoping the session copies the new price, or hoping to force the client onto an abort path that locks the deposit for `CLOSE_WINDOW` on every attempt. *Response:* `openSession` takes `expectedPriceInPerMillion` and `expectedPriceOutPerMillion`, the confirmed sheet's prices, and reverts if the node's current offer for that model differs, so a changed offer yields a reverted transaction and no session: no deposit is ever locked by an offer change, and the operator can at most cost the user the gas of a revert. As defence in depth, after inclusion the client still reads the prices copied into the session and, if they differ from the confirmed sheet, signs nothing and calls `closeSession`, recovering the deposit through `finalize` after `closeDeadline`. A price change, like a changed node, model, data scope or cap, invalidates the sheet.
+
+**T28 — Context version race or head-only registry.** Two devices of one owner publish the next version at once, or a node is asked to verify a version that is no longer the registry head. *Response:* `setContext` accepts one next version; the losing transaction reverts, the losing client keeps its local edit, rebases on the new head and publishes the next version, and nothing is silently merged or dropped. The registry keeps the head in state and the full history in `ContextSet` events; a node verifies an older granted version against its event, so a grant that is not the head still verifies. `contentHash` is keccak256 of the complete stored blob, one definition for everyone.
+
+**T29 — Manifest squatting.** Anyone registers a model manifest, or marks a model as commercially hostable, to capture a name or mislead operators. *Response:* `registerModel` and `updateModel` are callable only by the governance timelock through CIPs in v1; with nobody seated there is no mainnet registration, and Sepolia models come from a testnet-only CIP.
+
+**T30 — Open deposit with a lost wallet or an absent counterparty.** A session stays `open` because neither party calls `closeSession`: the user's wallet is lost, or the node is gone and the user never returns. *Response:* either the user or the node may call `closeSession` at any time, and nothing closes a session automatically; the close window therefore starts only when one of them acts, and until then the deposit sits in the escrow at no one's disposal. A node that wants its earnings follows T4: redeem the highest non-final voucher, call `closeSession`, and after `closeDeadline` anyone may call `finalize`, which credits the remainder to the user's address. If the user's wallet is lost, that credited balance is unrecoverable — pull payments go to the user's address and `withdraw()` pays only its caller — and the design says so rather than pretending otherwise. An anyone-can-close idle timeout is an open question (section 9), not part of v1.
+
+## 7. Out of scope
+
+- Jailbreaks and prompt attacks on the model's own behaviour.
+- Content moderation and the legality of prompts or outputs.
+- Training-data leakage by the model itself (memorized text surfacing in completions).
+- Wallet anonymity and payer unlinkability; payer addresses are public (docs/security/privacy-and-contexts.md section 9).
+- Denial of service against individual nodes, beyond noting that the user can choose another node.
+- Correctness of the Arbitrum One rollup and its fraud-proof system.
+
+## 8. Risks
+
+### R1 — Executor reads plaintext **[RISK] · High**
+
+Inherent in v1 [L]. Owner-only confidentiality against the chosen remote operator is unmet; only local execution provides it.
+
+### R2 — Activation inversion in model sharding **[RISK] · High**
+
+Prompts are recoverable from activations at 88.4 % token accuracy and 86.88 token F1 in the cited settings (evidence register §10 [V]). Sharding is counted as full disclosure to every shard holder and stays experimental.
+
+### R3 — Disclosure sheet skipped or under-counted **[RISK] · High**
+
+The sheet is the only thing standing between the user and an unbounded reader set, and it is enforced client-side. A buggy or hostile client removes the control entirely. Mitigation is open source, conformance testing and AAD binding for after-the-fact detection.
+
+### R4 — No audit **[RISK] · High**
+
+No audit has been performed on this design, on any implementation, or (per its own documentation) on the `hpke` crate the implementation would use [V]. Everything in section 6 is a design intention.
+
+### R5 — TEE physical attack **[RISK] · High**
+
+TEE.fail [L]. Attested mode cannot be sold as protection against the operator.
+
+### R6 — Stolen session signer with no rotation **[RISK] · Medium**
+
+Loss bounded by `min(depositWei, maxSpendWei)` per session, but `closeSession` does not stop the thief: vouchers stay redeemable until `closeDeadline`. No rotation or revocation in v1; small caps are the only mitigation.
+
+### R7 — Orchestrator node sees the prompt when planning is delegated **[RISK] · Medium**
+
+Delegated planning adds a full-prompt reader with influence over the plan, and an orchestrator node that merges or synthesizes is a full-prompt reader too. Its authority is limited to its own session, and the plan is shown and re-confirmed, but the reader is real.
+
+### R8 — Sequencer outage versus `closeDeadline` **[RISK] · Medium**
+
+A `CLOSE_WINDOW` shorter than outage plus roughly one day of force inclusion [V] lets honest nodes go unpaid, and even a sufficient one cannot save a node whose outage begins shortly before `closeDeadline`; prompt redemption is the node's own defence, and no guarantee is offered.
+
+### R9 — Prompt injection through intermediate results **[RISK] · Medium**
+
+Bounded to bad answers within a cap because intermediate text has no authority, but a node that follows injected instructions still wastes the user's deposit for that session.
+
+### R10 — Metadata correlation of multi-node requests **[RISK] · Medium**
+
+Several sessions by one payer at one time reveal the request's shape. No v1 mitigation.
+
+### R11 — Model substitution in standard mode **[RISK] · Medium**
+
+Invisible on-chain; only reputation, bonds and opt-in verifiable mode respond.
+
+### R12 — Grant revocation does not reach decrypted data **[RISK] · Low**
+
+Understood and documented; short `expiresAt` and narrow ranges limit exposure, and per-version keys make a narrow range cryptographically binding rather than a policy.
+
+### R13 — Input voucher paid for a prompt that is never run **[RISK] · Low**
+
+The node redeems the input voucher and produces nothing. Loss bounded by one prompt's input fee; the remedy is to stop signing and record a reputation event. No refund exists in v1.
+
+### R14 — Price change between confirmation and inclusion **[RISK] · Low**
+
+Bounded by `openSession` reverting when the current offer differs from the expected prices it was given, and, as defence in depth, by the client's check of the copied prices after inclusion and its refusal to sign; the user pays the gas of a reverted `openSession`, and an operator who changes prices on every attempt can keep a user from opening a session with that node, but never lock a deposit.
+
+### R15 — Open deposit nobody closes, and a lost user wallet **[RISK] · Medium**
+
+Nothing closes a session automatically; a deposit whose user and node both go silent stays `open` until one of them calls `closeSession`. When the user's wallet is lost, the balance credited by `finalize` or `closeWithVoucher` is unrecoverable, because pull payments go to the user's address. Mitigation in v1: small per-session caps and prompt closing; an anyone-can-close idle timeout is an open question.
+
+### R16 — Context ciphertext kept on one device **[RISK] · Medium**
+
+The backup export restores keys, not ciphertext; a context stored only on a lost device is lost with it, backup or not. Mitigation: at least one context host or a second device holding the blobs, recommended by the client at context creation.
+
+## 9. Open questions
+
+1. **Minimum `CLOSE_WINDOW`.** What outage duration the minimum should assume beyond the roughly one-day force-inclusion delay [V], and whether it should be a protocol constant or a per-session choice with a floor.
+2. **Session signer rotation or revocation.** Whether a later CIP should let the user replace or revoke the `sessionSigner` without settling the session, since `closeSession` does not stop a stolen signer, and what that does to voucher monotonicity and to the envelope signature check of T25.
+3. **Sheet conformance enforcement.** Whether any part of the disclosure sheet can be made verifiable by a third party without storing `executionFeatures` on-chain — for example a commitment to the sheet hash in `openSession`.
+4. **Collusion resistance in collective answer.** Whether operator diversity (distinct operators, not just distinct nodes) should be a hard requirement for reviewers and the synthesizer rather than a displayed count.
+5. **Attested-mode quote freshness.** How often a client must re-verify a quote for a long-lived session, and whether the node must re-attest after a key rotation.
+6. **Experimental spikes.** Whether `model_sharding` and `cross_node_speculation` should be removed from the feature set entirely until the privacy and performance evidence (evidence register §10, §9, §5) changes, rather than carried as spikes.
+7. **Reporting channel.** Which disclosure process applies to a vulnerability found in a node or client before any audit exists; SECURITY.md owns the answer.
+8. **Anyone-can-close idle timeout.** Whether a later CIP should let any address call `closeSession` on a session idle for longer than some bound, so that a deposit abandoned by both parties (T30) eventually settles, and what that does to a node that is merely slow to redeem. Not in v1.
+9. **Lost first envelope.** How the node and client recover if the session's first job envelope, which carries `commitKey`, is lost before the node acknowledges it, without opening a new session; docs/security/privacy-and-contexts.md open question 9.
