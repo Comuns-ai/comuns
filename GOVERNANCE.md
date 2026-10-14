@@ -14,7 +14,7 @@ Decisions are Comuns Improvement Proposals (CIPs). A CIP moves Draft → Review 
 
 This file is Draft: no CIP has adopted it, and it is not itself Final. The rules in this file are still the binding proposal for how participants write, review, and accept later documents, including the bootstrap CIP. A later CIP may replace this file. Participants do not grant themselves private exceptions while it is Draft.
 
-External facts are cited as the evidence register section that actually contains the fact (docs/evidence-register.md, §1–§13), with the tag recorded there; the governance and licensing facts in this file live in §8. [V] is a verified external fact in that register. [L] is a legal characterization. [V/L] is both. This document is not legal advice. A factual claim about the outside world that is not in the register is marked UNVERIFIED.
+External facts are cited as the evidence register section that actually contains the fact (docs/evidence-register.md, §1–§16, with How to cite at §17), with the tag recorded there; the governance and licensing facts in this file live in §8. [V] is a verified external fact in that register. [L] is a legal characterization. [V/L] is both. This document is not legal advice. A factual claim about the outside world that is not in the register is marked UNVERIFIED.
 
 ### Licensing
 
@@ -52,7 +52,7 @@ Anyone may file a CIP regardless of hardware class, stake or holdings. A class S
 
 ### 2.5 Honest privacy limits
 
-This governance file does not promise that LLM inference hides a prompt from the operator who processes it. Privacy limits belong in docs/security/privacy-and-contexts.md. Until that document is accepted, participants speak about privacy as an open design problem. An emergency action cannot be used to expose prompts.
+This governance file does not promise that LLM inference hides a prompt from the operator who processes it. This file also does not promise that the network hides what a prompt's content reveals about its author. Identity unlinkability and content privacy are stated in docs/security/privacy-and-contexts.md. Until that document is accepted, participants speak about privacy as an open design problem. An emergency action cannot be used to expose prompts.
 
 ### 2.6 The reference client is not the protocol
 

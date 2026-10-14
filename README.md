@@ -1,8 +1,8 @@
 # Comuns
 
-This repository is a draft proposal for a community to build an open-source, decentralized LLM-inference network; nothing here runs yet.
+This repository is a draft proposal for a community to build an open-source, decentralized LLM-inference network; nothing here runs yet. Inference runs only on network nodes, never on the user’s machine, and contexts are not labelled with the wallet on-chain.
 
-The proposal works like this: Arbitrum One settles sessions in ETH. Rust nodes run models off-chain; llama.cpp kernels are C/C++. A wallet keeps many encrypted contexts and hands one to another node only by re-wrapping the keys of the granted versions, each of which has its own key. The node that runs a prompt can read it; other nodes and the chain see only ciphertext and metadata unless you explicitly grant another node access. The user picks a model and then a node from the pool of nodes currently offering it. Any node that can load a registered model may offer it, subject to its hosting permission and price band; higher hardware classes charge more for the same model so small tasks stay on small hardware. By default one node runs a request. Optional multi-node features — several nodes answering and cross-checking (a collective answer, which shows its disagreements and is not verification), a plan split into parallel sub-tasks on different pools, parallel planning, and experimental sharding and cross-node speculative decoding — are opt-in per request. Before you sign, the client shows which nodes will read which part, including nodes that can reconstruct prompt text from their inputs, and counts distinct nodes and operators. The two experimental features are Phase 3 testnet-only work; the reference client refuses them under mainnet parameters, shard holders receive no sessions or payments, and no WAN speed-up is promised. The orchestrator is open-source code in your app; an optional orchestrator node is paid as an ordinary session and is never required. Development is by CIP, Apache-2.0 and the DCO, with no protocol token and no slashing in v1. The scope is inference only.
+The proposal works like this: Arbitrum One settles sessions in ETH. Rust nodes run models off-chain; llama.cpp kernels are C/C++. A wallet keeps many encrypted contexts in a local vault; independent context keys sign grants and heads, and sharing re-wraps only the granted versions’ keys. Relay transport and anonymous credits separate requests from the deposit wallet. In standard mode the chosen node can read the prompt, granted context and answer but should not learn who asked. In attested mode the node should not be able to read your prompt either, barring a physical attack ([evidence register §14](docs/evidence-register.md), [V]/[L]). The user picks a model and then a node from the pool of nodes currently offering it. Any node that can load a registered model may offer it, subject to its hosting permission and price band; higher hardware classes charge more for the same model so small tasks stay on small hardware. By default one node runs a request. Optional multi-node features — several nodes answering and cross-checking (a collective answer, which shows its disagreements and is not verification), a plan split into parallel sub-tasks on different pools, parallel planning, and experimental sharding and cross-node speculative decoding — are opt-in per request. Before you sign, the client shows which nodes will read which part, including nodes that can reconstruct prompt text from their inputs, and counts full-prompt recipients separately from operator-readable recipients. The two experimental features are Phase 3 testnet-only work; the reference client refuses them under mainnet parameters, shard holders receive no sessions or payments, and no WAN speed-up is promised. The orchestrator is open-source control logic in your app and performs no model computation; an optional orchestrator node is paid through a credit session and is never required. Development is by CIP, Apache-2.0 and the DCO, with no protocol token and no slashing in v1. The scope is inference only.
 
 comuns.ai
 
@@ -10,7 +10,7 @@ Draft · ADRs proposed · maintainers not seated
 
 ## Why
 
-- Privacy from third parties through encrypted requests and contexts, with the chosen prompt readers disclosed. An executing operator can retain plaintext; encryption does not prevent that.
+- Anonymous by default: nodes and chain observers should not learn who asked; the chosen node reads content in standard mode. In attested (TEE) mode the node should not be able to read your prompt either, barring a physical attack ([evidence register §14](docs/evidence-register.md), [V]/[L]). Identifying text, timing and relay–node collusion remain risks ([evidence register §16](docs/evidence-register.md), [V]/[L]).
 - Censorship resistance through independently operated nodes and a client that chooses its provider. This is a design goal, not a guarantee of availability.
 - Participation from CPU-only class S to multi-GPU class X, subject to measured capability and model fit. Classes select price bands; model tiers are separate labels.
 
@@ -70,7 +70,7 @@ Never paste prompts, keys or seed phrases into issues.
 
 ### docs/security
 
-- [docs/security/privacy-and-contexts.md](docs/security/privacy-and-contexts.md) — Prompt readers, signed job envelopes, per-version context keys, grants and backup limits.
+- [docs/security/privacy-and-contexts.md](docs/security/privacy-and-contexts.md) — Anonymous by default, two content tiers, relay transport and contexts without a wallet link.
 - [docs/security/threat-model.md](docs/security/threat-model.md) — Threats and mitigations.
 - [docs/security/inference-verification.md](docs/security/inference-verification.md) — Opt-in re-execution by a user-chosen second node under a demonstrated deterministic profile.
 
@@ -95,19 +95,24 @@ Never paste prompts, keys or seed phrases into issues.
 - [docs/adr/README.md](docs/adr/README.md) — ADR index.
 - [docs/adr/0001-settle-on-arbitrum-one-evm-not-stylus.md](docs/adr/0001-settle-on-arbitrum-one-evm-not-stylus.md) — Proposed Arbitrum One settlement with EVM contracts.
 - [docs/adr/0002-off-chain-rust-inference.md](docs/adr/0002-off-chain-rust-inference.md) — Proposed off-chain Rust nodes with pluggable inference backends.
-- [docs/adr/0003-hpke-and-the-executor-plaintext-limit.md](docs/adr/0003-hpke-and-the-executor-plaintext-limit.md) — Proposed two-way HPKE with explicit disclosure of prompt readers.
+- [docs/adr/0003-hpke-and-the-executor-plaintext-limit.md](docs/adr/0003-hpke-and-the-executor-plaintext-limit.md) — Proposed two-way HPKE; superseded in part by ADR 0010–0012 on anonymity, execution and context identity.
 - [docs/adr/0004-sessions-vouchers-and-no-slashing.md](docs/adr/0004-sessions-vouchers-and-no-slashing.md) — Proposed ETH escrow, cumulative vouchers, pull payments and no v1 slashing.
 - [docs/adr/0005-hardware-classes-and-price-bands.md](docs/adr/0005-hardware-classes-and-price-bands.md) — Proposed ordered price bands across hardware classes.
 - [docs/adr/0006-apache-2-0-and-dco.md](docs/adr/0006-apache-2-0-and-dco.md) — Proposed Apache-2.0 licensing and DCO contribution certification.
 - [docs/adr/0007-no-protocol-token-in-v1.md](docs/adr/0007-no-protocol-token-in-v1.md) — Proposed ETH payments and no protocol token in v1.
 - [docs/adr/0008-model-first-pools.md](docs/adr/0008-model-first-pools.md) — Proposed model-first pools: any node may offer a registered model it can load; classes select price bands.
-- [docs/adr/0009-opt-in-client-orchestration.md](docs/adr/0009-opt-in-client-orchestration.md) — Proposed single-node default, opt-in client orchestration and optional ordinary-session orchestrator nodes.
+- [docs/adr/0009-opt-in-client-orchestration.md](docs/adr/0009-opt-in-client-orchestration.md) — Proposed single-node default, opt-in client orchestration and optional credit-session orchestrator nodes.
+
+- [docs/adr/0010-anonymous-by-default.md](docs/adr/0010-anonymous-by-default.md) — Proposed anonymous default, relay transport and two content tiers.
+- [docs/adr/0011-anonymous-credits.md](docs/adr/0011-anonymous-credits.md) — Proposed anonymous credits and the amended 23-function list.
+- [docs/adr/0012-contexts-without-a-wallet-link.md](docs/adr/0012-contexts-without-a-wallet-link.md) — Proposed contexts without a wallet link.
 
 ### docs/cip
 
 - [docs/cip/README.md](docs/cip/README.md) — CIP process.
 - [docs/cip/0000-template.md](docs/cip/0000-template.md) — CIP template.
-- [docs/cip/0001-adopt-baseline-adrs.md](docs/cip/0001-adopt-baseline-adrs.md) — CIP adopting the baseline ADRs.
+- [docs/cip/0001-adopt-baseline-adrs.md](docs/cip/0001-adopt-baseline-adrs.md) — Draft CIP proposing adoption of the baseline ADRs.
+- [docs/cip/0002-anonymous-credits-relays-and-ownerless-contexts.md](docs/cip/0002-anonymous-credits-relays-and-ownerless-contexts.md) — Draft CIP proposing anonymous credits, relays and ownerless contexts.
 
 ### pitch
 

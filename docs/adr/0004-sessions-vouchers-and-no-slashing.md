@@ -18,11 +18,11 @@ Nothing runs yet. No code and no audit exist.
 
 ## Decision
 
-A user pays one node for one model by depositing ETH in `SessionEscrow`. Inference runs off-chain ([ADR 0002](0002-off-chain-rust-inference.md)). The client signs cumulative EIP-712 vouchers with an app-generated `sessionSigner`. The wallet signs `openSession`, and `topUp`, `closeSession` or `withdraw()` when those are used. The wallet is not prompted per chunk.
+The reference client funds a session through [ADR 0011](0011-anonymous-credits.md) and [CIP-0002](../cip/0002-anonymous-credits-relays-and-ownerless-contexts.md): a note is spent by `openSessionFromCredit`, submitted by the node or a broadcaster, and the session records `user = address(0)`. Wallet `openSession` remains specified for a direct caller and is not the reference client's path. This record does not offer that wallet path as a privacy mode. On the wallet path a user pays one node for one model by depositing ETH in `SessionEscrow`, and the wallet signs `openSession`, and `topUp`, `closeSession` or `withdraw()` when those are used. Inference runs off-chain ([ADR 0002](0002-off-chain-rust-inference.md)). The client signs cumulative EIP-712 vouchers with an app-generated `sessionSigner` on either path. The wallet is not prompted per chunk. On the credit path the wallet signs nothing for the session.
 
-`openSession` takes `expectedPriceInPerMillion` and `expectedPriceOutPerMillion` and reverts if the node's current offer differs, so an offer change cannot lock a deposit. After inclusion the client reads the prices copied into the session. If they differ from the confirmed disclosure sheet, the client signs nothing and calls `closeSession`. Prices a node reports in a welcome message are informational and never trigger that close.
+`openSession` takes `expectedPriceInPerMillion` and `expectedPriceOutPerMillion` and reverts if the node's current offer differs, so an offer change cannot lock a deposit. `openSessionFromCredit` applies the same price binding. After inclusion the client reads the prices copied into the session. If they differ from the confirmed disclosure sheet, the client signs nothing and closes. On a credit session that close is submitted through a relay or broadcaster, never from the deposit wallet. Prices a node reports in a welcome message are informational and never trigger that close.
 
-The effective cap is `min(depositWei, maxSpendWei)`. `topUp(newMaxSpendWei)` is payable and may raise `maxSpendWei` together with the deposit. It never lowers the cap. The client never signs a voucher above the effective cap. The path that re-signs the same cumulative totals under a new `seq` applies only when a voucher above the old cap was signed and only partly paid. A voucher above the cap is paid only up to the cap.
+The effective cap is `min(depositWei, maxSpendWei)`. `topUp(newMaxSpendWei)` is payable and may raise `maxSpendWei` together with the deposit. It never lowers the cap. `topUp` reverts on a credit session. When a credit session's cap is exhausted the client opens a new credit session with a new note ([ADR 0011](0011-anonymous-credits.md)). The client never signs a voucher above the effective cap. The path that re-signs the same cumulative totals under a new `seq` applies only when a voucher above the old cap was signed and only partly paid. A voucher above the cap is paid only up to the cap.
 
 **The one canonical voucher type**, defined only in the contracts document, with no spaces after the commas:
 
@@ -36,19 +36,21 @@ The effective cap is `min(depositWei, maxSpendWei)`. `topUp(newMaxSpendWei)` is 
 
 **Signing cadence.** The node tokenizes the prompt and granted context with the manifest's pinned tokenizer and, before prefill, sends a node-signed input receipt `(sessionId, jobId, jobInputTokens, cumulativeInputTokensAfter)`. The client checks `jobInputTokens` against its own tokenization and checks `cumulativeInputTokensAfter = lastInputTokens + jobInputTokens`. It signs the input voucher only if both match. The node starts prefill when it holds that voucher. Each output chunk then arrives with a node-signed receipt of the cumulative counts and the chunk hash, inside the sealed frame. The client signs the next voucher for the prefix it acknowledged. Receipts count model tokens only. Unsigned receipts bind nobody. A job whose input voucher was never signed never enters the cumulative counts.
 
-**Redemption.** `redeemVoucher` rejects any voucher with `final == true`. A closing voucher goes only through `closeWithVoucher`, which credits the node and credits the refund `depositWei − settledWei` to the user in the same call. `redeemVoucher` credits the node and credits no refund. `finalize` credits only that refund and credits nothing to the node. For every settled session, node credits plus the user refund equal `depositWei`. The contract's ETH balance equals the sum of all `balances[]` plus every open or closing deposit minus its `settledWei`.
+**Redemption.** `redeemVoucher` rejects any voucher with `final == true`. A closing voucher goes only through `closeWithVoucher`. On a wallet-funded session, `closeWithVoucher` credits the node and credits the refund `depositWei − settledWei` to `balances[user]` in the same call. `redeemVoucher` credits the node and credits no refund. `finalize` on a wallet-funded session credits only that refund and credits nothing to the node. For every settled wallet-funded session, node credits plus the user refund equal `depositWei`. The shared escrow balance, across both funding paths, satisfies `address(this).balance == Σ balances + Σ open/closing (depositWei − settledWei) + Σ pendingWei + Σ unspent note face value`.
 
-No contract pushes ETH. Credits go to `balances[address]`. The only ETH-sending function is `withdraw()`, which pays `msg.sender` its whole balance after zeroing it. Every state-changing function uses checks-effects-interactions and a reentrancy guard. The closed list has fifteen functions.
+A credit session does not refund `balances[user]`. On a credit session each incremental payout, from `redeemVoucher` or `closeWithVoucher`, splits as `relayDelta = min(relayFeeWei, newSettled) − min(relayFeeWei, oldSettled)` to `balances[relay]` and `nodeDelta = payout − relayDelta` to `balances[node]`. `closeWithVoucher` and `finalize` record `pendingWei = depositWei − settledWei`, which is the full denomination when `settledWei == 0`. The cumulative voucher, the no-slashing rule, pull payments and protocol fee 0 stay. The credit-session invariant and the pool-wide balance equation are the ones in [ADR 0011](0011-anonymous-credits.md).
 
-**State.** Legality follows `status`, never `closeDeadline == 0`. `redeemVoucher` and `closeWithVoucher` are allowed when `status` is open, or when `status` is closing and `block.timestamp < closeDeadline`. No voucher is redeemable after `closeDeadline`. `finalize` requires closing and `block.timestamp ≥ closeDeadline`. A settled session accepts no call. `closeDeadline` is set only by `closeSession`. Either the user or the node may call `closeSession` while the session is open. Nothing closes a session automatically.
+No contract pushes ETH. Credits go to `balances[address]`. The only ETH-sending function is `withdraw()`, which pays `msg.sender` its whole balance after zeroing it. Every state-changing function uses checks-effects-interactions and a reentrancy guard. The closed list has 23 names via [CIP-0002](../cip/0002-anonymous-credits-relays-and-ownerless-contexts.md), as [ADR 0011](0011-anonymous-credits.md) defines.
 
-**Two closes.** Cooperative close: the client signs a final voucher and the node calls `closeWithVoucher`. Unilateral close: the client calls `closeSession` with no voucher, and anyone calls `finalize` after `closeDeadline`. A client that has lost its voucher log signs nothing more and uses only the unilateral close.
+**State.** Legality follows `status`, never `closeDeadline == 0`. `redeemVoucher` and `closeWithVoucher` are allowed when `status` is open, or when `status` is closing and `block.timestamp < closeDeadline`. No voucher is redeemable after `closeDeadline`. `finalize` requires closing and `block.timestamp ≥ closeDeadline`. A settled wallet-funded session accepts no call. A settled credit session accepts `claimChange` while `pendingWei > 0`, and no other call. `closeDeadline` is set only by `closeSession`. On a wallet-funded session either the user or the node may call `closeSession` while the session is open. On a credit session the node may call `closeSession`, or any broadcaster presenting a `sessionSigner` EIP-712 signature over `(chainId, escrow, sessionId, "close")`. The reference client submits that credit close through a relay or broadcaster, never from the deposit wallet. Nothing closes a session automatically.
 
-**Abandoned client.** A node never relies on `closeWithVoucher` without a final voucher. When the client disappears, or a key is lost, the node redeems its highest non-final voucher with `redeemVoucher` while that is legal, then calls `closeSession`. `finalize` after `closeDeadline` credits the remainder to the user. A user who disappears pays only what they signed. A signed voucher is not reversed. There is no finalize-at-posted-usage: `finalize` never pays the node from a figure the node posts.
+**Two closes.** Cooperative close: the client signs a final voucher and the node calls `closeWithVoucher`. Unilateral close on a wallet-funded session: the client calls `closeSession` with no voucher, and anyone calls `finalize` after `closeDeadline`. Unilateral close on a credit session uses the broadcaster signature above, and `finalize` stays anyone. A client that has lost its voucher log signs nothing more and uses only the unilateral close.
 
-**Lost node key.** Nothing refunds automatically. The user calls `closeSession` and then `finalize` after `closeDeadline`.
+**Abandoned client.** A node never relies on `closeWithVoucher` without a final voucher. When the client disappears, or a key is lost, the node redeems its highest non-final voucher with `redeemVoucher` while that is legal, then calls `closeSession`. `finalize` after `closeDeadline` credits the remainder to `balances[user]` on a wallet-funded session, and records `pendingWei` on a credit session. A user who disappears pays only what they signed. A signed voucher is not reversed. There is no finalize-at-posted-usage: `finalize` never pays the node from a figure the node posts.
 
-**Lost user wallet.** The refund is credited to the depositing address. `withdraw()` pays only `msg.sender`. If that wallet is lost, the credit is unrecoverable. An anyone-can-close idle timeout is an open question, not v1.
+**Lost node key.** Nothing refunds automatically. On a wallet-funded session the user calls `closeSession` and then `finalize` after `closeDeadline`. On a credit session the same `closeSession` signature in the state rules above authorises a broadcaster, and `finalize` stays anyone. If both the node and the `sessionSigner` key are gone, the session stays open.
+
+**Lost user wallet.** On a wallet-funded session the refund is credited to the depositing address. `withdraw()` pays only `msg.sender`. If that wallet is lost, the credit is unrecoverable. An anyone-can-close idle timeout is an open question, not v1. A credit session's remainder stays `pendingWei` until `claimChange`, and that remainder is not a balance of the deposit wallet.
 
 **Stolen `sessionSigner`.** It can sign vouchers up to the effective cap until the session is settled. `closeSession` does not stop it. Vouchers stay redeemable until `closeDeadline`. v1 mitigation is a small per-session cap. Signer rotation or revocation is an open question for a later CIP. `sessionSigner` is not delegated to an orchestrator node in v1.
 
@@ -66,7 +68,7 @@ The protocol fee is 0. Multi-node work does not add a contract: N distinct `(nod
 
 ### One on-chain job per prompt
 
-Rejected. For small models the L2 fee of a deposit and a payout exceeds the inference fee, on the order of the comparison in the contracts document (evidence register §1 and §6). It would also be a wallet action per message. A session amortizes two happy-path transactions, `openSession` and `closeWithVoucher`, across many chunks. `withdraw()` is a later pull, once for many sessions.
+Rejected. For small models the L2 fee of a deposit and a payout exceeds the inference fee, on the order of the comparison in the contracts document (evidence register §1 and §6). It would also be a wallet action per message. A session amortizes two happy-path transactions across many chunks. On the reference client those are `openSessionFromCredit` and `closeWithVoucher`. Wallet `openSession` remains specified and is not that path. `withdraw()` is a later pull, once for many sessions.
 
 ### Dispute equals a full refund
 
@@ -86,18 +88,19 @@ Rejected. A recipient that reenters, or a contract wallet that cannot receive ET
 
 ## Consequences
 
-- Two happy-path transactions settle a session to internal balances. A third, `withdraw()`, moves ETH to the wallet and can batch many sessions.
+- A credit session opens with `openSessionFromCredit` and settles with `closeWithVoucher`; unused value stays `pendingWei` until a separate `claimChange` creates change notes and credits dust to the node. Deposits, change claims and withdrawals add transactions. A wallet-funded session settles to internal balances in two happy-path transactions, and `withdraw()` moves ETH out and can batch many sessions.
+- Nodes bear the L2 gas of a credit spend. A spend costs about 230–270k L2 gas (evidence register §15, [U]: an estimate for Semaphore's `validateProof`, not a measurement of this contract). LeanIMT insertion gas is UNVERIFIED. Nodes price that gas into their offers ([ADR 0011](0011-anonymous-credits.md)).
 - The node's loss on an abandoned client is at most one unpaid chunk of `CHUNK_TOKENS`, plus any input fee the client already signed. The user's loss on a node that takes the input fee and does not run is that input fee.
 - A stolen `sessionSigner` is bounded by the cap the user already chose. Closing the session does not revoke the key before `closeDeadline`.
 - Sequencer censorship longer than the remaining window costs the node unredeemed vouchers. Prompt redemption is the mitigation. There is no deadline extension in v1.
-- A lost depositing wallet cannot recover its credited refund. Deposits should be sized to the task.
+- On a wallet-funded session, a lost depositing wallet cannot recover its credited refund. Deposits should be sized to the task. A credit session's remainder is `pendingWei`, not `balances[user]`.
 - No slashing means model substitution in standard mode is invisible to the contract. Reputation, opt-in verifiable mode and opt-in attested mode are the v1 responses. Each costs the user something, as the verification document states.
 - Adding a penalty, a fee, a treasury or a dispute contract takes a CIP that amends the closed function list and, for a slash, supersedes this ADR after a published positive result.
 - `CHUNK_TOKENS`, `CLOSE_WINDOW`, `MIN_BOND_WEI`, `MIN_DEPOSIT_WEI` and `BOND_UNLOCK_DELAY` have no values in this record.
 
 ## Links
 
-- [docs/evidence-register.md](../evidence-register.md) §1, §5, §6
+- [docs/evidence-register.md](../evidence-register.md) §1, §5, §6, §15
 - [docs/protocol/contracts-and-settlement.md](../protocol/contracts-and-settlement.md)
 - [docs/security/privacy-and-contexts.md](../security/privacy-and-contexts.md)
 - [docs/security/inference-verification.md](../security/inference-verification.md)
@@ -107,4 +110,6 @@ Rejected. A recipient that reenters, or a contract wallet that cannot receive ET
 - [ADR 0005](0005-hardware-classes-and-price-bands.md)
 - [ADR 0008](0008-model-first-pools.md)
 - [ADR 0009](0009-opt-in-client-orchestration.md)
+- [ADR 0011](0011-anonymous-credits.md)
 - [docs/cip/0001-adopt-baseline-adrs.md](../cip/0001-adopt-baseline-adrs.md)
+- [docs/cip/0002-anonymous-credits-relays-and-ownerless-contexts.md](../cip/0002-anonymous-credits-relays-and-ownerless-contexts.md)

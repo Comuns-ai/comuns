@@ -10,7 +10,7 @@ Created: 2026-10-12
 
 ## 1. Summary
 
-`ModelRegistry` is the on-chain list of models a Comuns node may be paid to serve. A model is identified by its **manifest**: a canonical JSON file naming the weight files, their SHA-256 hashes, the tokenizer digest, the quantization, the context limit and the license file. `manifestHash` is the SHA-256 of the canonical manifest bytes and `modelId = keccak256(manifestHash)`; a different manifest is a different model. The record also carries the model's **tier** (T0–T4, a parameter-count label), the license's SPDX identifier and a `commercialHosting` flag that `openSession` checks: a model whose license forbids paid hosting cannot be the subject of a paid session or an offer.
+`ModelRegistry` is the on-chain list of models a Comuns node may be paid to serve. A model is identified by its **manifest**: a canonical JSON file naming the weight files, their SHA-256 hashes, the tokenizer digest, the quantization, the context limit and the license file. `manifestHash` is the SHA-256 of the canonical manifest bytes and `modelId = keccak256(manifestHash)`; a different manifest is a different model. The record also carries the model's **tier** (T0–T4, a parameter-count label), the license's SPDX identifier and a `commercialHosting` flag that `openSession` and `openSessionFromCredit` check: a model whose license forbids paid hosting cannot be the subject of a paid session or an offer.
 
 In v1 `registerModel` and `updateModel` are callable **only by the governance timelock**, acting on a CIP; with nobody seated there is no mainnet registration, and Arbitrum Sepolia models come from a testnet-only CIP. This prevents manifest squatting and false `commercialHosting` flags, at the price of making every registration a governance act.
 
@@ -41,7 +41,7 @@ The `Model` record, keyed by `modelId`, as defined in the contracts document (no
 | `modelId` | `bytes32` | `keccak256(manifestHash)`. The identity of a model is its manifest. |
 | `tier` | `tier` (uint8) | A partition of the parameter count in the manifest: T0 ≤ 4B; T1 > 4B and ≤ 8B; T2 > 8B and ≤ 32B; T3 > 32B and ≤ 70B; T4 > 70B. Every count falls in exactly one tier (the example manifest in section 4, at 8,000,000,000 parameters, is T1). Set at registration, immutable. A label for price bands, never an eligibility gate, and a different thing from a node's `hardwareClass`. |
 | `licenseSpdx` | `string` | SPDX identifier of the model license (`Apache-2.0`, `MIT`, or a `LicenseRef-…` identifier for a bespoke license such as the Llama, Qwen or Gemma terms). Mutable by `updateModel`. |
-| `commercialHosting` | `bool` | Whether the license, as read by the registrant at the snapshot date, permits paid hosting. `openSession`, `registerNode` and `updateNode` refuse models where this is false. Mutable by `updateModel`. |
+| `commercialHosting` | `bool` | Whether the license, as read by the registrant at the snapshot date, permits paid hosting. `openSession`, `openSessionFromCredit`, `registerNode` and `updateNode` refuse models where this is false. Mutable by `updateModel`. |
 | `manifestHash` | `bytes32` | SHA-256 of the canonical JSON manifest (section 4). Immutable. |
 | `metadataUri` | `string` | Where the manifest, the model card and the license file are published. Mutable. |
 | `publisher` | `address` | The registrant; in v1 always the governance timelock. |
@@ -80,7 +80,7 @@ The manifest is the one document that says what "this model" means. It is canoni
 | `contextLimit` | The maximum context the model supports; a node may advertise less, never more. |
 | `license` | The license file shipped with the weights, its hash and SPDX identifier. The hash lets anyone check that the file the registrant read is the file in the download. |
 
-The manifest is published at `metadataUri` together with the model card and the license file. Anyone can recompute `manifestHash` and `modelId` from it, and a node checks every file's hash before load (docs/node/node-design.md, R2).
+The manifest is published at `metadataUri` together with the model card and the license file. Anyone can recompute `manifestHash` and `modelId` from it, and a node checks every file's hash before load (docs/node/node-design.md, R2). In attested mode the published measurement list binds the node build and this model manifest. Before sealing a job, the client checks the quote against that list and checks that it binds the node’s job HPKE key, registered `ohttpKeyConfig` and client nonce. A wrong manifest or measurement fails closed; see [privacy and contexts](../security/privacy-and-contexts.md).
 
 ## 5. License snapshot
 
@@ -103,13 +103,13 @@ Reading the table: "Allowed" is this document's reading of the register's entry,
 
 ## 6. What may be paid
 
-`openSession` reverts unless the session's model has `commercialHosting == true`; `registerNode` and `updateNode` refuse an offer on a model where it is false (contracts doc, §6 and §9). A model whose license forbids paid hosting can therefore be registered — so that the registry can say so — but never offered or sold. Clearing such an offer is always allowed, so an `updateModel` that flips the flag to false strands no node: operators clear the offer on their next `updateNode`, and sessions already open settle at their copied prices.
+`openSession` and `openSessionFromCredit` revert unless the session's model has `commercialHosting == true`; `registerNode` and `updateNode` refuse an offer on a model where it is false (contracts doc, §6 and §9). A model whose license forbids paid hosting can therefore be registered — so that the registry can say so — but never offered or sold. Clearing such an offer is always allowed, so an `updateModel` that flips the flag to false strands no node: operators clear the offer on their next `updateNode`, and sessions already open settle at their copied prices.
 
 What the flag does **not** do: it does not verify that the operator meets the license's conditions (attribution, naming, thresholds, use policies), it does not make the protocol a licensee, and it does not change when a license changes upstream until a CIP updates it. The flag is a gate against paying for a model the community has read as unhostable, not a compliance system.
 
 ## 7. Model pools
 
-A **pool** is the set of nodes with a current offer for a `modelId`: each is a `NodeRegistry` entry whose `prices[modelId] = (priceInPerMillion, priceOutPerMillion, modelBenchmarkHash)` carries a **non-zero `modelBenchmarkHash`**. The pool is a filtered view of `NodeRegistry` — the set of node offers for that model — **not a model-record field** in `ModelRegistry`, not stored anywhere on-chain beyond the offers themselves, and **not a payee**: no function pays "a pool", and every payment goes to the one node of the one session.
+A **pool** is the set of nodes with a current offer for a `modelId`: each is a `NodeRegistry` entry whose `prices[modelId] = (priceInPerMillion, priceOutPerMillion, modelBenchmarkHash)` carries a **non-zero `modelBenchmarkHash`**. The pool is a filtered view of `NodeRegistry` — the set of node offers for that model — **not a model-record field** in `ModelRegistry`, not stored anywhere on-chain beyond the offers themselves, and **not a payee**: no function pays "a pool", and credit-session payouts split between the chosen node and its registered relay under ADR 0011.
 
 **Joining.** An operator joins the pool of a registered model by:
 
@@ -119,11 +119,11 @@ A **pool** is the set of nodes with a current offer for a `modelId`: each is a `
 
 A node of any class may join any model's pool it can load; the class decides the band, not the right to join. A class M node offering a T3 model prices inside the (T3, M) band — cheaper than a class X node's (T3, X) band, as the strict band ordering requires.
 
-**Leaving.** The operator clears the entry — by calling `updateNode` with a complete offer list that omits the model, which emits an `OfferSet` with zero prices and a zero `modelBenchmarkHash` ("cleared") — when it unloads the model, re-benchmarks, or no longer wants the work. Clearing is always allowed. `deregisterNode` clears every offer the same way. A **stale offer** — a model the node cannot currently serve — makes `openSession` succeed and the node refuse the session; no money is lost, but the user loses gas and time, and indexers downrank the node. Stale offers are a **reputation risk, not slashing**.
+**Leaving.** The operator clears the entry — by calling `updateNode` with a complete offer list that omits the model, which emits an `OfferSet` with zero prices and a zero `modelBenchmarkHash` ("cleared") — when it unloads the model, re-benchmarks, or no longer wants the work. Clearing is always allowed. `deregisterNode` clears every offer the same way. A **stale offer** — a model the node cannot currently serve — can survive the contract checks at `openSession` or `openSessionFromCredit` while the node refuses the job. The client requests admission before either opening path; the reference client uses only `openSessionFromCredit`, through a relay. If readiness becomes stale after admission, an unused credit session must close and settle before `claimChange` restores its full denomination as a fresh note. The node loses spend gas and the client loses time; indexers downrank the node. Stale offers are a **reputation risk, not slashing**.
 
 **Enumeration.** Clients and indexers build a pool from registry state and events, exactly as the contracts document specifies (§9, §11): take the `OfferSet` events for the `modelId`, keep each operator's latest, drop those whose latest has a zero hash, drop deregistered nodes (`NodeDeregistered` without a later `NodeRegistered`), and read the current prices, class, modes and endpoint from the node record. A re-registration after `withdrawBond` starts from an empty offer list, so no pre-deregistration offer survives in an indexer that follows this rule.
 
-**A thin pool.** When no node in the pool offers a quote the user accepts — or no node offers the model at all inside any band — the client **says so** rather than silently picking another model. The disclosure sheet binds the model the user chose; a substitution is a new sheet and a new confirmation. A pool with one operator is a pool with one reader; the sheet counts operators, and the client shows that count.
+**A thin pool.** When no node in the pool offers a quote the user accepts — or no node offers the model at all inside any band — the client **says so** rather than silently picking another model. The disclosure sheet binds the model the user chose; a substitution is a new sheet and a new confirmation. A selected node is a disclosed recipient; the sheet counts recipients separately from operator-readable recipients so that attested mode is not presented as standard mode. The client also shows the pool’s operator count.
 
 **Pool metrics** (off-chain, for indexers and clients): number of distinct operators with a current offer; classes present; price range per class; modes offered; the freshness of each `modelBenchmarkHash`; the share of sessions on that model that settled with zero `settledWei` (a proxy for stale offers). None of these is stored on-chain.
 
@@ -163,11 +163,11 @@ A manifest `name` like "…-commercial" or "open-…" on a model whose license f
 
 ### R4 — Thin pools **[RISK] · Medium**
 
-A model with one or two operators gives the user no price competition and a single reader. Mitigation: the client shows the operator count on the disclosure sheet and says plainly when no acceptable quote exists; it never substitutes a model silently.
+A model with few operators limits price competition and provider choice. Mitigation: the client shows the operator count on the disclosure sheet and says plainly when no acceptable quote exists; it never substitutes a model silently.
 
 ### R5 — Stale offers **[RISK] · Medium**
 
-Offers outlive the loaded model. Mitigation: the reference node clears offers on unload; the client requests admission before `openSession`; indexers surface zero-`settledWei` settlements; no slashing, by design.
+Offers outlive the loaded model. Mitigation: the reference node clears offers on unload; the client requests admission before `openSession` or `openSessionFromCredit` (the latter is the reference-client path); indexers surface zero-`settledWei` settlements; no slashing, by design.
 
 ### R6 — Governance bottleneck **[RISK] · Medium**
 

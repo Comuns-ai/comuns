@@ -50,16 +50,16 @@ pitch/pitch-deck.html is the self-contained rendering of this file and must be k
 
 ## One prompt, end to end
 
-By default **one node** runs a request: pick a model, then a node from its pool. Collective answers, decomposed plans and parallel planning are **opt-in**; every planner reads the prompt, and the client shows which nodes read what before signing.
+By default **one node** runs a request: pick a model, then a node from its pool. Collective answers and decomposed plans are **opt-in**.
 
-1. Pick a node; encrypt the prompt locally.
-2. Open a session with a deposit.
-3. The node runs the model off-chain; chunks return sealed.
+1. Deposit once into the credit pool.
+2. Encrypt the prompt locally; send it through a relay run by someone else.
+3. The node opens the session with your unlinkable credit and runs the model off-chain; chunks return sealed.
 4. The client signs a voucher per chunk.
 
-A paid orchestrator node is disclosed, never mandatory. The chain never runs a model.
+A paid orchestrator is disclosed, never mandatory.
 
-> Speaker notes: Walk the four steps slowly; single-node execution is the default. The open-source orchestrator in the user's app can assess, plan a DAG, run waves in parallel, review and merge; it is designed client-side code, not something implemented today.
+> Speaker notes: Walk the four steps slowly; single-node execution is the default. You pick a model and a node before step 2. Parallel planning is also opt-in; every planner reads the prompt, and the client shows which nodes read what before signing. The chain never runs a model. The open-source orchestrator in the user's app can assess, plan a DAG, run waves in parallel, review and merge; it is designed client-side code, not something implemented today.
 
 ---
 
@@ -90,38 +90,37 @@ A paid orchestrator node is disclosed, never mandatory. The chain never runs a m
 
 ## Who can read a prompt
 
-- In standard mode the chosen node can read the prompt.
-- Other nodes and the chain cannot read it.
-- With more than one node, the disclosure sheet states before signing how many readers, counted by distinct node and operator, see the prompt, a sub-task, activations or draft tokens: a floor from the actual payloads.
-- Public: who paid whom, for which model, and token counts.
-- Attested mode does not stop a physical attacker (evidence register §4, [L]).
-- Local execution is the only owner-only option.
+- Anonymous by default: the node you pick can read your prompt, but neither it nor the chain should learn who sent it.
+- Attested (TEE) nodes should not be able to read it either; a physical attack can break that (evidence register §14, [V]).
+- Standard mode has one content reader; multi-node features add more, counted on the disclosure sheet before you confirm.
+- Relays hide your network address; unlinkable credits hide your wallet, though the deposit itself is public.
+- Not hidden: what your words reveal about you, or traffic timing (evidence register §16, [L]/[V]).
 
-> Speaker notes: Say plainly that the executor sees plaintext. The disclosure sheet counts every reader before the user signs anything.
+> Speaker notes: Keep the two promises apart. The disclosure sheet is shown before you confirm. Anonymity: the node you pick can read your prompt but should not learn who sent it. Confidentiality: only an attested node should be unable to read it, barring a physical attack. The disclosure sheet counts every reader before the user signs anything.
 
 ---
 
 ## Your contexts, your wallet
 
-- One wallet keeps many encrypted, versioned contexts.
-- Each version has its own key; ciphertext stays off-chain and the chain records the latest version hash.
-- Sharing with a node means re-wrapping that version's key to the node's key, signed by the owning wallet. Nodes never exchange plaintext.
-- Revocation works going forward: later versions stay unreadable, but a node cannot forget what it already decrypted.
+- Many encrypted, versioned contexts live in your local vault; the chain stores no wallet.
+- Each version has its own key; ciphertext stays off-chain.
+- Sharing with a node means re-wrapping that version's key to the node's key, signed by a per-context key, not your wallet. Nodes never exchange plaintext.
+- Revocation works going forward: later versions stay unreadable, but a node cannot forget plaintext it already saw.
 - Back up the identity key, and keep ciphertext on a second device or host.
 
-> Speaker notes: Contexts are portable memory the user owns. Revocation limits the future, not the past, and the deck should say so.
+> Speaker notes: Contexts are portable memory the user owns, with no wallet link on-chain. Revocation limits the future, not the past, and the deck should say so.
 
 ---
 
 ## Sessions on Arbitrum One
 
 - Solidity contracts on the EVM of Arbitrum One settle sessions.
-- Stylus is not the v1 plan: new activations are paused since 2026-10-02 (evidence register §1, [V]), and a model cannot fit in a contract.
-- Two transactions per session on the happy path, not one per message; a plan using several nodes pays several sessions.
-- The ETH paid to the node is not the L2 fee; gas is paid separately.
+- Sessions are funded by unlinkable credits from Semaphore groups inside the escrow and opened by the node: the chain sees a session, never a payer.
+- Stylus is not the v1 plan: new activations are paused since 2026-10-02 (evidence register §1, [V]).
+- Close still settles; claiming unspent credit takes another transaction. Gas is paid separately.
 - Protocol fee: zero. Payees withdraw their credited balances.
 
-> Speaker notes: Many prompts share one session, so the chain sees an open and a close. Multi-node plans multiply sessions, and we say so up front.
+> Speaker notes: Many prompts share one session, so the chain sees an open and a close but no payer. Multi-node plans multiply sessions, and we say so up front.
 
 ---
 
@@ -146,6 +145,8 @@ Comuns does LLM inference and nothing else. Its non-goals:
 - Stylus in v1, and inference inside a contract.
 - A mandatory central proxy or orchestrator.
 - Slashing in v1.
+- MPC or FHE private inference: minutes per token today (evidence register §14, [V]).
+- Running the model on your own machine as a product option.
 
 A narrow scope keeps the design small enough for a volunteer community to review line by line.
 
@@ -155,15 +156,15 @@ A narrow scope keeps the design small enough for a volunteer community to review
 
 ## From proposal to running code
 
-| Phase | Name |
-|---|---|
-| 0 | Documentation baseline |
-| 1 | Sepolia slice |
-| 2 | Contexts and classes |
-| 3 | Verification spike |
-| 4 | External review |
+| Phase | Name | Content |
+|---|---|---|
+| 0 | Documentation baseline | This documentation |
+| 1 | Sepolia slice | Relay plus credit session |
+| 2 | Contexts and classes | Ownerless contexts, pools, sheet, orchestrator |
+| 3 | Verification spike | Attested nodes plus the spikes |
+| 4 | External review | Reviews, then go/no-go |
 
-There are no dates. Phase 3 may end with a negative result. Sharding and cross-node speculation are experimental Phase 3 work, with testnet-only prices, refused under mainnet parameters; shard holders hold no session and are never paid. No internet speed-up is promised (evidence register §9, quote [V], result not replicated [U]). Phase 4 closes with a go/no-go CIP.
+There are no dates. Phase 3 may end with a negative result. Sharding and cross-node speculation are experimental Phase 3 work, with testnet-only prices, refused under mainnet parameters; shard holders hold no session and are never paid. No internet speed-up is promised (evidence register §9, quote [V], result not replicated [U]).
 
 > Speaker notes: Phases are ordered, not scheduled. A published negative result counts as a finished phase.
 
@@ -171,14 +172,14 @@ There are no dates. Phase 3 may end with a negative result. Sharding and cross-n
 
 ## Risks we state openly
 
-- Executor plaintext: the chosen node reads the prompt in standard mode.
+- Anonymity is not confidentiality: the chosen node reads standard-mode content; your words can identify you; anonymity sets are small at launch; relay and node timing can correlate (evidence register §15 [U], §16 [V]/[L]).
 - Arbitrum One has a single sequencer (evidence register §1, [V]).
-- Price bands are unset, so mainnet is not deployable.
-- Hardware class claims are self-benchmarks and can be faked.
-- Nobody is seated, and nobody may come to contribute.
-- Activations can reveal a prompt (evidence register §10, [V]); a parallel plan or collective answer costs several sessions and can be worse than one strong model (evidence register §11, [V]).
+- Price bands are unset: no mainnet.
+- Class claims are self-benchmarks, fakeable.
+- Nobody is seated; nobody may come.
+- Activations can reveal a prompt (evidence register §10, [V]); parallel plans cost several sessions and can be worse than one model (evidence register §11, [V]).
 
-> Speaker notes: Read the risks aloud rather than skipping them. Each one has a mitigation and an owner document in the repository.
+> Speaker notes: Read the risks aloud rather than skipping them. Anonymity sets are small at launch. Relay and node timing can both correlate; contributors may not arrive. Without price bands mainnet is not deployable; hardware class claims are self-benchmarks. A collective answer likewise costs several sessions and can be worse than one strong model. Each one has a mitigation and an owner document in the repository.
 
 ---
 

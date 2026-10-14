@@ -16,8 +16,9 @@ Links by path:
 
 - [docs/cip/0000-template.md](0000-template.md)
 - [docs/cip/0001-adopt-baseline-adrs.md](0001-adopt-baseline-adrs.md)
+- [docs/cip/0002-anonymous-credits-relays-and-ownerless-contexts.md](0002-anonymous-credits-relays-and-ownerless-contexts.md)
 
-The file docs/cip/0001-adopt-baseline-adrs.md holds CIP-0001, which is a Draft and is not Final. Linking the path does not make it Final.
+The file docs/cip/0001-adopt-baseline-adrs.md holds CIP-0001, which is a Draft and is not Final. The file docs/cip/0002-anonymous-credits-relays-and-ownerless-contexts.md holds CIP-0002, which is a Draft and is not Final. Linking a path does not make it Final.
 
 ## 2 Lifecycle
 
@@ -45,8 +46,9 @@ What counts as substantive activity, what counts as a blocking objection, and ho
 
 - Numbers are four digits, zero-padded.
 - 0000 is docs/cip/0000-template.md. It is the template. It is not a proposal, and it is not Final.
-- 0001 is reserved for docs/cip/0001-adopt-baseline-adrs.md. ADRs under docs/adr/ are proposed until that CIP is accepted. Accepted means Final. After acceptance, a change that contradicts an ADR needs a superseding ADR.
-- The next CIP uses the lowest free number above 0001. The filename is docs/cip/NNNN-kebab-title.md. The slug is kebab-case: lowercase words separated by hyphens.
+- 0001 is reserved for docs/cip/0001-adopt-baseline-adrs.md. ADRs 0001–0009 under docs/adr/ are proposed until that CIP is accepted; ADRs 0010–0012 are proposed until docs/cip/0002-anonymous-credits-relays-and-ownerless-contexts.md is accepted. Accepted means Final. After acceptance, a change that contradicts an ADR needs a superseding ADR.
+- 0002 is allocated to docs/cip/0002-anonymous-credits-relays-and-ownerless-contexts.md, a Draft that proposes ADRs 0010–0012 and the amended closed function list.
+- The next CIP uses the lowest free number above 0002. The filename is docs/cip/NNNN-kebab-title.md. The slug is kebab-case: lowercase words separated by hyphens.
 - If two authors take the same number, they resolve it in public and one author renames. Nobody has private authority to allocate numbers.
 
 ## 4 Required sections
@@ -70,7 +72,7 @@ Who may merge: nobody, until maintainers are seated by a public CIP. MAINTAINERS
 
 ## 6 Current CIP status
 
-None are Final. 0000 is a template. 0001 is reserved and is a Draft, not Final. No other CIP number is allocated by this file.
+None are Final. 0000 is a template. 0001 is reserved and is a Draft, not Final: [docs/cip/0001-adopt-baseline-adrs.md](0001-adopt-baseline-adrs.md). 0002 is allocated and is a Draft, not Final: [docs/cip/0002-anonymous-credits-relays-and-ownerless-contexts.md](0002-anonymous-credits-relays-and-ownerless-contexts.md). No other CIP number is allocated by this file.
 
 ## 7 Risks
 
@@ -88,6 +90,6 @@ docs/cip/0001-adopt-baseline-adrs.md is linked by path while it is a Draft. A re
 
 ## 8 Open questions
 
-- Should a public issue be able to reserve a CIP number before the file exists? This draft reserves only 0000 and 0001.
+- Should a public issue be able to reserve a CIP number before the file exists? This draft identifies 0000 as the template and allocates 0001 and 0002 to existing proposal files.
 - After a CIP is Final, may the author add an editorial note, or does every change require a new CIP? This draft treats Final text as stable. A superseding CIP carries later changes. A superseding ADR carries a later change that contradicts an accepted ADR.
 - Who confirms, in the file, that Last Call's 14 days have elapsed, while no maintainers are seated? This draft uses the public record described in GOVERNANCE.md.

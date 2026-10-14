@@ -8,7 +8,7 @@ Created: 2026-10-12
 
 ---
 
-This register is the single list of external facts the Comuns documents may rely on. Each fact carries a mark: **[V]** verified at source, **[L]** likely, **[U]** unsure. Sections §1–§8 are a snapshot taken 2026-10-12; sections §9–§13 were retrieved 2026-10-13. A URL is given where one was recorded. Nothing outside this register may be cited as evidence; see section 14.
+This register is the single list of external facts the Comuns documents may rely on. Each fact carries a mark: **[V]** verified at source, **[L]** likely, **[U]** unsure. Sections §1–§8 are a snapshot taken 2026-10-12; sections §9–§13 were retrieved 2026-10-13; sections §14–§16 were compiled 2026-10-13 from two screened research annexes (annex A: private inference; annex B: anonymous payments and relays), and each of their facts names the annex and the source the annex gives. A URL is given where one was recorded. Nothing outside this register may be cited as evidence; see section 17.
 
 ## 1. Arbitrum (§1)
 
@@ -180,7 +180,172 @@ All entries in this section are [V].
 - Allora combines numeric inferences as a loss-weighted average; designed for numeric targets, not free text [V] docs.allora.network/learn/inference-synthesis
 - Fortytwo: nodes answer, then rank each other's answers pairwise; Bradley-Terry-style aggregation weighted by on-chain reputation; reported GPQA Diamond 85.90% vs 68.69% for majority vote [V] arxiv 2510.24801; ~10–15 s added latency per the company [L]; company executives said node operators could potentially see prompts [L]
 
-## 14. How to cite
+## 14. Private inference: MPC, FHE and TEE (§14)
+
+Compiled 2026-10-13 from annex A (private-inference research, screened). Marks follow the annex: [V] checked in the source, [L] likely (abstract, secondary source or vendor), [U] unsure; "(calc)" is the researcher's own arithmetic and keeps the annex's mark, or [U] where the annex gives none. This section supersedes nothing in §4: the §4 FHE/MPC/TEE bullets stay a dated 2026-10-12 snapshot with different figures.
+
+MPC (secure multi-party computation)
+
+- PUMA: 3PC replicated secret sharing, semi-honest, secure only if at most 1 of 3 parties is corrupt; LLaMA-7B with an 8-token prompt, first token 200 s and 1.79 GB on a LAN (0.1 ms RTT, three 128-thread servers) [V] — annex A R1, PUMA arXiv 2307.12533; second token about 164 s and 2.06 GB (calc) [V] — annex A R1
+- Ditto (ICML 2024): 3PC, semi-honest, honest majority; GPT2-base 233 s on a WAN of 400 Mbps / 40 ms; BERT-base 30.6 s on LAN, 303.5 s on WAN; code not released [V] — annex A R4
+- SIGMA (PoPETs 2024): 2PC function secret sharing with a dealer doing preprocessing, semi-honest; per 128-token pass with preprocessing excluded, Llama2-7B 23.1 s / 12.1 GB and Llama2-13B 37.6 s / 18.9 GB on a 9.4 Gbps / 0.05 ms LAN with A6000 GPUs; needs an honest dealer [V] — annex A R3
+- BumbleBee (NDSS 2025): 2PC between client and server, HE + oblivious transfer, no third party; LLaMA-7B at 7.96 min and 6.27 GB per token on a 1 Gbps / 0.5 ms LAN [V]; GPT2-base (64-token prompt, 1 token out) 1.48 min on LAN and about 2.05 min on a 400 Mbps / 4 ms WAN [V]; the client is one of the two compute parties — annex A R2
+- Permutation-based schemes (PermLLM, STIP, Centaur) are broken: an ICML 2025 attack recovers prompts exactly 97.6–100% of the time [V] — annex A R10, R11, PermLLM arXiv 2405.18744, permutation attack arXiv 2505.18332
+- CrypTen was archived in May 2025 [V] — annex A §1
+- No maliciously secure MPC result at 1B parameters or more was found; Mosformer, the first maliciously secure 3PC for transformers, covers BERT and GPT-2 only [L] — annex A §1, R13. The "not found" is a search result, not a proof of absence [U]
+- 3PC schemes are secure only if at most 1 of 3 parties is corrupt [V] — annex A R1, R4; a Sybil operator controlling 2 of 3 nodes breaks privacy completely [U] — annex A §7 (researcher's reasoning)
+
+FHE (fully homomorphic encryption)
+
+- NEXUS (NDSS 2025): Llama-3-8B, 1 token out, 51.8 s on GPU batch-averaged (1,088 s on CPU) [V] — annex A R15
+- ROSETTA (CCS 2026), per token on an A100: GPT-2 1.31 min, TinyLlama-1.1B 2.71 min, Llama-3-8B 5.18–6.79 min [V] — annex A R20, ROSETTA arXiv 2609.16915
+- Cachemir: Llama-3-8B at 1.61 min/token on an A100, perplexity unchanged [V]; ROSETTA reports a conflicting figure for it — annex A R19, Cachemir arXiv 2602.11470
+- Zama Concrete ML hybrid: the server runs only the linear layers and the client runs attention in the clear; GPT-2 about 11 s/token on a GPU server; the license grants no patent rights [V] — annex A R21, Zama Concrete ML LLM docs
+- No FHE accelerator shipping for LLMs was found: Intel Heracles is a prototype with no commercial plan, Niobium has no ship date [V] — annex A R23, IEEE Spectrum Heracles March 2026
+
+TEE (confidential-computing CPUs and GPUs)
+
+- Google Cloud H100 + Intel TDX is generally available [V] — annex A R30, Google Cloud blog August 2025
+- Azure offers H100 + AMD SEV-SNP [V] — annex A R31, Azure docs
+- Blackwell B200/B300 and the RTX PRO 6000 support confidential computing [V, vendor] — annex A R29, NVIDIA
+- NVIDIA reports a confidential-computing overhead of 1–8% [V, vendor] — annex A §5, NVIDIA
+- An independent H100 + TDX study measured time-to-first-token up 21.8–27.8% and throughput down 11.5–21.1% [V] — annex A R28
+- NVIDIA's attestation service (NRAS) checks the GPU report together with the CPU TEE measurements; keys are released only after that [V] — annex A R29
+- TEE.fail (S&P 2026): a DDR5 interposer costing under $1,000 extracts TDX and SEV-SNP keys; NVIDIA attestation reports are not VM-bound, so a report can be relayed; Intel and AMD consider physical attacks out of scope [V] — annex A R32, tee.fail
+- TDXRay (S&P 2026) recovers prompts from tokenizer memory-access patterns with 91.5–94.2% similarity [L] — annex A R34, tdxray.cpusec.org
+- Battering RAM / WireTap (2025) are further physical attacks [L] — annex A §5
+- Every network shipping private LLM inference today uses TEEs: NEAR AI Cloud (TDX + NVIDIA CC on H200, attested TLS) [V], Nillion nilAI (NVIDIA CC TEE, no MPC for LLMs) [V], Phala (H100/H200 TEEs) [V], Chutes [L] — annex A §6, NEAR AI, Nillion and Phala docs
+
+What leaks in every approach, and the scale gap
+
+- Output length alone reveals the language with more than 75% precision [V] — annex A R42
+- Timing and packet sizes reveal the topic (Whisper Leak) [L] — annex A R43, Whisper Leak, The Hacker News, November 2025; annex B §5 marks the Whisper Leak paper itself [V] (see §16)
+- The model and architecture are visible to the compute parties [U] — annex A §7 (researcher's reasoning)
+- GPU TEEs cost 1–28% and are the only option shown at 70B scale and beyond [U] — annex A §7, combining R28 and the NVIDIA figure above
+- A 200-token answer at 7–13B with the best cryptographic results (SIGMA, NEXUS, Cachemir) takes hours; no MPC or FHE result at 70B was found [U] (calc) — annex A §7
+
+## 15. Anonymous credits, relays and precedents (§15)
+
+Compiled 2026-10-13 from annex B §1, §2, §4, §6 and §7 (anonymous payments and relays research, screened). Marks follow the annex: [V] verified in the source, [L] likely (abstract, secondary, vendor or snippet), [U] unsure or the researcher's own estimate.
+
+Semaphore v4
+
+- An identity commitment goes into an on-chain LeanIMT/Poseidon group; a spend is a membership proof plus a per-scope nullifier; `validateProof` rejects reused nullifiers, verifies the proof and stores the nullifier [V] — annex B §1, Semaphore docs and repo
+- Semaphore has no deposit or withdraw logic, so a payment pool must be built on top [U] — annex B §1
+- Anonymity set: the group, with tree depth 1–32 [V] — annex B §1, Semaphore docs and repo
+- Proof system: Groth16 with a snarkjs verifier [V] — annex B §1, Semaphore docs and repo
+- Trusted setup: more than 400 participants, finished 13 July 2024 [V]; a second Phase-2 ceremony followed a ZK-Kit circuit fix, its date and participant count unconfirmed [L] — annex B §1, Semaphore docs and repo
+- Live on Arbitrum One: Semaphore `0x8A1f…693D`, verifier `0x4DeC…31f8` [V] — annex B §1, Semaphore docs and repo
+- No published v4 gas figure; a generic Groth16/BN254 check is about 181k gas plus about 6.15k per public input [V]; Arbitrum charges EVM instructions at Ethereum gas plus a parent-chain data fee (Brotli-compressed size × 16) [V] — annex B §1
+- Estimate for Semaphore's own `validateProof`: about 230–270k L2 gas [U] — annex B §1 (researcher's estimate)
+- The Arbitrum gas-price floor is unclear: sources give 0.1, 0.02 or 0.01 gwei [L] — annex B §1
+- Proving time for the Semaphore-32 circuit: iPhone 16 Pro native rapidsnark 143 ms, ark-works 151 ms, snarkjs 1,002 ms; iPhone browser 652 ms (ark-works) and 920 ms (snarkjs); Samsung S23 Ultra rapidsnark 166 ms, snarkjs 2,146 ms [V] — annex B §1, Semaphore docs and repo
+- Audits and license: v4.0.0 audited by PSE; v3 audited by Veridise; MIT license [V] — annex B §1, Semaphore docs and repo
+- Contract source, read 2026-10-13 (semaphore-protocol/semaphore, `packages/contracts/contracts/Semaphore.sol` and `interfaces/ISemaphore.sol`):
+  - `SemaphoreProof` has the fields `merkleTreeDepth`, `merkleTreeRoot`, `nullifier`, `message`, `scope` and `points[8]` [V].
+  - `validateProof(groupId, proof)` has no access modifier: any caller holding a proof can submit it, which verifies the proof and stores the group's nullifier [V].
+  - `verifyProof` accepts the current root, or a replaced root until the group's `merkleTreeDuration` has passed since the replacement; `createGroup()` sets 1 hour by default, and the duration is settable by the group admin [V].
+  - `message` and `scope` enter the verifier as public inputs hashed as `uint256(keccak256(abi.encodePacked(x))) >> 8` [V].
+  - Proof depth is bounded by `MIN_DEPTH`..`MAX_DEPTH` and is a proof parameter [V].
+  - LeanIMT insertion gas and `addMember` duplicate-leaf behaviour were not checked [U].
+  - Source: Semaphore repository contract source, read by the project on 2026-10-13.
+
+Other credit and pool designs
+
+- Privacy Pools (0xbow): deposits are public; a full or partial withdrawal is a Groth16 proof of inclusion in the state tree and in the ASP-approved label set; a partial withdrawal re-commits the remainder (the change pattern); withdrawals can go through a relayer charging a basis-point fee; each proof is bound to its parameters by a context hash; ragequit lets the depositor always withdraw publicly without ASP approval [V] — annex B §1, Privacy Pools docs and repo (0xbow-io/privacy-pools-core)
+- Privacy Pools anonymity set is the ASP-approved subset [L] — annex B §1
+- Privacy Pools trusted setup: Groth16/Circom on BN254, Phase 2 in March 2025 with 514 and 513 contributions; only an Ethereum mainnet ETH pool is listed, no Arbitrum deployment found; Apache-2.0 with an audit directory in the repo; gas and proving time not found [V] — annex B §1, Privacy Pools docs and repo, L2BEAT
+- Railgun: live on Arbitrum, contract `0xFA70…A4b9`; UTXO notes with arbitrary amounts, each token with its own anonymity set; Groth16/BN254, 54 circuits, Phase 2 with 304 contributions ending December 2022; 0.25% fee on each shield and unshield, broadcasters about 10% over gas; PPOI list providers flag illicit funds and new shields wait 1 hour; L2BEAT reports a 7-day exit window but flags contract permissions that contradict it [V] — annex B §1, Railgun docs, L2BEAT
+- Tornado-style pools: fixed 0.1 / 1 / 10 / 100 ETH denominations, Groth16 with a MiMC tree, setup of 1,114 contributions; a malicious governance proposal (May 2023) and an app build that leaked deposit notes (January 2024) [V] — annex B §1, L2BEAT; an Arbitrum deployment was announced in November 2021 [L] — annex B §1
+- RLN: each message reveals a share y = k + a·x; reusing a ticket index reveals the secret key k, which allows slashing [V] — annex B §1
+- "ZK API Usage Credits" (Crapis, credited with Buterin; ethresear.ch, 11 Feb 2026): a maximum cost per request plus refunds [V] — annex B §1, ethresear.ch/t/24104
+- zkAPI (Ethereum Foundation): mainnet since 1 Oct 2026, Groth16/BN254 with a 32-level tree, single-party trusted setup, labelled experimental, mainnet and Sepolia only [V]; spend proofs are verified off-chain [L] — annex B §1, github.com/ethereum/zkapi
+- IETF Anonymous Credit Tokens: an expired individual draft; BBS-style keyed-verification credentials with partial spends and anonymous change [V] — annex B §1, draft-schlesinger-cfrg-act
+
+Blind-signature tokens and issuers
+
+- RFC 9576 defines the roles Client, Attester, Issuer and Origin [V]; RFC 9578 token types are VOPRF(P-384), privately verifiable, and Blind RSA-2048, publicly verifiable, and neither carries an amount or metadata [V] — annex B §1, RFC 9576, RFC 9578
+- Issuers hold secret keys, so issuance happens off-chain [U] — annex B §1
+- Issuer options: (a) each node as its own issuer fragments the anonymity sets, and RFC 9576 says to limit active configurations [V] — RFC 9576; (b) threshold issuance with Coconut (NDSS 2019) [L] or Nym zk-nyms with a t-of-n quorum of signers [V] — Coconut NDSS 2019, Nym zk-nym docs; (c) a central token service, as Apple PCC uses rate-limited RSA blind signatures [V] — Apple PCC documentation; all via annex B §1
+- If issuer and origin collude, a distinctive gap between challenge and issuance can link them [V] — annex B §1, RFC 9576
+
+Metered sessions
+
+- Existing patterns: Privacy Pools partial withdrawal with change re-committed; a maximum cost up front then refunds by signed tickets or a homomorphic running total; zkAPI's capped lease with actual usage deducted afterwards; ACT anonymous change on partial spends [V] — annex B §2
+- Refund amounts and the server-visible settlement log let a server re-link requests; a forum simulation recovered per-user chains; the proposed fix is fixed budget classes of 256/512/1024/2048 tokens at an estimated 20–40% cost overhead [V] — annex B §2, zkAPI (ethresear.ch/t/24104)
+- Tornado Cash: address reuse and fund-flow links trace 5.1–12.6% of withdrawals, FIFO timing adds 15–22 percentage points, and over $2.3B was linked; v3 of that paper was withdrawn over reference errors [V] — annex B §2
+- Mixer anonymity sets shrink 27.34% on average (Ethereum) and 46.02% (BSC); advertised sizes are mostly inaccurate [V] — annex B §2
+- Zcash heuristics shrink the anonymity set "considerably" [V] — annex B §2
+- Mitigations: common amounts, a delay before exiting, fresh addresses, client-side delays before redeeming tokens [V] — annex B §2
+- No authoritative minimum anonymity-set size was found [U] — annex B §2 (a search result, not a proof of absence)
+
+Network-level anonymity
+
+- Oblivious HTTP (RFC 9458): the relay sees the client's IP but not the content, the gateway sees the content but not the IP, and relay and gateway must be run by different entities; a fresh HPKE context per request; no streaming; no forward secrecy within a key configuration; traffic analysis is out of scope [V] — annex B §4, RFC 9458
+- Each OHTTP request costs at least two HTTP requests; no published millisecond figures; ODoH, a similar design, is "comparable" to DoH [V] — annex B §4, RFC 9458, ODoH (PoPETs 2021)
+- Chunked OHTTP (draft -08, February 2026, at the IESG) enables streaming; interactive exchanges let the relay or gateway measure round-trip time [V] — annex B §4, draft-ietf-ohai-chunked-ohttp
+- Tor median round-trip to the response header (20 Sep 2026): 100–540 ms to public servers, 250–680 ms to onion services [V] — annex B §4, Tor Metrics; DeepCorr reports 96% flow-correlation accuracy from about 900 packets [L] — annex B §4, DeepCorr
+- Nym: 5 hops with about 15 ms average mixing delay per hop; Nym publishes no measured latency [V] — annex B §4, Nym limitations
+
+Precedents: relays combined with TEE inference
+
+- Apple Private Cloud Compute: one-time RSA blind-signature tokens (RFC 9578 style) unlinkable to the request; the client chooses randomly among relays run by distinct third parties (Cloudflare, Fastly); relays route to attested nodes; the client encrypts only to a subset of nodes; node keys are checked against a transparency log; goal: a limited compromise must not let an attacker steer requests from specific users [V] — annex B §4, §6, Apple PCC documentation
+- Apple PCC published limits: the relay exposes the client's rough region and headers can help target a user; target diffusion is bounded by the number of node ensembles (k) that can decrypt a request; a software attack could work fleet-wide; metering could re-link usage, mitigated by a Cost Aggregation Service; the multi-turn KV cache is encrypted with keys the device supplies each turn and PCC keeps no keys between turns [V] — annex B §6, Apple PCC documentation
+- Cloudflare runs an OHTTP Relay and launched an OHTTP Gateway in October 2026 [V] — annex B §4
+- Meta WhatsApp Private Processing (April 2025): anonymous credentials, a third-party OHTTP relay, RA-TLS to confidential VMs and confidential-compute GPUs; Trail of Bits found 28 issues, 8 of them High [V] — annex B §4, §6, Meta Engineering (29 Apr 2025), Trail of Bits WhatsApp Private Processing review (Aug 2025)
+- Google Private AI Compute (November 2025) uses IP-blinding relays [V] — annex B §4, §6, NCC Group Google report v1.4 (8 Nov 2025)
+- NEAR AI: Intel TDX plus NVIDIA confidential computing on H200s, API keys, gateway metadata undocumented [V] — annex B §6
+- OpenGradient: OHTTP to AWS Nitro enclaves, an on-chain enclave registry, and relay-to-gateway payment via x402 on Base [V] — annex B §6
+- TEE.fail: a DDR5 interposer under $1,000 forges TDX attestation that passes Intel's checks and reuses NVIDIA attestations; Intel and AMD treat it as out of scope [V] — annex B §6, TEE.fail (see also §14)
+
+Researcher's takeaways (annex B §7, [U] unless cited)
+
+- A zkAPI-style vault on Arbitrum with fixed-denomination deposits into a Groth16/BN254 note tree, per-request RLN spends verified off-chain by nodes, and the chain touched only for deposit, batched settlement and escape at about 200–270k L2 gas per on-chain proof [U] — annex B §7
+- Fixed budget classes to avoid refund linkage, re-randomized change, delayed and batched settlement [U] — annex B §7
+- An OHTTP relay run independently of node operators, chunked OHTTP for streaming, a fresh HPKE context per request, size-bucket padding and token batching, and gateway keys published in one on-chain registry so no user can be given unique keys [U] — annex B §7
+- Give each conversation a random ID and a client-held key; store the encrypted blobs off-chain; deliver keys per turn inside the attested channel (the PCC pattern); never reference the wallet on-chain; turns within one conversation are linkable [U] — annex B §7 (researcher's reasoning)
+- Residual risks: prompt content and stylometry, relay–node timing correlation, small anonymity sets at launch, physical attacks on TEEs, trust in the trusted setup, and legal exposure (§16) [U] — annex B §7
+
+## 16. Deanonymization and legal facts (§16)
+
+Compiled 2026-10-13 from annex B §3 and §5. Marks follow the annex. The legal items are facts as the annex reports them, not legal advice.
+
+What the prompt text reveals
+
+- LLMs infer personal attributes from text at up to 85% top-1 accuracy [L] — annex B §5, deanonymization research list
+- An LLM pipeline linked pseudonymous profiles at up to 68% recall at 90% precision [V] — annex B §5, deanonymization research list
+- Query-log precedent: AOL user 4417749 [L] — annex B §5
+
+Traffic and node-side side channels
+
+- Token lengths alone let attackers reconstruct 29% of responses and infer the topic of 55% [V] — annex B §5, deanonymization research list
+- Whisper Leak (28 LLMs): often more than 98% AUPRC; padding, batching and packet injection reduce it, but none fully protects [V] — annex B §5, Whisper Leak (annex A marks the secondary report [L], see §14)
+- Unpadded ciphertext length leaks request and response size [V] — annex B §5
+- vLLM's prefix cache leaked through time-to-first-token (AUC 0.99), fixed in 0.9.0 [L] — annex B §5, CVE-2025-46570
+- Trail of Bits flagged unmasked output size and possible tokenization-cache leaks [V] — annex B §5, Trail of Bits WhatsApp Private Processing review (Aug 2025)
+
+Relay–node correlation and multi-turn linkability
+
+- NCC Group found timing side channels in Google's IP-blinding relay that "may be able to unmask" users, exploitability Low [V] — annex B §5, NCC Group Google report v1.4 (8 Nov 2025)
+- Trail of Bits: rotating OHTTP or credential keys could deanonymize users, severity Medium [V] — annex B §5, Trail of Bits WhatsApp Private Processing review (Aug 2025)
+- OpenGradient states that timing and volume metadata are not protected [V] — annex B §5
+- Apple PCC deliberately links the turns of one conversation [V] — annex B §5, Apple PCC documentation
+- Mitigations: fresh keys per request; padding, batching and packet injection; consistent issuer keys for all users [V] — annex B §5
+- No study of conversation splitting was found [U] — annex B §5 (a search result, not a proof of absence)
+
+Legal and regulatory facts (not legal advice)
+
+- OFAC sanctioned Tornado Cash in August 2022 [V] — annex B §3, OFAC
+- *Van Loon v. Treasury* (5th Cir., 26 Nov 2024): immutable smart contracts are not "property" under IEEPA [V] — annex B §3, Van Loon v. Treasury (5th Cir.)
+- OFAC delisted Tornado Cash on 21 March 2025 [V] — annex B §3, OFAC recent action 20250321
+- Roman Storm was convicted on 6 August 2025 of conspiracy to operate an unlicensed money-transmitting business (§1960), maximum 5 years [V] — annex B §3, USAO-SDNY; the other counts were a hung jury per DOJ and Decrypt [L], and one outlet called the sanctions count an acquittal [U] — annex B §3
+- Storm's acquittal motion was argued on 9 April 2026 and is undecided; retrial is set for 26 April 2027 [V] — annex B §3, USAO-SDNY
+- DOJ policy (21 Aug 2025): no new §1960(b)(1)(C) charges against a third party where the software is "truly decentralized", only automates peer-to-peer transactions, and nobody has custody of user funds [V] — annex B §3, DOJ
+- Samourai Wallet founders were sentenced to 5 and 4 years in November 2025 [L] — annex B §3, USAO-SDNY
+- EU AMLR (Regulation 2024/1624) Article 79(1): credit institutions, financial institutions and crypto-asset service providers may not keep anonymous crypto-asset accounts, or accounts allowing anonymisation or increased obfuscation, including through anonymity-enhancing coins [V] — annex B §3, AMLR Art. 79; it applies from 10 July 2027 [L] — annex B §3
+- Compliance designs: association sets let a user prove membership in a "good" set without revealing which deposit is theirs [L]; the ASP publishes roots plus an IPFS hash on-chain, and ragequit remains as a public exit [V] — annex B §3, Privacy Pools docs
+
+## 17. How to cite
 
 - Sibling documents cite a fact as 'evidence register §N' together with its mark ([V], [L] or [U]), for example: "new Stylus activations are paused (evidence register §1, [V])".
 - Any claim that is not in this register is labeled UNVERIFIED where it appears.
@@ -189,4 +354,8 @@ All entries in this section are [V].
 - §9–§13 were retrieved 2026-10-13. They are cited as 'evidence register §N' with their marks like every other section.
 - The 2025–26 networked-speculative-decoding preprints in §9 carry both marks inline: [V] for what the preprint says, [U] because the result is not independently replicated. A document citing them carries both marks and the [U] stays; no document may cite them as [V] alone or upgrade them. The cited claim is "no WAN speed-up is promised", never "no speed-up exists".
 - The llama.cpp RPC backend facts ('proof-of-concept', 'fragile and insecure', never on an open network) are §10, not §9; a citation to them must say §10.
+- §14–§16 were added 2026-10-13, compiled from two screened research annexes (annex A: private inference; annex B: anonymous payments and relays). They are cited as 'evidence register §N' with the mark the annex gives. The older §4 FHE/MPC/TEE bullets remain a dated 2026-10-12 snapshot with different figures; a document citing current figures cites §14.
+- A [U] figure in §14–§16 (including "(calc)" arithmetic and the researchers' own estimates and takeaways) must not be upgraded to [L] or [V] by any document; a fact that annex A and annex B mark differently (Whisper Leak) is cited with the mark of the entry actually used.
+- The Semaphore-32 proving times (143–2,146 ms [V]) and the about 230–270k L2 gas estimate for `validateProof` [U] describe Semaphore's own circuit and contract function, not any Comuns circuit or contract. A Comuns figure built on them is UNVERIFIED until measured. Semaphore audits ("v4.0.0 audited by PSE; v3 audited by Veridise") do not transfer to any Comuns contract.
+- The legal and regulatory items in §16 are facts as reported, not legal advice; no document may present them as legal advice or as a legal conclusion about Comuns.
 - Adding or changing a fact requires a pull request to this file that states the source and the mark; reviewers check the source before merge.
