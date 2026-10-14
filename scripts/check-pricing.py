@@ -9,12 +9,32 @@ Dollar results round half up to 12 decimals; multipliers to at most 4 decimals.
 import json
 import re
 import sys
+import unicodedata
 from decimal import Decimal, ROUND_HALF_UP, localcontext
 from pathlib import Path
 
 
 MILLION = 1_000_000
 CLASSES = ("S", "M", "L", "X")
+
+
+def emit(line):
+    """Print with control, format and separator characters made visible.
+
+    Fixture ids and labels come from the JSON file, which a pull request can
+    change; escaping keeps them from rewriting the terminal.
+    """
+    out = []
+    for ch in str(line):
+        if ch.isprintable() and unicodedata.category(ch) not in ("Cc", "Cf", "Zl", "Zp"):
+            out.append(ch)
+        elif ord(ch) < 0x100:
+            out.append(f"\\x{ord(ch):02x}")
+        elif ord(ch) < 0x10000:
+            out.append(f"\\u{ord(ch):04x}")
+        else:
+            out.append(f"\\U{ord(ch):08x}")
+    print("".join(out))
 
 
 def require(condition, message):
@@ -118,6 +138,39 @@ def session(fixture):
     equal(settled, min(payment(fixture, incoming, outgoing), cap), "cumulative cap")
     if fixture.get("expectOverCap"):
         require(last_amount > cap, "over-cap case did not exceed cap")
+
+
+def credit_session(fixture):
+    values = fixture["denominationsWei"]
+    require(isinstance(values, list) and values, "denominationsWei must be a nonempty list")
+    denominations = [integer(value) for value in values]
+    require(denominations[0] > 0, "denominations must be positive")
+    require(all(previous < current for previous, current in zip(denominations, denominations[1:])),
+            "denominationsWei must be strictly increasing")
+    denomination = integer(fixture["denominationWei"])
+    require(denomination in denominations, "denominationWei must be listed in denominationsWei")
+    owed = payment(fixture)
+    settled = min(owed, denomination)
+    pending = denomination - settled  # Recorded at settlement, before claimChange.
+    dust = pending
+    for value in reversed(denominations):
+        dust %= value  # Greedy multi-note change, per ADR 0011; no adopted note limit.
+    change = pending - dust  # Total face value of all minted change notes.
+    relay = min(integer(fixture["relayFeeWei"]), settled)
+    node_payout = settled - relay + dust
+    for key, result in (
+        ("expectedOwedWei", owed),
+        ("expectedSettledWei", settled),
+        ("expectedPendingWei", pending),
+        ("expectedChangeWei", change),
+        ("expectedDustWei", dust),
+        ("expectedRelayWei", relay),
+        ("expectedNodePayoutWei", node_payout),
+    ):
+        equal(result, integer(fixture[key]), key)
+    equal((settled - relay) + relay + pending, denomination, "settlement conservation")
+    equal(node_payout + relay + change, denomination, "node + relay + change conservation")
+    require(dust < denominations[0], "dust must be below the smallest denomination")
 
 
 def bands(fixture):
@@ -238,7 +291,7 @@ def amortization(fixture):
 
 
 CHECKERS = {"formula": formula, "session": session, "bands": bands, "operator": operator,
-            "collective": collective, "amortization": amortization}
+            "collective": collective, "amortization": amortization, "credit_session": credit_session}
 
 
 def reject_number(value):
@@ -255,7 +308,7 @@ def unique_object(pairs):
 
 def main():
     if len(sys.argv) > 2:
-        print("FAIL input: usage: check-pricing.py [pricing-examples.json]")
+        emit("FAIL input: usage: check-pricing.py [pricing-examples.json]")
         return 1
     path = Path(sys.argv[1] if len(sys.argv) == 2 else "docs/economics/pricing-examples.json")
     try:
@@ -271,7 +324,7 @@ def main():
                 "required class-S-on-T4 or collective fixture missing")
         require(set(CHECKERS).issubset({fixture["kind"] for fixture in fixtures}), "missing fixture category")
     except (OSError, ValueError, KeyError, TypeError) as error:
-        print(f"FAIL input: {error}")
+        emit(f"FAIL input: {error}")
         return 1
     failures = 0
     for fixture in fixtures:
@@ -279,10 +332,10 @@ def main():
             with localcontext() as context:
                 context.prec = 80
                 CHECKERS[fixture["kind"]](fixture)
-            print(f"PASS {fixture['id']}")
+            emit(f"PASS {fixture['id']}")
         except (ValueError, KeyError, TypeError, ArithmeticError) as error:
             failures += 1
-            print(f"FAIL {fixture['id']}: {error}")
+            emit(f"FAIL {fixture['id']}: {error}")
     return 1 if failures else 0
 
 

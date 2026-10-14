@@ -4,13 +4,13 @@ Author: Comuns contributors
 Status: Draft
 Category: Analysis
 Created: 2026-10-12
-**Reference:** [evidence-register.md](evidence-register.md) §2, [project-charter.md](project-charter.md), [adr/0008-model-first-pools.md](adr/0008-model-first-pools.md), [adr/0009-opt-in-client-orchestration.md](adr/0009-opt-in-client-orchestration.md)
+**Reference:** [evidence-register.md](evidence-register.md) §2, §14–§16, [project-charter.md](project-charter.md), [adr/0008-model-first-pools.md](adr/0008-model-first-pools.md), [adr/0009-opt-in-client-orchestration.md](adr/0009-opt-in-client-orchestration.md)
 
 ---
 
 ## 1. Summary
 
-Comuns is a community proposal for open-source, decentralized LLM inference settled in ETH on Arbitrum One. Nothing runs yet: there is no network, no deployment and no seated maintainer. This file reads other compute and inference networks only from evidence register §2, which is a snapshot, and then states the design this proposal writes for itself.
+Comuns is a community proposal for open-source, decentralized LLM inference settled in ETH on Arbitrum One. Nothing runs yet: there is no network, no deployment and no seated maintainer. The network comparison uses the dated evidence register §2 snapshot; the relay-plus-TEE precedents use §15, with privacy limits from §14 and §16. This file then states the proposal’s own design.
 
 The table is not a ranking. This proposal does not claim to be faster, cheaper or more proven than any project named below. A cell that compares designs states what this proposal does. It does not score the other project.
 
@@ -20,7 +20,7 @@ Model-first pools, the open-source client-side orchestrator and collective answe
 
 ## 2. How to read this (confidence marks)
 
-Every external fact in this file is copied from evidence register §2, and it keeps the mark §2 gives it. The register's marks mean:
+External facts come from evidence register §2 and §14–§16 and retain the mark of the cited section. The register's marks mean:
 
 - **[V]** verified at the source the register names.
 - **[L]** likely. A likely mark is not a settled fact.
@@ -28,9 +28,9 @@ Every external fact in this file is copied from evidence register §2, and it ke
 
 A mark sits on the clause it belongs to. This file does not upgrade [L] or [U] to [V], and it does not drop a mark when it repeats a fact. Where §2 is silent, the cell says "not stated in evidence register §2". Silence is not filled from memory.
 
-Sections §1–§8 of the evidence register, including §2, are a snapshot taken 2026-10-12. A later change to a named project is absent from this table until the register itself changes. Header dates and statements about this proposal are not §2 facts; they are this document's own.
+Sections §1–§8 of the evidence register, including §2, are a snapshot taken 2026-10-12. Sections §14–§16 were compiled on 2026-10-13 from the screened research annexes. A later change to a named project is absent from this table until the register itself changes. Header dates and statements about this proposal are not §2 facts; they are this document's own.
 
-Names, numbers and dates of third-party projects that do not appear in §2 are not used here. Mechanisms recorded only in later sections of the register are not imported to decorate a row.
+The comparison table below stays within §2. A separate precedent list cites §15; it implies no partnership, integration or adoption by Comuns.
 
 ## 3. Comparison table
 
@@ -44,7 +44,7 @@ Columns are the project, where it settles or how it coordinates, how operators a
 | Gensyn | OP Stack rollup; mainnet Apr 2026 [L] | Not stated in evidence register §2 | Not stated in evidence register §2 | Verde + RepOps [V] | Out of scope. Training-first [L]. This proposal is inference only. |
 | io.net | Central matching [L] | Solana token [L]. A per-request formula is not stated in §2 | No privacy mechanism found [L] | Hardware checks after a 2024 fake-GPU incident [L]. A protocol-level result check is not stated in §2 | This proposal has no central matcher and no token. It does not treat a hardware check as an unfakeable proof. |
 | Hyperbolic | Centralized market [V] | Not stated in evidence register §2 | Not stated in evidence register §2 | PoSP/spML research [V] | This proposal's client reads offers. It does not adopt that research as a payment rule, and it does not rank the two checks. |
-| Morpheus | On-chain bids; settles on Base; MIT; Go + TypeScript [V] | MOR stake [V]. A per-token ETH formula is not stated in §2 | Proxy-router carries prompts [V] | 'tee' tags attested [V]. Nothing further on result checking is in §2 | This proposal does not place a proxy on the path of the prompt. The client seals the prompt to the node the user chose. |
+| Morpheus | On-chain bids; settles on Base; MIT; Go + TypeScript [V] | MOR stake [V]. A per-token ETH formula is not stated in §2 | Proxy-router carries prompts [V] | 'tee' tags attested [V]. Nothing further on result checking is in §2 | This proposal routes ciphertext through a relay to the chosen node’s OHTTP gateway; the relay does not receive prompt plaintext. |
 | ORA (opML) | Not stated in evidence register §2 | Not stated in evidence register §2 | Not stated in evidence register §2 | opML bisection to a one-step MIPS VM; 7B on a CPU-only PC [V]; window under 10 min [L] | This proposal does not use that bisection as its result check. Opt-in verifiable mode is re-execution by a second node the user chooses. This document does not rank the two checks. |
 | Petals | Block-sharded swarm; MIT; last release Sep 2023 [V] | Not stated in evidence register §2 | README warns that data is processed by other people [V] | No result check is stated in §2. §2 records ~6 tok/s for Llama 2 70B [V], which is a throughput figure | Single-node execution is this proposal's default. This document records that throughput figure and does not rank this proposal's speed against it. |
 | Exo | Own devices; Python + Rust; Apache-2.0 [V] | No payments [V] | Not stated in evidence register §2 | No verification [V] | This proposal specifies an ETH session payment. It does not claim that a payment makes a result more correct. |
@@ -63,13 +63,23 @@ These clauses are the whole of what §2 records for each name. They are not extr
 - Nosana is recorded as a Solana marketplace [L], with verification marked [U].
 - Golem is recorded as yagna in Rust with Polygon and Ethereum payments [V], with verification marked [U].
 
+### Relay-plus-TEE precedents
+
+These are recorded precedents for combining network anonymity with protected execution, not claims about Comuns deployment or partnerships:
+
+- **Apple Private Cloud Compute (PCC):** one-time blind-signature tokens, independent third-party relays to attested nodes, and node keys checked against a transparency log (evidence register §15, [V]).
+- **Meta WhatsApp Private Processing:** anonymous credentials, a third-party OHTTP relay, RA-TLS to confidential VMs and confidential-compute GPUs (evidence register §15, [V]).
+- **OpenGradient:** OHTTP to AWS Nitro enclaves, an on-chain enclave registry and relay-to-gateway payments through x402 on Base (evidence register §15, [V]).
+
+A relay does not remove timing and volume correlation (evidence register §16, [V]); attested execution has physical-attack limits (evidence register §14, [V]/[L]). These precedents support a separation of identity protection from content protection, not an absolute privacy claim.
+
 ## 4. The gap
 
 This section states this proposal's own design. It adds no third-party name, number or date.
 
-**Per-session ETH payment, with chunked vouchers, rather than emissions.** The user deposits ETH for a session with one node and one model. The client signs a cumulative voucher for each chunk of output the client has acknowledged. Input and output token counts on a voucher are cumulative for the session, and a later voucher cannot lower what is owed. The contract credits an internal balance. No contract pushes ETH during settlement, bond release or refund. The only function that sends ETH is `withdraw()`, which pays the caller that caller's whole balance. A signed voucher is not reversed. v1 has no slashing and no token. The protocol fee is 0. The inference payment is the ETH owed for tokens. It is not the chain's transaction fee.
+**Anonymous credits with metered ETH sessions.** A public wallet deposit creates a fixed-denomination note. A membership proof spends it through `openSessionFromCredit`, submitted by a node or broadcaster, with no payer address recorded on the session. Fresh session signers sign cumulative usage vouchers. Settled value is split between the relay and node; unused value becomes `pendingWei`, then fresh notes through `claimChange`, with dust to the node. SessionEscrow is non-upgradeable. Pull payments use `withdraw()`. A signed voucher is not reversed; v1 has no slashing and no token. See [ADR 0011](adr/0011-anonymous-credits.md).
 
-**Wallet-owned encrypted contexts.** Each wallet owns many versioned contexts, encrypted under a fresh key for each version. Sharing a context with a node re-wraps that version's key to the node's key. The ciphertext blob is what moves. Nodes do not exchange plaintext. The chain stores the content hash, not the text. The backup holds keys and key-wrap records. Ciphertext that existed only on a lost device is gone even with that backup.
+**Wallet-owned contexts without wallet labels.** A wallet’s list of independent context signing keys lives only in its encrypted vault and backup. Each version has its own encryption key, re-wrapped to each granted node; context keys sign grants and heads. Nodes never exchange plaintext or keys. The host is trusted for sequencing and availability. Clients persist accepted checkpoints in the vault and backups and reject rollback behind them, but a host can still equivocate between devices that have not compared checkpoints, and a device restored from a stale backup accepts a head that a newer device would reject until they sync (ADR 0012 (5)). A globally consistent multi-device head requires an anonymous public anchor submitted by a broadcaster. Reusing a context id links sessions; key backups do not recover lost ciphertext. See [ADR 0012](adr/0012-contexts-without-a-wallet-link.md).
 
 **An open Rust node.** Inference runs off-chain in an open-source Rust node with pluggable backends. This proposal does not claim that the language alone makes inference faster.
 
@@ -77,43 +87,43 @@ This section states this proposal's own design. It adds no third-party name, num
 
 **Community CIPs, with no token.** A change is a written CIP under rough consensus. There is no coin vote. No maintainer is seated, and seating happens only through a Final CIP. A CIP in Last Call cannot become Stagnant. A substantive edit during Last Call returns the CIP to Review.
 
-**Arbitrum One settlement.** Settlement is Arbitrum One, with EVM contracts for nodes, models, context hashes and session escrow. The chain records offers and sessions. It does not run the model, and it does not store a pool list or a plan.
+**Arbitrum One settlement.** Settlement is Arbitrum One, with EVM contracts for nodes and relays, models, optional context anchors and credit/session escrow. The chain records offers and sessions. It does not run the model, and it does not store a pool list or a plan.
 
 **Inference only.** Training, fine-tuning and federated learning are non-goals.
 
-**The executing node sees plaintext.** In standard mode the chosen node can read the prompt, the granted context and the completion. The client says so before the user signs. This proposal does not claim confidentiality against that node. Attested mode checks a TEE quote and is not a physical-attack defense. Verifiable mode, when the user opts in, is re-execution by a second node the user chooses, under a demonstrated deterministic profile, and that verifier can read the prompt too.
+**Anonymous by default, with two content tiers.** Relay transport, anonymous credits and context-key grants aim to keep nodes and chain observers from learning who asked. In standard mode the chosen node reads the prompt, granted context and completion. Its banner says: “This node can read your prompt and your answer. It should not learn who you are.” Attested mode checks a quote before sealing: “This node should not be able to read your prompt. A physical attack on the hardware can break that.” Verifiable mode adds a user-chosen reader reached through a relay and funded by its own credit. Identifying content and traffic correlation remain risks (evidence register §16, [V]/[L]); hardware limits are recorded in §14, [V]/[L].
 
 **Model-first pools, with per-model offers and no class-to-tier gate.** A pool is the set of nodes with a current offer for one model id. The offer is `prices[modelId]` carrying input and output prices and a non-zero per-model benchmark hash. Clients enumerate pools off-chain. A pool is not a contract and not a payee. Any node may offer any registered model it can load. `maxTier` is informational. Model registration in v1 is governance-only, through a CIP. With nobody seated, there is no mainnet registration.
 
-**An open-source client-side orchestrator, with opt-in collective answers.** Single-node execution is the default: one node, one session, one reader of the prompt in standard mode. Collective answers, decomposed plans and parallel planning are opt-in per request. The orchestrator is open-source logic in the client SDK. Before the user signs, the client shows a disclosure sheet that lists each node's role, what that node receives, its prices and its cap, and counts which nodes can read the prompt. An optional orchestrator node is never mandatory. It is paid as an ordinary session and holds no session signer in v1.
+**An open-source client-side orchestrator, with opt-in collective answers.** Single-node execution is the default: one node, one session, one reader of the prompt in standard mode. Collective answers, decomposed plans and parallel planning are opt-in per request. The orchestrator is open-source control logic in the client SDK, with no model computation on the user’s device. Model-based planning, review, merging and synthesis run on disclosed network nodes. Before the user signs, the client shows a disclosure sheet that lists each node's role, what that node receives, its prices and its cap, and counts full-prompt recipients separately from operator-readable recipients. An optional orchestrator node is never mandatory. It is reached through a relay, paid through a credit session and holds no session signer in v1.
 
 Collective answers are this proposal's quality mechanism: independent answers, a blind cross-check, and a synthesis that lists disagreements. They are not verification, not a privacy mode and not chain consensus, and they never change what a signed voucher pays.
 
-Two further features, model sharding and cross-node speculation, are experimental spikes in this proposal. The reference client refuses both under mainnet parameters. They run only with testnet-only, non-normative prices. Shard holders hold no session and are not paid. For cross-node speculation, no WAN speed-up is promised. Both are opt-in and appear on the disclosure sheet. Single-node execution remains the default.
+Two further features, model sharding and cross-node speculation, are experimental spikes in this proposal. The reference client refuses both under mainnet parameters. They run only with testnet-only, non-normative prices. Shard holders, including embedding and output-layer nodes, are unpaid volunteer readers without sessions. Activations reach each holder through a relay, OHTTP-encapsulated to its registered `ohttpKeyConfig`, without an inner job HPKE envelope. The client performs no model computation. For cross-node speculation, no WAN speed-up is promised. Both are opt-in and appear on the disclosure sheet. Single-node execution remains the default.
 
 ## 5. What this proposal refuses to copy
 
 Each item is a pattern this proposal refuses. Where a named project illustrates the pattern, the only fact used is one that evidence register §2 states, with its mark. The refusal itself is this proposal's design.
 
-1. **A proxy that sees prompts.** §2 records that the Morpheus proxy-router carries prompts [V]. This proposal seals the prompt to the node the user chose. No proxy sits on that path.
+1. **A proxy that sees prompts.** §2 records that the Morpheus proxy-router carries prompts [V]. This proposal seals the prompt to the chosen node and routes it through an independent OHTTP relay that sees the network address and ciphertext, not the prompt.
 2. **A public swarm.** §2 records Petals as a block-sharded swarm whose README warns that data is processed by other people [V]. This proposal's default is one node chosen by the user.
 3. **An emission token.** §2 records that Bittensor miners are paid by emissions, not per request [L]. This proposal has no token. An operator is paid from the ETH session the user opened.
 4. **A central matcher.** §2 records that io.net uses central matching [L]. This proposal's client chooses a node by reading offers. A matcher is not a protocol role.
 5. **A claim of unfakeable hardware.** §2 records that io.net added hardware checks after a 2024 fake-GPU incident [L]. This proposal's class benchmark and per-model self-benchmark are signed claims. They are not an unfakeable proof, and v1 does not slash because a benchmark looks wrong.
 6. **Slashing on nondeterministic output.** §2 records that Ritual's staked executors are slashed [V]. §2 does not say that the slash is for two outputs that differ. This proposal's own rule is that v1 has no slashing. Differing outputs are not a payment event, and a signed voucher is not reversed.
 7. **A public swarm that shards prompts across strangers by default.** The Petals fact in item 2 is the §2 record of a public swarm that processes other people's data [V]. This proposal does not shard a prompt across strangers by default. Its experimental sharding spike is opt-in, treats every shard holder as able to read the prompt, pays no shard holder, and is refused by the reference client under mainnet parameters.
-8. **A mandatory orchestrator or proxy that sees every prompt.** The Morpheus proxy-router fact in item 1 is the §2 record of a component that carries prompts [V]. §2 does not describe a mandatory orchestrator, and this file does not invent one. This proposal keeps orchestration as open-source logic in the client. Single-node is the default. An orchestrator node is optional, is paid as an ordinary session, and holds no session signer.
-9. **An emission or stake-weighted score presented as a collective answer.** §2 records Bittensor emissions [L] and a Morpheus MOR stake [V]. This proposal does not present an emission share or a stake weight as a collective answer. When the user opts in, a collective answer is a quality mechanism on ordinary ETH sessions, and disagreement does not change payment.
+8. **A mandatory orchestrator or proxy that sees every prompt.** The Morpheus proxy-router fact in item 1 is the §2 record of a component that carries prompts [V]. §2 does not describe a mandatory orchestrator, and this file does not invent one. This proposal keeps orchestration as open-source logic in the client. Single-node is the default. An orchestrator node is optional, is reached through a relay and paid through a credit session, and holds no session signer.
+9. **An emission or stake-weighted score presented as a collective answer.** §2 records Bittensor emissions [L] and a Morpheus MOR stake [V]. This proposal does not present an emission share or a stake weight as a collective answer. When the user opts in, a collective answer is a quality mechanism on credit-funded ETH sessions, and disagreement does not change payment.
 
 ## 6. Risks
 
 ### R1 — The comparison table goes stale **[RISK] · High**
 
-Evidence register §2 is a snapshot taken 2026-10-12. A project can change its settlement, its payment, its privacy claim or its result check after that date. A reader who treats this table as a live survey will be wrong, and a later document that copies a cell without re-checking the register will spread the stale cell. Mitigation: this file cites §2 and does not add third-party facts; a changed fact is a change to the register first, with its source and its mark.
+Evidence register §2 is a snapshot taken 2026-10-12. A project can change its settlement, its payment, its privacy claim or its result check after that date. A reader who treats this table as a live survey will be wrong, and a later document that copies a cell without re-checking the register will spread the stale cell. The separate relay-plus-TEE precedents are from the 2026-10-13 compilation of §15. Mitigation: each fact cites its snapshot section; a changed fact is a change to the register first, with its source and its mark.
 
 ### R2 — A likely mark is read as certain **[RISK] · Medium**
 
-Several load-bearing cells are [L] or [U]: Bittensor's consensus, emission split and TEE claim; Gensyn's mainnet date and training-first label; io.net's matching, token, privacy note and hardware checks; the ORA window; Phala's TEEs; Oasis ROFL; Fluence; Nosana's marketplace; Lilypad's deterministic modules; and the verification notes for Nosana and Golem, which are [U]. A summary that drops the mark turns a likely or unsure statement into a settled one. Mitigation: every borrowed fact in this file keeps the mark §2 gave it, and section 2 says a likely mark is not certainty.
+Several load-bearing cells are [L] or [U]: Bittensor's consensus, emission split and TEE claim; Gensyn's mainnet date and training-first label; io.net's matching, token, privacy note and hardware checks; the ORA window; Phala's TEEs; Oasis ROFL; Fluence; Nosana's marketplace; Lilypad's deterministic modules; and the verification notes for Nosana and Golem, which are [U]. A summary that drops the mark turns a likely or unsure statement into a settled one. Mitigation: every borrowed fact in this file keeps its source section’s mark, and section 2 says a likely mark is not certainty.
 
 ### R3 — A design note is read as a ranking **[RISK] · Medium**
 

@@ -8,19 +8,24 @@ Created: 2026-10-12
 
 ---
 
-Comuns is a community proposal for open-source decentralized LLM inference. Nothing runs yet. Entries are alphabetical. Settlement identifiers are defined in [protocol/contracts-and-settlement.md](protocol/contracts-and-settlement.md); if a wording here and that document disagree on a field, that document wins. v1 has no slashing and no token.
+Comuns is a community proposal for open-source decentralized LLM inference. Nothing runs yet. Entries are alphabetical. Settlement identifiers are defined in [protocol/contracts-and-settlement.md](protocol/contracts-and-settlement.md); ADR [0011](adr/0011-anonymous-credits.md) is the source of truth for signatures, parameters and session fields; ADRs [0010](adr/0010-anonymous-by-default.md) and [0012](adr/0012-contexts-without-a-wallet-link.md) govern anonymity and contexts. v1 has no slashing and no token.
+
 
 ### ADR
 
-An ADR is an architecture decision record under `docs/adr/`. The records ADR 0001 through ADR 0009 are proposed, and none is adopted, because adoption requires a Final CIP and [cip/0001-adopt-baseline-adrs.md](cip/0001-adopt-baseline-adrs.md) is not Final. With nobody seated, nobody has authority to mark a record adopted.
+An ADR is an architecture decision record under `docs/adr/`. The records ADR 0001 through ADR 0012 are proposed, and none is adopted, because adoption requires a Final CIP; [CIP-0001](cip/0001-adopt-baseline-adrs.md) and [CIP-0002](cip/0002-anonymous-credits-relays-and-ownerless-contexts.md) remain Draft. ADR 0003 is superseded in part by ADR 0010–0012. With nobody seated, nobody has authority to mark a record adopted.
+
+### anonymous by default
+
+Anonymous by default is the proposed separation of a request from the user’s identity: relay transport, credit-funded sessions with fresh session signers, and contexts without a wallet link. Nodes and chain observers should not learn who asked. It does not hide content in standard mode. Identifying text and timing remain risks (evidence register §16, [V]/[L]); anonymity sets are small at launch (evidence register §15, [U]); relay–node collusion remains a risk (evidence register §15, [V], and §16, [V]). All session-specific chain reads, including RPC or indexer queries for sessions, settlement, change, witnesses and roots, tunnel through a relay.
 
 ### answerer
 
-An answerer is a node that, in an opt-in collective answer, receives the full prompt sealed to it alone and returns one independent answer. It does not see another answer while it is generating. It is a full-prompt reader, it is paid through an ordinary session for the model it runs, and a discarded answer does not reverse its signed voucher.
+An answerer is a node that, in an opt-in collective answer, receives the full prompt sealed to it alone and returns one independent answer. It does not see another answer while it is generating. It is a full-prompt reader, it is paid through a credit-funded session for the model it runs, and a discarded answer does not reverse its signed voucher.
 
 ### attested mode
 
-Attested mode (mode 1) means the client checks a TEE quote, bound to the node's HPKE key and a client nonce, before it seals anything, and the request fails closed when no eligible node exists. It is not a physical-attack defense: a physical extraction of attestation keys is recorded, and vendors treat physical attacks as out of scope (evidence register §4, [L]). The node still sees the prompt in plaintext inside the TEE.
+Attested mode (mode 1) adds content privacy to anonymous transport and credits. The normative banner is: “This node should not be able to read your prompt. A physical attack on the hardware can break that.” Before sealing, the client checks a quote binding the TEE-generated job HPKE key, gateway key configuration and client nonce against the published measurement list for the node build and model manifest. Every plaintext recipient must be attested; no eligible node means failure, never a silent downgrade. Hardware limits are recorded in evidence register §14, [V]/[L].
 
 ### band
 
@@ -28,7 +33,11 @@ A band is the governance-set floor and ceiling, for input and for output, on the
 
 ### bond
 
-A bond is the ETH an operator locks when registering a node. After the unlock delay, `withdrawBond` credits that operator's internal balance, and only `withdraw()` sends ETH. v1 has no slashing and no token, so the bond is never seized.
+A bond is the ETH an operator locks when registering a node or relay. After deregistration and the unlock delay, `withdrawBond` credits that operator’s internal balance and deletes the corresponding record; the relay branch requires no Node record. Only `withdraw()` sends ETH. v1 has no slashing and no token.
+
+### change note
+
+A change note is a fresh fixed-denomination note minted by `claimChange` after settlement, authorised by the session signer. The client greedily decomposes `pendingWei` into at most `MAX_CHANGE_NOTES` notes and durably stores a new Semaphore identity for each before publication. A zero-use session can return its full denomination this way. No note is inserted at close or finalize; there is no separate refund note.
 
 ### chunk (CHUNK_TOKENS)
 
@@ -48,35 +57,55 @@ A collective answer is an opt-in quality mechanism: at least two nodes answer th
 
 ### content hash
 
-The content hash is keccak256 of the complete stored blob, which is the header, the ciphertext and the tag, and that is the one canonical definition. It is not a hash of the plaintext. ContextRegistry stores the latest version and content hash for each context, and a node checks an older version against the `ContextSet` event history.
+The content hash is keccak256 of the complete stored blob: header, ciphertext and tag, never plaintext. A context-key-signed head record binds it to the context id, version and previous content hash. The default integrity path is the host’s signed hash chain plus client checkpoints; an anchored context also records its latest version and hash in ContextRegistry, with older versions checked against event history.
 
 ### context
 
-A context is a versioned blob a wallet owns — a transcript, a document or a system prompt — and each version `v` has its own random 256-bit key `K_v`. The chain stores the content hash, not the ciphertext. The backup export contains the identity key and every key-wrap record, and ciphertext that existed only on a lost device is gone even with the backup.
+A context is a versioned encrypted blob, such as a transcript, document or system prompt. One wallet owns many contexts only through the key list in its local vault and identity-key backup; no wallet label is sent to nodes or written on-chain. `contextId = keccak256(contextPubKey)` and each version has a fresh encryption key `K_v`. A context host stores signed heads and ciphertext and is trusted for sequencing and availability. Clients persist accepted head checkpoints in the vault and backups and reject rollback behind them. Unanchored hosts can equivocate between devices that have not compared checkpoints; a stale backup cannot detect a head newer checkpoints would reject. A globally consistent multi-device head requires a public `setContext` anchor submitted by a broadcaster. Reusing a context id links sessions; key backups do not restore lost ciphertext.
 
 ### context grant
 
-A context grant is EIP-712 typed data signed by the wallet that owns the context, not by the session signer, and it wraps exactly the keys of the granted versions to one node's HPKE key. Expiry is `expiresAt`, a unix time in seconds (`uint64`), never a block number. A narrow grant restricts decryption to those versions, and the grant's idempotency key includes the job id.
+A context grant is EIP-712 typed data signed by the independent context key, carrying `contextPubKey` and `contextSignature`. It travels inside the encrypted job and wraps exactly the granted versions’ `K_v` keys to the recipient node’s job HPKE key. Neither the wallet nor the session signer signs the grant. Expiry is `expiresAt`, a unix time in seconds (`uint64`); the grant’s idempotency key includes the job id.
+
+### context key
+
+A context key is a random per-context signing key from the operating-system CSPRNG, never the wallet key or derived from it. It signs grants, head records and optional public anchors. The client checks `keccak256(contextPubKey) == contextId`. It is distinct from the per-version content encryption keys `K_v`; its wallet association stays in the vault and backup.
+
+### credit
+
+A credit is ETH held as an unspent fixed-denomination note in the non-upgradeable SessionEscrow. A public `depositNote` creates it; a membership proof and nullifier fund `openSessionFromCredit` without naming the deposit wallet. It is not a protocol token or a withdrawable `balances[address]` entry. Change creates fresh notes, and ragequit is a public exit bounded by the caller’s deposits in that denomination group.
 
 ### DCO
 
 The DCO, the Developer Certificate of Origin, is the per-commit certification this proposal uses, recorded as a Signed-off-by line. It grants no license (evidence register §8, [V/L]). This proposal uses no CLA and no copyright assignment, and code and documents are Apache-2.0.
 
+### denomination
+
+A denomination is the fixed ETH face value of a note and its Semaphore group, selected by denomination index. Governance appends values through `setCreditParameters`; existing values never change. Each value satisfies `MIN_DEPOSIT_WEI`, and an append must preserve greedy decomposition of every remainder below the largest denomination into at most `MAX_CHANGE_NOTES` notes with dust below the smallest denomination. Values remain unset.
+
 ### disclosure sheet
 
-The disclosure sheet is the record the client shows before the user signs any session for a request: each node's role, what it receives, its privacy mode, its two prices and its cap, plus how many distinct nodes and distinct operators can read the prompt. `readersOfFullPrompt` is a floor taken from the actual payloads and is at least `counts.fullPrompt`, which counts nodes literally sent the full prompt; the sheet JSON is normative. Any change of node, model, data scope, price, cap or reader set creates a new sheet version that the user confirms before any `openSession` or job under it, and amounts are shown in ETH with the unit.
+The disclosure sheet is the record the user confirms before a credit spend or job: recipient roles, payloads, modes, prices and caps, plus `anonymity.transport`, `relay`, `funding` and `contextLinkage`. `readersOfFullPrompt` remains a floor on distinct recipients and operators across all modes. `recipients[].operatorReadable` is false only for attested recipients; `counts.operatorReadable` drives the banner, alongside `counts.attestedRecipients`. An attested request fails closed unless every plaintext recipient is attested. A change to the node, model, scope, price, cap or reader set requires a new confirmed sheet.
 
 ### draft node
 
-A draft node is the node, in the experimental cross-node speculation spike, that proposes draft tokens for a target node to score. It receives the full prompt, so it is a full-prompt reader, and its ordinary session on the draft model is billed for the acknowledged draft tokens it delivers, including drafts the target rejects. The reference client refuses the spike under mainnet parameters; it runs only with testnet-only, non-normative prices, and no WAN speed-up is promised.
+A draft node is the node, in the experimental cross-node speculation spike, that proposes draft tokens for a target node to score. It receives the full prompt, so it is a full-prompt reader, and its credit-funded session on the draft model is billed for the acknowledged draft tokens it delivers, including drafts the target rejects. The reference client refuses the spike under mainnet parameters; it runs only with testnet-only, non-normative prices, and no WAN speed-up is promised.
+
+### dust
+
+Dust is `pendingWei` minus the value of the notes minted by `claimChange`. It is credited once to `balances[node]`, then `pendingWei` becomes zero. The reference client decomposes change greedily, leaving dust below the smallest denomination. An empty change list is the dust-only branch.
 
 ### escrow
 
-Escrow is the `SessionEscrow` contract: the user deposits ETH for one node and one model, and the effective cap is the minimum of `depositWei` and `maxSpendWei`. No contract pushes ETH during settlement, refund or bond release; credits land in an internal balance, and the only function that sends ETH is `withdraw()`, which pays the caller its whole balance. For every settled session the credits to the node and to the user add up to `depositWei` exactly.
+Escrow is the non-upgradeable `SessionEscrow` contract holding notes and sessions. For a credit session, `nodeCredited + relayCredited + remainingLockedWei + pendingWei + mintedChangeValue = depositWei`; remaining locked value is `depositWei − settledWei` while open or closing and zero after settlement, and node credit includes dust exactly once. Settlement leaves unused value in `pendingWei` for `claimChange`, without a wallet refund. Only `withdraw()` sends internal balances as ETH. The legacy wallet path remains specified for direct callers and is absent from the reference client.
 
 ### execution feature
 
 An execution feature is one of `collective_answer`, `parallel_planning`, `task_decomposition`, `model_sharding` and `cross_node_speculation`, chosen on the client per request and never stored on-chain. The empty set is single-node execution, which is the default. Every non-empty set is opt-in per request and is listed on the disclosure sheet, and these features are orthogonal to the privacy modes of each session.
+
+### gateway key configuration
+
+The gateway key configuration is a node’s registered `ohttpKeyConfig`, used for the outer OHTTP hop. Every user checks the same published configuration to avoid individual key tagging. Relays hold no OHTTP gateway key. In attested mode the gateway and job HPKE keys are generated inside the TEE and both are bound into its quote.
 
 ### HPKE
 
@@ -84,11 +113,11 @@ HPKE in this proposal is RFC 9180 base mode with X25519, HKDF-SHA256 and ChaCha2
 
 ### inference payment
 
-The inference payment is the ETH that `SessionEscrow` credits to a node for cumulative tokens, by the formula `paymentWei = (priceInPerMillion * inputTokens + priceOutPerMillion * outputTokens) / 1000000` with integer floor division and the session's prices. It is not L2 gas, which the user pays separately to the chain, and the protocol fee is 0. v1 has no token; a signed voucher is not reversed; `redeemVoucher` credits the node and never credits a refund.
+The inference payment is cumulative ETH for tokens: `paymentWei = (priceInPerMillion * inputTokens + priceOutPerMillion * outputTokens) / 1000000`, with integer floor division and the session’s copied prices. Credit-session payouts split between relay and node: the first `relayFeeWei` of settled value goes to the relay, the rest to the node. This is distinct from L2 gas; the node bears spend gas and reflects it in its offer. The protocol fee is 0, and a signed voucher is not reversed.
 
 ### L2 gas
 
-L2 gas is the Arbitrum One fee for a transaction, including opening a session, topping up, redeeming a voucher, closing, finalizing and withdrawing. It does not pay for model tokens, and it is not the inference payment. The disclosure sheet shows a gas estimate in ETH with the unit, separate from the inference cap.
+L2 gas is the Arbitrum One fee for chain transactions such as depositing a note, spending it, settling, claiming change and withdrawing a balance. It does not buy model tokens. The node bears credit-spend gas and reflects it in its offer; the client shows applicable gas estimates separately from the inference cap. Credit sessions cannot be topped up.
 
 ### maintainer
 
@@ -100,7 +129,7 @@ The manifest hash is the SHA-256 of the canonical JSON manifest, which names the
 
 ### model sharding
 
-Model sharding (`model_sharding`) is the experimental Phase 3 spike in which shard holders keep contiguous layer ranges of one model and the client mediates every stage boundary. Every shard holder is treated as able to read the prompt; none holds a session and none is paid, in v1 or in the spike, including the first and the last. The reference client refuses the feature under mainnet parameters, a lost holder causes a restart from the beginning on a new chain from the sheet, and no performance is promised.
+Model sharding (`model_sharding`) is the experimental Phase 3 spike in which disclosed network nodes perform all model computation, including embeddings and the output layer. Every holder is an unpaid volunteer reader without a session. The client mediates stage boundaries, transport and sampling decisions, but runs no model computation. Activations travel through a relay, OHTTP-encapsulated to each holder’s registered `ohttpKeyConfig`, without an inner job HPKE envelope. The reference client refuses this spike under mainnet parameters; loss of a holder restarts generation on a new chain from the sheet, and no performance is promised.
 
 ### model tier (T0–T4)
 
@@ -109,6 +138,14 @@ A model tier partitions the manifest's parameter count: T0 is at most 4B; T1 is 
 ### node
 
 A node is the open-source Rust process an operator runs to load models and serve inference, with pluggable backends. In v1 the node's identity is the operator's address, one node per address. In standard mode that node sees the prompt in plaintext; it signs receipts, checks vouchers, and keeps every HPKE key used by a session that is not yet settled.
+
+### note
+
+A note is a fixed-denomination credit represented by a commitment in SessionEscrow’s denomination group and a client-held secret. Every deposit and change note uses a fresh Semaphore identity, stored durably before its `uint256` commitment is published. The escrow’s `noteSeen` rejects commitments previously used in any group. Identity reuse can make another note unspendable or link groups; losing the secret loses the note.
+
+### nullifier
+
+A nullifier is the public single-use identifier proved for a note under the fixed scope `keccak256(chainId, escrow, denominationIndex)`. SessionEscrow maintains its own nullifier set, trees and root window and calls only the stateless Semaphore v4 verifier. A consumed nullifier cannot fund another session or ragequit. The contract computes the scope and message itself as specified in ADR 0011.
 
 ### offer
 
@@ -120,23 +157,31 @@ An operator is the person who runs a node and the Ethereum address that register
 
 ### orchestrator
 
-The orchestrator is open-source logic in the client SDK. It assesses the task on the user's device first, and it plans, decomposes work into waves, or runs a collective answer or parallel planning only after the user opts in and confirms the disclosure sheet. Planner output is untrusted data: it never authorizes a new recipient, a payment, a tool or an external action.
+The orchestrator is open-source control logic in the client SDK. On-device assessment uses rules and user choices, with no model computation. Model-based planning, review, merging and synthesis run on disclosed network nodes after user confirmation. Planner output is untrusted data and never authorizes a recipient, payment, tool or external action.
 
 ### orchestrator node
 
-An orchestrator node is an optional node that runs the same orchestrator logic for a thin client, and it is paid as an ordinary session for the tokens it generates. It holds no session signer in v1, takes no cut and custodies no other session; the user's client still opens every session and signs every voucher. It is never mandatory, and it is a full-prompt reader whenever it plans, merges or synthesizes.
+An orchestrator node is an optional network node for model-based planning, merging or synthesis, paid through its own credit-funded session. It receives requests through a relay and holds no session signer, takes no cut and custodies no other session. It is a disclosed full-prompt recipient; operator readability depends on its mode. It is never mandatory.
 
 ### plan
 
-A plan is an off-chain DAG of waves, held as client-side JSON. It is not a contract, and no registry stores it. The work pays one ordinary session per distinct pair of node and model id, the user confirms every model before a session opens, and a judge's rank is never executed on its own.
+A plan is an off-chain DAG of waves held as client-side JSON, not a contract or registry entry. Every paid node-and-model pair has a credit-funded session. The user confirms the model and disclosure sheet before the spend; a judge’s rank cannot authorize execution. Unpaid volunteer holders in the sharding spike are the stated exception to paid sessions.
 
 ### pool
 
-A pool is the set of nodes with a current offer `prices[modelId]` carrying a non-zero `modelBenchmarkHash`, enumerated off-chain from `OfferSet` events. It is not a contract and not a payee; the chain stores offers and sessions, and it never stores a pool list. Any node may offer any registered model it can load, and `maxTier` is informational and is never read as a gate by `openSession`.
+A pool is the set of nodes with a current offer `prices[modelId]` carrying a non-zero `modelBenchmarkHash`, enumerated off-chain from `OfferSet` events. It is not a contract and not a payee; the chain stores offers and sessions, and it never stores a pool list. Any node may offer any registered model it can load, and `maxTier` is informational and is never read as a gate by `openSession` or `openSessionFromCredit`.
+
+### ragequit
+
+Ragequit is a public, linkable exit for a note proved in a denomination group. It credits `balances[msg.sender]` only while `depositedWei[msg.sender][denominationIndex] − ragequitWei[msg.sender][denominationIndex]` covers that denomination, consumes the nullifier and increases the caller’s ragequit total. It cannot distinguish deposit notes from change notes or identify a note’s original depositor. The caller withdraws the balance through `withdraw()`.
 
 ### re-wrap
 
-Shared contexts are re-wrapped ciphertext: the client unwraps the granted version keys with the identity key and seals those same keys to the next node's HPKE key, and the stored blob stays ciphertext. Nodes never exchange plaintext or keys. Moving a context to another node is a new session, a new wallet-signed grant and a new reader, disclosed on a new sheet version.
+Sharing a context re-wraps exactly the granted versions’ keys from the identity-key vault to the recipient node’s job HPKE key; stored blobs remain ciphertext. Nodes never exchange plaintext or keys. Moving a context requires a context-key-signed grant and a newly confirmed disclosure sheet for the recipient; the wallet does not sign the grant.
+
+### relay
+
+A relay is a registered, bonded transport operator distinct from the chosen node operator. The relay banner, normative and copied verbatim from ADR 0010, is: “The relay sees your network address and not your prompt. The node sees your prompt and not your network address.” The node is the OHTTP gateway; the relay has no gateway key. The client selects a relay at random and fails closed if none exists. Registration prevents one address holding both roles, but cannot detect one person using two addresses. A relay’s copied fee comes from the session’s settled value; collusion and timing remain risks (evidence register §15–§16, [V]/[U]).
 
 ### reputation event
 
@@ -144,23 +189,23 @@ A reputation event is an off-chain note, or a reading of public chain events, th
 
 ### reviewer
 
-A reviewer receives the prompt together with the material it critiques: anonymized answers in a collective answer, or a sub-task output that the client treats as containing prompt text unless the client has checked that it does not. In a collective answer the review is blind and is repeated with positions swapped, and disagreement between those two passes is expected and does not by itself make the synthesis incomplete. The reviewer is paid through an ordinary session, and a low score does not change that payment.
+A reviewer receives the prompt together with the material it critiques: anonymized answers in a collective answer, or a sub-task output that the client treats as containing prompt text unless the client has checked that it does not. In a collective answer the review is blind and is repeated with positions swapped, and disagreement between those two passes is expected and does not by itself make the synthesis incomplete. The reviewer is paid through a credit-funded session, and a low score does not change that payment.
 
 ### session
 
-A session is one ETH escrow binding one user, one node, one model and one privacy mode, and it may contain many jobs run one at a time. The usual path is two transactions, `openSession` and `closeWithVoucher`; either the user or the node may call `closeSession` at any time, and nothing closes a session by itself. A request that uses several node-and-model pairs opens one session for each distinct pair.
+A session binds one node, model, privacy mode and fresh session signer, and may run many jobs one at a time. The reference client spends a note through `openSessionFromCredit`, submitted by the node or a broadcaster: `user = address(0)`, `funding = credit`, and `depositWei = maxSpendWei` equals the denomination. It records the relay and copied relay fee, and cannot be topped up. The node can close it, or any broadcaster can submit `closeSession` with a session-signer signature; anyone can finalize after the deadline. Settlement records unused value as `pendingWei` for `claimChange`, even in settled status. If both node and signer are gone it stays open. The legacy wallet session is specified only for direct callers.
 
 ### session signer
 
-The session signer is an application key the client generates for one session, registered at `openSession`. It signs every job envelope and every voucher for that session, so the wallet is not prompted once per chunk, and an orchestrator node never holds this key in v1. A stolen session signer can keep signing vouchers up to the effective cap until the session is settled, and `closeSession` does not stop those vouchers before the close deadline.
+The session signer is a fresh application key per session, never reused or derived from the wallet, recorded by `openSessionFromCredit`. It signs job envelopes, vouchers, credit-session close authorizations and `claimChange` authorizations. It signs no context grants and is never delegated to an orchestrator node. A stolen signer can authorize vouchers up to the cap or redirect change; closing does not stop vouchers before the close deadline. The wallet is not prompted for each session or chunk.
 
 ### settlement layer
 
-The settlement layer is Arbitrum One, and the v1 contracts are Solidity on the EVM: `NodeRegistry`, `ModelRegistry`, `ContextRegistry` and `SessionEscrow`. Stylus is not the v1 path, because new Stylus activations are paused and no reopening date is recorded (evidence register §1, [V]). Inference runs off-chain; the chain records offers, content hashes and sessions, and it does not run the model.
+The settlement layer is Arbitrum One, and the v1 contracts are Solidity on the EVM: `NodeRegistry`, `ModelRegistry`, `ContextRegistry` and `SessionEscrow`. Stylus is not the v1 path, because new Stylus activations are paused and no reopening date is recorded (evidence register §1, [V]). Inference runs off-chain; the chain records offers, optional context anchors, notes and sessions, and it does not run the model.
 
 ### shard holder
 
-A shard holder keeps one contiguous layer range in the experimental model-sharding spike and is treated as able to read the prompt. It holds no session and is never paid, in v1 or in the spike, and the reference client never opens a session or signs a voucher for it. Holders authenticate with mutual TLS bound to their registered operator keys, and the client sends activations only to holders named on the disclosure sheet.
+A shard holder is a disclosed unpaid volunteer reader in the experimental sharding spike, including nodes computing embeddings and the output layer. It holds no session and receives no voucher. The client sends activations only to holders on the sheet, through a relay and OHTTP to each holder’s registered `ohttpKeyConfig`, with no inner job HPKE envelope and no direct client-to-holder path.
 
 ### speculative decoding
 
@@ -172,23 +217,23 @@ The splits list is the set of claims a synthesizer reports that the answers disa
 
 ### standard mode
 
-Standard mode (mode 0) means the chosen node sees the prompt, the granted context and the completion in plaintext. The client says this on the disclosure sheet before the user signs. Parties that were not selected see ciphertext and the public session metadata, not the prompt text.
+Standard mode (mode 0) is the anonymous default. The normative banner is: “This node can read your prompt and your answer. It should not learn who you are.” The chosen node also reads granted context and can retain content. Relays hide the client’s network address from it, credits remove the payer from the session, and context keys avoid wallet-labelled grants. Identifying content and traffic correlation remain risks (evidence register §16, [V]/[L]).
 
 ### synthesizer
 
-A synthesizer takes the prompt, the answers and the critiques and returns a merged answer, a splits list and an agreement level. A remote synthesizer can read the full prompt; a synthesizer that is the user's own local model does not add a remote reader. The synthesis is incomplete only when a required field is missing or malformed.
+A synthesizer is a disclosed network node that receives the prompt, answers and critiques and returns a merged answer, splits list and agreement level. It is a full-prompt recipient paid through a credit session; operator readability depends on its mode. The client performs no model synthesis. Synthesis is incomplete when a required field is missing or malformed.
 
 ### verifiable mode
 
-Verifiable mode (mode 2) is opt-in re-execution by a user-chosen second node under a demonstrated deterministic profile, after which the client compares the two outputs. The verifier is a disclosed full-prompt reader, the session mode is public on-chain, a mismatch does not change payment in v1, and an activation commitment may be given to that disclosed verifier only. It is not a collective answer, and cross-node speculation is incompatible with it.
+Verifiable mode (mode 2) is opt-in re-execution by a user-chosen second node under a demonstrated deterministic profile. The normative banner is: “This node and the verifier you chose can read your prompt. They should not learn who you are.” The verifier uses a relay and its own credit session and adds a disclosed reader. Mode is public; mismatch does not change payment. It is no content-privacy upgrade, is not combined with attested mode in v1, and is incompatible with cross-node speculation.
 
 ### voucher
 
-A voucher is the EIP-712 typed data `Voucher(bytes32 sessionId,uint64 seq,uint256 cumulativeWei,uint64 inputTokens,uint64 outputTokens,bytes32 outputCommitment,bool final)`, signed by the session signer, with cumulative token counts and a `seq` that starts at 1 and strictly increases. `final` means only that the client closes the session; `redeemVoucher` rejects a final voucher, and only `closeWithVoucher` and `finalize` credit a refund. A signed voucher is not reversed; `outputCommitment` is keccak256 of the session's random 32-byte commit key, the session id, that voucher's seq and the transcript hash, it is not checked on-chain, and opening the commit key discloses that session's output.
+A voucher is the EIP-712 typed data `Voucher(bytes32 sessionId,uint64 seq,uint256 cumulativeWei,uint64 inputTokens,uint64 outputTokens,bytes32 outputCommitment,bool final)`, signed by the session signer, with cumulative token counts and a `seq` that starts at 1 and strictly increases. `final` means only that the client closes the session; `redeemVoucher` rejects a final voucher, and `closeWithVoucher` or `finalize` record unused credit-session value in `pendingWei` for a later `claimChange`; only legacy wallet sessions credit a user refund. A signed voucher is not reversed; `outputCommitment` is keccak256 of the session's random 32-byte commit key, the session id, that voucher's seq and the transcript hash, it is not checked on-chain, and opening the commit key discloses that session's output.
 
 ### wallet owner
 
-The wallet owner is the Ethereum account that owns the user's contexts and that funds sessions. That wallet signs `openSession`, `topUp`, `closeSession`, `withdraw` and every context grant. It does not sign each chunk's voucher, and encryption keys are never derived from it.
+The wallet owner is the account that publicly deposits ETH through `depositNote` and may use the public, deposit-bounded `ragequit` exit followed by `withdraw()`. Its association with context keys stays only in the vault and backup. The reference client does not ask it to sign per-session prompts, vouchers or context grants; fresh session signers and independent context keys handle those. Wallet-funded `openSession` and `topUp` remain legacy direct-caller interfaces, absent from the reference client.
 
 ### wave
 

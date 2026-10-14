@@ -75,11 +75,11 @@ body { background: #11161c; font-family: system-ui, -apple-system, "Segoe UI", R
 </section>
 <section class="slide">
 <h2>One prompt, end to end</h2>
-<p>By default <strong>one node</strong> runs a request: pick a model, then a node from its pool. Collective answers, decomposed plans and parallel planning are <strong>opt-in</strong>; every planner reads the prompt, and the client shows which nodes read what before signing.</p>
+<p>By default <strong>one node</strong> runs a request: pick a model, then a node from its pool. Collective answers and decomposed plans are <strong>opt-in</strong>.</p>
 <ol>
-<li>Pick a node; encrypt the prompt locally.</li>
-<li>Open a session with a deposit.</li>
-<li>The node runs the model off-chain; chunks return sealed.</li>
+<li>Deposit once into the credit pool.</li>
+<li>Encrypt the prompt locally; send it through a relay run by someone else.</li>
+<li>The node opens the session with your unlinkable credit and runs the model off-chain; chunks return sealed.</li>
 <li>The client signs a voucher per chunk.</li>
 </ol>
 <svg class="flow" viewBox="0 0 1150 150" role="img" aria-label="Wallet to encrypted prompt to Rust node to sealed answer, settled on Arbitrum One">
@@ -94,8 +94,8 @@ body { background: #11161c; font-family: system-ui, -apple-system, "Segoe UI", R
 </g>
 <g stroke="#0b5f6e" stroke-width="3" fill="none" marker-end="url(#ar)"><path d="M194 38H270"/><path d="M504 38H580"/><path d="M774 38H850"/></g>
 </svg>
-<p>A paid orchestrator node is disclosed, never mandatory. The chain never runs a model.</p>
-<aside class="notes">Speaker notes: Walk the four steps slowly; single-node execution is the default. The open-source orchestrator in the user's app can assess, plan a DAG, run waves in parallel, review and merge; it is designed client-side code, not something implemented today.</aside>
+<p>A paid orchestrator is disclosed, never mandatory.</p>
+<aside class="notes">Speaker notes: Walk the four steps slowly; single-node execution is the default. You pick a model and a node before step 2. Parallel planning is also opt-in; every planner reads the prompt, and the client shows which nodes read what before signing. The chain never runs a model. The open-source orchestrator in the user's app can assess, plan a DAG, run waves in parallel, review and merge; it is designed client-side code, not something implemented today.</aside>
 <footer>Comuns · comuns.ai · open source · draft · 4/14</footer>
 </section>
 <section class="slide">
@@ -126,38 +126,37 @@ body { background: #11161c; font-family: system-ui, -apple-system, "Segoe UI", R
 <section class="slide">
 <h2>Who can read a prompt</h2>
 <ul>
-<li>In standard mode the chosen node can read the prompt.</li>
-<li>Other nodes and the chain cannot read it.</li>
-<li>With more than one node, the disclosure sheet states before signing how many readers, counted by distinct node and operator, see the prompt, a sub-task, activations or draft tokens: a floor from the actual payloads.</li>
-<li>Public: who paid whom, for which model, and token counts.</li>
-<li>Attested mode does not stop a physical attacker (evidence register §4, [L]).</li>
-<li>Local execution is the only owner-only option.</li>
+<li>Anonymous by default: the node you pick can read your prompt, but neither it nor the chain should learn who sent it.</li>
+<li>Attested (TEE) nodes should not be able to read it either; a physical attack can break that (evidence register §14, [V]).</li>
+<li>Standard mode has one content reader; multi-node features add more, counted on the disclosure sheet before you confirm.</li>
+<li>Relays hide your network address; unlinkable credits hide your wallet, though the deposit itself is public.</li>
+<li>Not hidden: what your words reveal about you, or traffic timing (evidence register §16, [L]/[V]).</li>
 </ul>
-<aside class="notes">Speaker notes: Say plainly that the executor sees plaintext. The disclosure sheet counts every reader before the user signs anything.</aside>
+<aside class="notes">Speaker notes: Keep the two promises apart. The disclosure sheet is shown before you confirm. Anonymity: the node you pick can read your prompt but should not learn who sent it. Confidentiality: only an attested node should be unable to read it, barring a physical attack. The disclosure sheet counts every reader before the user signs anything.</aside>
 <footer>Comuns · comuns.ai · open source · draft · 7/14</footer>
 </section>
 <section class="slide">
 <h2>Your contexts, your wallet</h2>
 <ul>
-<li>One wallet keeps many encrypted, versioned contexts.</li>
-<li>Each version has its own key; ciphertext stays off-chain and the chain records the latest version hash.</li>
-<li>Sharing with a node means re-wrapping that version's key to the node's key, signed by the owning wallet. Nodes never exchange plaintext.</li>
-<li>Revocation works going forward: later versions stay unreadable, but a node cannot forget what it already decrypted.</li>
+<li>Many encrypted, versioned contexts live in your local vault; the chain stores no wallet.</li>
+<li>Each version has its own key; ciphertext stays off-chain.</li>
+<li>Sharing with a node means re-wrapping that version's key to the node's key, signed by a per-context key, not your wallet. Nodes never exchange plaintext.</li>
+<li>Revocation works going forward: later versions stay unreadable, but a node cannot forget plaintext it already saw.</li>
 <li>Back up the identity key, and keep ciphertext on a second device or host.</li>
 </ul>
-<aside class="notes">Speaker notes: Contexts are portable memory the user owns. Revocation limits the future, not the past, and the deck should say so.</aside>
+<aside class="notes">Speaker notes: Contexts are portable memory the user owns, with no wallet link on-chain. Revocation limits the future, not the past, and the deck should say so.</aside>
 <footer>Comuns · comuns.ai · open source · draft · 8/14</footer>
 </section>
 <section class="slide">
 <h2>Sessions on Arbitrum One</h2>
 <ul>
 <li>Solidity contracts on the EVM of Arbitrum One settle sessions.</li>
-<li>Stylus is not the v1 plan: new activations are paused since 2026-10-02 (evidence register §1, [V]), and a model cannot fit in a contract.</li>
-<li>Two transactions per session on the happy path, not one per message; a plan using several nodes pays several sessions.</li>
-<li>The ETH paid to the node is not the L2 fee; gas is paid separately.</li>
+<li>Sessions are funded by unlinkable credits from Semaphore groups inside the escrow and opened by the node: the chain sees a session, never a payer.</li>
+<li>Stylus is not the v1 plan: new activations are paused since 2026-10-02 (evidence register §1, [V]).</li>
+<li>Close still settles; claiming unspent credit takes another transaction. Gas is paid separately.</li>
 <li>Protocol fee: zero. Payees withdraw their credited balances.</li>
 </ul>
-<aside class="notes">Speaker notes: Many prompts share one session, so the chain sees an open and a close. Multi-node plans multiply sessions, and we say so up front.</aside>
+<aside class="notes">Speaker notes: Many prompts share one session, so the chain sees an open and a close but no payer. Multi-node plans multiply sessions, and we say so up front.</aside>
 <footer>Comuns · comuns.ai · open source · draft · 9/14</footer>
 </section>
 <section class="slide">
@@ -181,6 +180,8 @@ body { background: #11161c; font-family: system-ui, -apple-system, "Segoe UI", R
 <li>Stylus in v1, and inference inside a contract.</li>
 <li>A mandatory central proxy or orchestrator.</li>
 <li>Slashing in v1.</li>
+<li>MPC or FHE private inference: minutes per token today (evidence register §14, [V]).</li>
+<li>Running the model on your own machine as a product option.</li>
 </ul>
 <p>A narrow scope keeps the design small enough for a volunteer community to review line by line.</p>
 <aside class="notes">Speaker notes: Every non-goal removes a reason for someone to capture the project. If the community wants one of these later, it writes a CIP.</aside>
@@ -189,30 +190,30 @@ body { background: #11161c; font-family: system-ui, -apple-system, "Segoe UI", R
 <section class="slide">
 <h2>From proposal to running code</h2>
 <table>
-<thead><tr><th>Phase</th><th>Name</th></tr></thead>
+<thead><tr><th>Phase</th><th>Name</th><th>Content</th></tr></thead>
 <tbody>
-<tr><td>0</td><td>Documentation baseline</td></tr>
-<tr><td>1</td><td>Sepolia slice</td></tr>
-<tr><td>2</td><td>Contexts and classes</td></tr>
-<tr><td>3</td><td>Verification spike</td></tr>
-<tr><td>4</td><td>External review</td></tr>
+<tr><td>0</td><td>Documentation baseline</td><td>This documentation</td></tr>
+<tr><td>1</td><td>Sepolia slice</td><td>Relay plus credit session</td></tr>
+<tr><td>2</td><td>Contexts and classes</td><td>Ownerless contexts, pools, sheet, orchestrator</td></tr>
+<tr><td>3</td><td>Verification spike</td><td>Attested nodes plus the spikes</td></tr>
+<tr><td>4</td><td>External review</td><td>Reviews, then go/no-go</td></tr>
 </tbody>
 </table>
-<p>There are no dates. Phase 3 may end with a negative result. Sharding and cross-node speculation are experimental Phase 3 work, with testnet-only prices, refused under mainnet parameters; shard holders hold no session and are never paid. No internet speed-up is promised (evidence register §9, quote [V], result not replicated [U]). Phase 4 closes with a go/no-go CIP.</p>
+<p>There are no dates. Phase 3 may end with a negative result. Sharding and cross-node speculation are experimental Phase 3 work, with testnet-only prices, refused under mainnet parameters; shard holders hold no session and are never paid. No internet speed-up is promised (evidence register §9, quote [V], result not replicated [U]).</p>
 <aside class="notes">Speaker notes: Phases are ordered, not scheduled. A published negative result counts as a finished phase.</aside>
 <footer>Comuns · comuns.ai · open source · draft · 12/14</footer>
 </section>
 <section class="slide">
 <h2>Risks we state openly</h2>
 <ul>
-<li>Executor plaintext: the chosen node reads the prompt in standard mode.</li>
+<li>Anonymity is not confidentiality: the chosen node reads standard-mode content; your words can identify you; anonymity sets are small at launch; relay and node timing can correlate (evidence register §15 [U], §16 [V]/[L]).</li>
 <li>Arbitrum One has a single sequencer (evidence register §1, [V]).</li>
-<li>Price bands are unset, so mainnet is not deployable.</li>
-<li>Hardware class claims are self-benchmarks and can be faked.</li>
-<li>Nobody is seated, and nobody may come to contribute.</li>
-<li>Activations can reveal a prompt (evidence register §10, [V]); a parallel plan or collective answer costs several sessions and can be worse than one strong model (evidence register §11, [V]).</li>
+<li>Price bands are unset: no mainnet.</li>
+<li>Class claims are self-benchmarks, fakeable.</li>
+<li>Nobody is seated; nobody may come.</li>
+<li>Activations can reveal a prompt (evidence register §10, [V]); parallel plans cost several sessions and can be worse than one model (evidence register §11, [V]).</li>
 </ul>
-<aside class="notes">Speaker notes: Read the risks aloud rather than skipping them. Each one has a mitigation and an owner document in the repository.</aside>
+<aside class="notes">Speaker notes: Read the risks aloud rather than skipping them. Anonymity sets are small at launch. Relay and node timing can both correlate; contributors may not arrive. Without price bands mainnet is not deployable; hardware class claims are self-benchmarks. A collective answer likewise costs several sessions and can be worse than one strong model. Each one has a mitigation and an owner document in the repository.</aside>
 <footer>Comuns · comuns.ai · open source · draft · 13/14</footer>
 </section>
 <section class="slide">

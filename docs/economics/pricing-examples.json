@@ -140,6 +140,28 @@
       "expectedInferencePerPromptDollars": "0.00004", "expectedTransactionPairDollars": "0.002",
       "expectedSinglePromptGasRatio": "50", "expectedSessionInferenceDollars": "0.004",
       "expectedGasPerPromptDollars": "0.00002"
+    },
+    {
+      "id": "credit-session-change-and-dust", "kind": "credit_session",
+      "source": "Illustrative and UNVERIFIED values; non-normative arithmetic under docs/adr/0011-anonymous-credits.md. Pending is before claimChange; change is the total face value of greedy change notes. No denomination or relay fee is adopted.",
+      "priceInPerMillion": "333333", "priceOutPerMillion": "666667",
+      "inputTokens": "5", "outputTokens": "6",
+      "denominationWei": "20", "denominationsWei": ["4", "10", "20"],
+      "relayFeeWei": "2",
+      "expectedOwedWei": "5", "expectedSettledWei": "5", "expectedPendingWei": "15",
+      "expectedChangeWei": "14", "expectedDustWei": "1",
+      "expectedRelayWei": "2", "expectedNodePayoutWei": "4"
+    },
+    {
+      "id": "credit-session-full-spend-no-change", "kind": "credit_session",
+      "source": "Illustrative and UNVERIFIED values; non-normative arithmetic under docs/adr/0011-anonymous-credits.md. Owed exceeds the denomination and the relay fee exceeds settled value to exercise both caps. No denomination or relay fee is adopted.",
+      "priceInPerMillion": "4", "priceOutPerMillion": "5",
+      "inputTokens": "2000000", "outputTokens": "3000000",
+      "denominationWei": "20", "denominationsWei": ["4", "10", "20"],
+      "relayFeeWei": "25",
+      "expectedOwedWei": "23", "expectedSettledWei": "20", "expectedPendingWei": "0",
+      "expectedChangeWei": "0", "expectedDustWei": "0",
+      "expectedRelayWei": "20", "expectedNodePayoutWei": "0"
     }
   ]
 }

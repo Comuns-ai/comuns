@@ -26,13 +26,13 @@ A node may offer any registered model it can load. An offer is
 
 with a non-zero `modelBenchmarkHash`. The node writes offers through `registerNode` or `updateNode`. `updateNode` takes the complete offer list and replaces the stored list. It emits `OfferSet` for every model added or changed, and an `OfferSet` with zero prices and a zero `modelBenchmarkHash` (cleared) for every model removed. Clearing is always allowed, whatever the band or `commercialHosting` state. `deregisterNode` emits a cleared `OfferSet` for every offer it removes. A hardware-class change revalidates every listed offer against the new bands and reverts if any is outside its band.
 
-The pool of a `modelId` is the set of nodes with such an offer. Clients and indexers enumerate it off-chain from `OfferSet` events: keep each operator's latest offer, drop a zero hash, drop a deregistered node, and read the current prices. The pool is never a registry record, never a payee and never a session party. The chain stores offers and sessions. It does not store a pool list, a plan or a sub-task assignment. No function pays a pool.
+The pool of a `modelId` is the set of nodes with such an offer. A pool may be filtered by advertised mode, keeping nodes whose `modes` bitmask includes the mode the client asks for. Clients and indexers enumerate it off-chain from `OfferSet` events: keep each operator's latest offer, drop a zero hash, drop a deregistered node, and read the current prices. Pools stay off-chain views, not payees. The pool is never a registry record and never a session party. The chain stores offers and sessions. It does not store a pool list, a plan or a sub-task assignment. No function pays a pool.
 
-`maxTier` is informational and does not limit offers. `openSession` checks the offer, the band for `(the model's tier, the node's class)`, and `commercialHosting`. It never checks a class-tier matrix, and it never reads `maxTier`.
+`maxTier` is informational and does not limit offers. `openSession` checks the offer, the band for `(the model's tier, the node's class)`, and `commercialHosting`. It never checks a class-tier matrix, and it never reads `maxTier`. `openSessionFromCredit` uses the same offer, band, `commercialHosting` and never-read-`maxTier` rules as `openSession` ([ADR 0011](0011-anonymous-credits.md), [ADR 0010](0010-anonymous-by-default.md)).
 
 Bands exist for every `(tier, class)` pair, over all four classes S < M < L < X, with `floor(class c+1) > ceiling(class c)` for input and for output separately. Stronger hardware charges more for the same model. Forty directional entries must be set before mainnet. An unset band blocks that pair until a CIP. It does not make the class ineligible.
 
-Memory fit and the per-model benchmark are off-chain admission. The node offers a model only when it can load it at the concurrency it advertises, and only after it has published a self-benchmark whose hash is `modelBenchmarkHash`. The chain gains no proof of memory. A stale offer — the model is no longer loaded — can still pass `openSession`. The node then refuses. The user loses gas and time, not the deposit, once the session is closed. Stale offers are a reputation risk. They are not slashing.
+Memory fit and the per-model benchmark are off-chain admission. The node offers a model only when it can load it at the concurrency it advertises, and only after it has published a self-benchmark whose hash is `modelBenchmarkHash`. The chain gains no proof of memory. A stale offer — the model is no longer loaded — can still pass `openSession` or `openSessionFromCredit`. The node then refuses. On the wallet path the user loses the open's gas and time, not the deposit, once the session is closed. On the credit path the submitting node bore the spend gas, and a zero-use session's `pendingWei` is the full denomination. Stale offers are a reputation risk. They are not slashing.
 
 `registerModel` and `updateModel` are governance-only in v1, so the manifest, the tier and `commercialHosting` come from a CIP. With nobody seated there is no mainnet registration. Sepolia models come from a testnet-only CIP. A model with `commercialHosting` false can be registered and cannot be offered.
 
@@ -64,7 +64,7 @@ Rejected. A list would copy the offers, drift from them, and cost gas to maintai
 
 - A thin pool may hold no quote inside a band, or no offer at all. The client says so. It does not silently switch models. A substitution is a new disclosure sheet and a new confirmation.
 - Forty band entries must be set before mainnet. Until then, model-first pools cannot take a paid mainnet session. That block is the unset-band rule, not a return of the serving gate.
-- Stale offers are a reputation risk. The reference client asks the node for admission before `openSession`. Indexers can downrank sessions that settle with nothing paid. No slash follows.
+- Stale offers are a reputation risk. The reference client asks the node for admission through a relay before the node or its broadcaster submits `openSessionFromCredit`. Indexers can downrank sessions that settle with nothing paid. No slash follows.
 - A class S node that loads a T4 model may offer it inside the (T4, S) band, once that band exists. A class X node offering the same model prices inside the (T4, X) band, which the ordering rule places strictly above S.
 - Governance-only registration slows the listing of models and blocks squatters. Both effects stand until a later CIP reopens registration.
 - Pools are not parties to a session. Multi-node work opens one session per `(node, modelId)` and pays those nodes, never the pool ([ADR 0009](0009-opt-in-client-orchestration.md)).
@@ -81,4 +81,6 @@ Rejected. A list would copy the offers, drift from them, and cost gas to maintai
 - [ADR 0005](0005-hardware-classes-and-price-bands.md)
 - [ADR 0006](0006-apache-2-0-and-dco.md)
 - [ADR 0009](0009-opt-in-client-orchestration.md)
+- [ADR 0010](0010-anonymous-by-default.md)
+- [ADR 0011](0011-anonymous-credits.md)
 - [docs/cip/0001-adopt-baseline-adrs.md](../cip/0001-adopt-baseline-adrs.md)

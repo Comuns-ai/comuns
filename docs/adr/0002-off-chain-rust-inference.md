@@ -16,7 +16,7 @@ A claim that "Rust is faster" would be false. Throughput and latency come from k
 
 ## Decision
 
-The Comuns node is one Rust binary that runs off-chain. It watches the registries and its own sessions on Arbitrum One, accepts encrypted jobs over TLS 1.3 and HPKE, runs them through a pluggable backend, meters tokens with the tokenizer pinned in the model manifest, exchanges node-signed receipts for client-signed vouchers, and redeems on-chain. Prompt, context and completion plaintext exist only in process memory, are zeroized after use and are never logged. Logging policy does not stop a modified node. It is the reference node's rule.
+The Comuns node is one Rust binary that runs off-chain. It watches the registries and its own sessions on Arbitrum One. The node process hosts the OHTTP gateway ([ADR 0010](0010-anonymous-by-default.md)) and submits credit spends ([ADR 0011](0011-anonymous-credits.md)). Jobs arrive through that gateway: the inner HPKE envelope from [ADR 0003](0003-hpke-and-the-executor-plaintext-limit.md) travels inside the OHTTP hop. The reference client has no direct client-to-node job path. The node runs jobs through a pluggable backend, meters tokens with the tokenizer pinned in the model manifest, exchanges node-signed receipts for client-signed vouchers, and redeems on-chain. In standard mode, prompt, context and completion plaintext exist in process memory. The node can read that content and should not learn who asked. In attested mode the plaintext stays inside the TEE. The node should not be able to read the prompt, barring a physical attack (evidence register §14). In both modes the reference node zeroizes plaintext after use and never logs it. Logging policy does not stop a modified node. It is the reference node's rule.
 
 Backends sit behind one trait. Per-model choice of adapter is gated by the benchmark protocol: the node offers a model on an adapter only after the operator has published a self-benchmark of that model on that adapter and build, and `modelBenchmarkHash` names that result ([ADR 0008](0008-model-first-pools.md)).
 
@@ -66,7 +66,7 @@ Rejected. No measurement in the register supports a claim that a new Rust kernel
 
 ## Links
 
-- [docs/evidence-register.md](../evidence-register.md) §1, §3, §5, §9, §10
+- [docs/evidence-register.md](../evidence-register.md) §1, §3, §5, §9, §10, §14
 - [docs/node/node-design.md](../node/node-design.md)
 - [docs/node/hardware-classes-and-benchmarks.md](../node/hardware-classes-and-benchmarks.md)
 - [docs/security/inference-verification.md](../security/inference-verification.md)
@@ -75,4 +75,6 @@ Rejected. No measurement in the register supports a claim that a new Rust kernel
 - [ADR 0004](0004-sessions-vouchers-and-no-slashing.md)
 - [ADR 0008](0008-model-first-pools.md)
 - [ADR 0009](0009-opt-in-client-orchestration.md)
+- [ADR 0010](0010-anonymous-by-default.md)
+- [ADR 0011](0011-anonymous-credits.md)
 - [docs/cip/0001-adopt-baseline-adrs.md](../cip/0001-adopt-baseline-adrs.md)

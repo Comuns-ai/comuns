@@ -24,11 +24,11 @@ v1 settlement is Solidity on the EVM, on Arbitrum One. The four contracts are `N
 
 Payment is in ETH. The protocol fee is 0. There is no protocol token. Inference payment is not L2 gas. L2 gas is an extra cost of the transactions that open, top up, redeem, close and withdraw.
 
-The closed list of state-changing functions has fifteen names, including `withdraw()`. No contract pushes ETH during settlement, bond release or refund. Credits land in an internal `balances[address]` mapping. `withdraw()` is the only function that sends ETH: it zeroes `msg.sender`'s balance and then sends that amount, under checks-effects-interactions and a reentrancy guard. Every state-changing function follows the same two rules. A contract wallet that cannot receive ETH therefore cannot lock a refund, a payment or a bond.
+The closed list of state-changing functions has 23 names via [CIP-0002](../cip/0002-anonymous-credits-relays-and-ownerless-contexts.md), including `withdraw()`, as [ADR 0011](0011-anonymous-credits.md) defines. There are still four contracts. No contract pushes ETH during settlement, bond release or refund. Credits land in an internal `balances[address]` mapping. `withdraw()` is the only function that sends ETH: it zeroes `msg.sender`'s balance and then sends that amount, under checks-effects-interactions and a reentrancy guard. Every state-changing function follows the same two rules. A contract wallet that cannot receive ETH therefore cannot lock a refund, a payment or a bond.
 
 `registerModel` and `updateModel` are callable only by the governance timelock, acting through a CIP. With nobody seated there is no mainnet registration. Models on Arbitrum Sepolia come from a testnet-only CIP. This blocks manifest squatting and a false `commercialHosting` flag.
 
-Contracts are non-upgradeable in v1, or they sit behind a timelock of at least 7 days controlled by seated maintainers. An upgrade must not redirect escrow or change the terms of a funded session. A timelock delays an upgrade. It does not review the upgrade's content. No maintainer is seated, so no timelock can be executed.
+The credit-holding `SessionEscrow` is non-upgradeable. It is deployed without a proxy and without an upgrade path, as [ADR 0011](0011-anonymous-credits.md) decides and [CIP-0002](../cip/0002-anonymous-credits-relays-and-ownerless-contexts.md) states. Governance parameters, including bands and `setCreditParameters`, stay timelocked as already specified. `NodeRegistry`, `ModelRegistry` and `ContextRegistry` are non-upgradeable in v1, or they sit behind a timelock of at least 7 days controlled by seated maintainers. An upgrade of those three must not redirect escrow or change the terms of a funded session. A timelock delays an upgrade. It does not review the upgrade's content. No maintainer is seated, so no timelock can be executed.
 
 `CLOSE_WINDOW` must exceed an expected sequencer outage plus about one day of force inclusion (evidence register §1, [V]). That sizing is not a guarantee. An outage that starts shortly before `closeDeadline` can still cost a node its unredeemed vouchers. Nodes redeem while redemption is legal. [ADR 0004](0004-sessions-vouchers-and-no-slashing.md) states the session rules.
 
@@ -72,4 +72,6 @@ Rejected. The project's founding requirements name Arbitrum One as the example c
 - [ADR 0002](0002-off-chain-rust-inference.md)
 - [ADR 0004](0004-sessions-vouchers-and-no-slashing.md)
 - [ADR 0007](0007-no-protocol-token-in-v1.md)
+- [ADR 0011](0011-anonymous-credits.md)
 - [docs/cip/0001-adopt-baseline-adrs.md](../cip/0001-adopt-baseline-adrs.md)
+- [docs/cip/0002-anonymous-credits-relays-and-ownerless-contexts.md](../cip/0002-anonymous-credits-relays-and-ownerless-contexts.md)

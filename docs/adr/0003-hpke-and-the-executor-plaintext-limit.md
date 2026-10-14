@@ -1,12 +1,14 @@
 # ADR 0003: Encrypt both ways with HPKE and state who can still read
 
-**Status:** proposed
+**Status:** proposed — proposed to be superseded in part by ADR 0010 and ADR 0012; the cipher suite, AAD list, envelope signature, commitKey and keyring rules carry forward
 
 **Date:** 2026-10-12
 
 **Deciders:** none seated; adoption is the subject of docs/cip/0001-adopt-baseline-adrs.md
 
 ## Context
+
+2026-10-14: [ADR 0010](0010-anonymous-by-default.md) and [ADR 0012](0012-contexts-without-a-wallet-link.md) withdraw four parts of this record: the sender-identity story (a session now presents no wallet or persistent identifier to a node), the sentence naming the payer in the public metadata (a credit session has no payer address), the wallet-signed grant (grants are signed by a per-context key) and the local-execution consequence (local execution is no longer a product option). Three further statements below are superseded and stay only as dated history: the MPC and FHE figures in this Context and under "FHE chat" are the evidence register §4 snapshot of 2026-10-12, replaced by the figures in evidence register §14; the sentence "Strict owner-only confidentiality against the chosen remote operator is an unmet requirement" is superseded in part by ADR 0010, which makes attested mode the opt-in answer to it, bounded by physical attacks; and the sharding-spike transport sentence in the Decision's transport paragraph ("activations move under mutual TLS") is replaced, since activations now travel through a relay, OHTTP-encapsulated to the holder's registered `ohttpKeyConfig` (docs/security/privacy-and-contexts.md §6, docs/node/distributed-execution.md). The plaintext limit remains: in standard mode the executing node reads the prompt. Everything else below stands.
 
 In standard mode the node that executes a request sees the prompt, the granted context and the completion in plaintext. An executor must see plaintext unless fully homomorphic encryption, multi-party computation or a trusted execution environment is used (evidence register §4, [L]). The register's figures for the first two are far from interactive chat:
 
@@ -41,7 +43,7 @@ TLS hides content from a passive observer of the hop. It does not hide sizes or 
 
 The deprecated wallet RPCs `eth_getEncryptionPublicKey` and `eth_decrypt` are not used (evidence register §4, [V]). Draft ERC-5630 is not used (evidence register §4, [V]).
 
-**Who can still read.** In standard mode the executing node reads the prompt in plaintext. Other operators, the sequencer, RPC providers, indexers and network observers see ciphertext and the public metadata (payer, node, model, token counts, prices, caps, timing, context hashes). Single-node execution is the default: one remote party reads the prompt, unless the user also opts into verifiable mode, which adds one user-chosen verifier.
+**Who can still read.** In standard mode the executing node reads the prompt in plaintext. Other operators, the sequencer, RPC providers, indexers and network observers see ciphertext and the public metadata (node, model, token counts, prices, caps, timing, context hashes; credit sessions have no payer address, see [ADR 0010](0010-anonymous-by-default.md)). Single-node execution is the default: one remote party reads the prompt, unless the user also opts into verifiable mode, which adds one user-chosen verifier.
 
 Any non-empty execution-feature set is opt-in per request and is listed on the disclosure sheet before the user signs ([ADR 0009](0009-opt-in-client-orchestration.md)). The sheet's `readersOfFullPrompt` is a floor, never a ceiling, counted by distinct node and by distinct operator. The floor is: the executor; in verifiable mode the verifier; in `collective_answer` every answerer, every reviewer (reviewers receive the prompt) and a remote synthesizer; in `parallel_planning` every planner, every plan reviewer and the plan synthesizer; in `cross_node_speculation` both the draft node and the target node; every shard holder; an orchestrator node whenever it plans, merges or synthesizes; a merge node, whose inputs are assumed to quote the prompt; any remote assessor or planner, including under `task_decomposition`; and any sub-task executor or reviewer whose payload contains prompt text. A sub-task payload is assumed to contain prompt text unless the client has verified that it contains none. The client derives the count from the actual payloads. `counts.fullPrompt` is how many distinct nodes are literally sent the full prompt. `readersOfFullPrompt` is at least that number. The banner is "N nodes can read your prompt", from `readersOfFullPrompt`.
 
@@ -83,7 +85,7 @@ Rejected. A protocol-mandatory relay, matcher or orchestrator would be a new par
 
 ## Consequences
 
-- Users who need owner-only confidentiality run the model locally. Every remote mode has a reader.
+- Content privacy against the operator is the attested tier ([ADR 0010](0010-anonymous-by-default.md)); every remote mode has a reader and anonymity does not change that.
 - More parties read a prompt only when the user opts in and the sheet lists them. A silent downgrade is a broken client.
 - The `hpke` crate has no paid audit (evidence register §4, [V]). An external review is required before mainnet handles real prompts. No audit has been performed.
 - Losing the identity key and its backup loses every context the wrap records covered. Losing the only device that held ciphertext loses those blobs even when the backup survives.

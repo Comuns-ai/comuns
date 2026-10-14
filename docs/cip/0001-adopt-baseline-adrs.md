@@ -39,6 +39,8 @@ Each summary below is one sentence. The ADR text wins if a summary is read more 
 
 Adopting the nine records does not make multi-node execution the default and does not restore a class-to-tier serving gate. The plaintext limit, the no-slashing rule, the band ordering, the Apache-2.0 license and the no-token rule stay as those ADRs state them.
 
+Later records. [ADR 0010](../adr/0010-anonymous-by-default.md), [ADR 0011](../adr/0011-anonymous-credits.md), [ADR 0012](../adr/0012-contexts-without-a-wallet-link.md) and [CIP-0002](0002-anonymous-credits-relays-and-ownerless-contexts.md) are separate proposals. This CIP does not adopt them. If this CIP and CIP-0002 both become Final, ADRs 0010–0012 supersede the conflicting sentences on identity, contexts, local execution and the fifteen-function list in the nine records above, rather than this file being rewritten.
+
 ## Rationale
 
 One process CIP is the smallest proposal that lets a reviewer accept or object to the baseline as a set. Splitting adoption across nine CIPs would let the set pass in a combination the documents do not support, for example bands without the model-first pool rule, or orchestration without the plaintext limit.
