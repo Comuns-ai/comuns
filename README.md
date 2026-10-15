@@ -1,6 +1,6 @@
 # Comuns
 
-This repository is a draft proposal for a community to build an open-source, decentralized LLM-inference network; nothing here runs yet. Inference runs only on network nodes, never on the user’s machine, and contexts are not labelled with the wallet on-chain.
+This repository is a draft proposal for a community to build an open-source, decentralized LLM-inference network; no protocol implementation runs yet; the repository includes documentation checker scripts. Inference runs only on network nodes, never on the user’s machine, and contexts are not labelled with the wallet on-chain.
 
 The proposal works like this: Arbitrum One settles sessions in ETH. Rust nodes run models off-chain; llama.cpp kernels are C/C++. A wallet keeps many encrypted contexts in a local vault; independent context keys sign grants and heads, and sharing re-wraps only the granted versions’ keys. Relay transport and anonymous credits separate requests from the deposit wallet. In standard mode the chosen node can read the prompt, granted context and answer but should not learn who asked. In attested mode the node should not be able to read your prompt either, barring a physical attack ([evidence register §14](docs/evidence-register.md), [V]/[L]). The user picks a model and then a node from the pool of nodes currently offering it. Any node that can load a registered model may offer it, subject to its hosting permission and price band; higher hardware classes charge more for the same model so small tasks stay on small hardware. By default one node runs a request. Optional multi-node features — several nodes answering and cross-checking (a collective answer, which shows its disagreements and is not verification), a plan split into parallel sub-tasks on different pools, parallel planning, and experimental sharding and cross-node speculative decoding — are opt-in per request. Before you sign, the client shows which nodes will read which part, including nodes that can reconstruct prompt text from their inputs, and counts full-prompt recipients separately from operator-readable recipients. The two experimental features are Phase 3 testnet-only work; the reference client refuses them under mainnet parameters, shard holders receive no sessions or payments, and no WAN speed-up is promised. The orchestrator is open-source control logic in your app and performs no model computation; an optional orchestrator node is paid through a credit session and is never required. Development is by CIP, Apache-2.0 and the DCO, with no protocol token and no slashing in v1. The scope is inference only.
 
@@ -18,7 +18,7 @@ Comuns makes no claim of a lower price than hosted APIs.
 
 ## How to take part
 
-Read [GOVERNANCE.md](GOVERNANCE.md) for the CIP process and [CONTRIBUTING.md](CONTRIBUTING.md) for contribution and DCO rules. Review [the baseline adoption CIP](docs/cip/0001-adopt-baseline-adrs.md), which remains Draft. [MAINTAINERS.md](MAINTAINERS.md) records the unseated roles; seating and removal require a Final CIP. [SECURITY.md](SECURITY.md) explains reporting boundaries. Contribute documentation comments, requirement reviews or working-group proposals through issues and CIP comments on the future public repository.
+Read [GOVERNANCE.md](GOVERNANCE.md) for the CIP process and [CONTRIBUTING.md](CONTRIBUTING.md) for contribution and DCO rules. Review [the baseline adoption CIP](docs/cip/0001-adopt-baseline-adrs.md), which remains Draft. [CIP-0003](docs/cip/0003-bootstrap-first-maintainer-and-channels.md) is the Draft bootstrap proposal and seats nobody today. [MAINTAINERS.md](MAINTAINERS.md) records the unseated roles; seating and removal require a Final CIP. [SECURITY.md](SECURITY.md) explains reporting boundaries. Contribute documentation comments, requirement reviews or working-group proposals through issues and CIP comments on the public repository.
 
 Never paste prompts, keys or seed phrases into issues.
 
@@ -60,6 +60,10 @@ Never paste prompts, keys or seed phrases into issues.
 
 - [docs/architecture/system-architecture.md](docs/architecture/system-architecture.md) — Components and flows.
 - [docs/architecture/deployment-and-decentralization.md](docs/architecture/deployment-and-decentralization.md) — Deployment and decentralization limits.
+
+### docs/deployments
+
+- [docs/deployments/arbitrum-sepolia.md](docs/deployments/arbitrum-sepolia.md) — Unfilled record for deployment observations after CIP-0004 is Final; no deployment claimed.
 
 ### docs/protocol
 
@@ -106,6 +110,9 @@ Never paste prompts, keys or seed phrases into issues.
 - [docs/adr/0010-anonymous-by-default.md](docs/adr/0010-anonymous-by-default.md) — Proposed anonymous default, relay transport and two content tiers.
 - [docs/adr/0011-anonymous-credits.md](docs/adr/0011-anonymous-credits.md) — Proposed anonymous credits and the amended 23-function list.
 - [docs/adr/0012-contexts-without-a-wallet-link.md](docs/adr/0012-contexts-without-a-wallet-link.md) — Proposed contexts without a wallet link.
+- [docs/adr/0013-repositories-toolchains-ci-and-releases.md](docs/adr/0013-repositories-toolchains-ci-and-releases.md) — Proposed repository layout, toolchains, CI, DCO, style and testnet release gates; adoption proposed in CIP-0005.
+- [docs/adr/0014-relay-authentication-to-gateways.md](docs/adr/0014-relay-authentication-to-gateways.md) — Proposed relay authentication per connection without a contract change; adoption proposed in CIP-0005.
+- [docs/adr/0015-node-key-possession.md](docs/adr/0015-node-key-possession.md) — Proposed client key-possession probe before spending, without a contract change; adoption proposed in CIP-0005.
 
 ### docs/cip
 
@@ -113,6 +120,9 @@ Never paste prompts, keys or seed phrases into issues.
 - [docs/cip/0000-template.md](docs/cip/0000-template.md) — CIP template.
 - [docs/cip/0001-adopt-baseline-adrs.md](docs/cip/0001-adopt-baseline-adrs.md) — Draft CIP proposing adoption of the baseline ADRs.
 - [docs/cip/0002-anonymous-credits-relays-and-ownerless-contexts.md](docs/cip/0002-anonymous-credits-relays-and-ownerless-contexts.md) — Draft CIP proposing anonymous credits, relays and ownerless contexts.
+- [docs/cip/0003-bootstrap-first-maintainer-and-channels.md](docs/cip/0003-bootstrap-first-maintainer-and-channels.md) — Draft bootstrap CIP; proposes seating the first maintainer and naming the private channels; seats nobody today.
+- [docs/cip/0004-sepolia-testnet-configuration.md](docs/cip/0004-sepolia-testnet-configuration.md) — Draft CIP proposing testnet-only, non-normative configuration and model registration; mainnet unchanged.
+- [docs/cip/0005-phase-one-implementation.md](docs/cip/0005-phase-one-implementation.md) — Draft implementation CIP proposing ADRs 0013–0015, completion gates and pre-code rechecks.
 
 ### pitch
 
@@ -124,6 +134,7 @@ Never paste prompts, keys or seed phrases into issues.
 - [scripts/check-pricing.py](scripts/check-pricing.py) — Checks the pricing fixtures.
 - [scripts/check-docs.py](scripts/check-docs.py) — Checks document conventions.
 - [scripts/check-deck.py](scripts/check-deck.py) — Checks the pitch deck.
+- [scripts/check-dco.py](scripts/check-dco.py) — Checks DCO trailers on every commit in a pull-request range, including merges.
 
 ## Checks you can run
 

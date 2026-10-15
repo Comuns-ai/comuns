@@ -13,7 +13,7 @@ If this CIP becomes Final, Comuns treats ADRs 0001 through 0009 as the adopted b
 
 ## Motivation
 
-The design documents already take these decisions. They are spread across the contracts, the node, the privacy write-up, the economics note, the governance file and the orchestration notes. A reviewer cannot object to a scattered assumption as one proposal. A CIP is the written record Comuns uses for a decision. This one asks the community to adopt the nine records together, on the future public repository, with objections written against this file.
+The design documents already take these decisions. They are spread across the contracts, the node, the privacy write-up, the economics note, the governance file and the orchestration notes. A reviewer cannot object to a scattered assumption as one proposal. A CIP is the written record Comuns uses for a decision. This one asks the community to adopt the nine records together, on the Comuns-ai/documentation repository, with objections written against this file.
 
 The proposal does not rely on a token, a coin vote or an ARB balance. ARB balances are not this project's votes. Anyone may object, including a class S operator. Nobody is seated, so nobody can merge this file on private authority.
 
@@ -21,7 +21,7 @@ The proposal does not rely on a token, a coin vote or an ARB balance. ARB balanc
 
 This CIP changes no price band, no deadline, no bond and no protocol fee. The protocol fee is 0. No timelock is stated, because no parameter changes. Nothing in this file sets a wei value.
 
-The proposal is that, if this CIP becomes Final after the lifecycle in GOVERNANCE.md and docs/cip/README.md, the following nine records are the baseline. This Draft does not perform that step. Reviewers who object do so in writing on the future public repository, naming a specific defect and the change they want. Silence is not approval.
+The proposal is that, if this CIP becomes Final after the lifecycle in GOVERNANCE.md and docs/cip/README.md, the following nine records are the baseline. This Draft does not perform that step. Reviewers who object do so in writing on the Comuns-ai/documentation repository, naming a specific defect and the change they want. Silence is not approval.
 
 Moving this file from Draft follows the CIP lifecycle. A CIP in Last Call cannot become Stagnant. A substantive edit during Last Call returns the CIP to Review and starts a new, full 14-day Last Call. Seating and removal of maintainers happen only through a Final CIP. A status line that says Final without a completed Last Call is void. This file's status is Draft.
 
@@ -61,7 +61,7 @@ If a later CIP contradicts an ADR after this CIP has become Final, that later CI
 
 ## Security considerations
 
-Adopting these records does not seize escrow and does not expose prompts. An emergency action cannot seize escrow or expose prompts. No code exists, so no private vulnerability report is required for this CIP. This file contains no prompt, no key and no seed phrase.
+Adopting these records does not seize escrow and does not expose prompts. An emergency action cannot seize escrow or expose prompts. No protocol implementation exists, so no private vulnerability report is required for this CIP. This file contains no prompt, no key and no seed phrase.
 
 The plaintext limit stays: in standard mode the executing node reads the prompt. Extra readers exist only when the user opts in and the disclosure sheet lists them. There is no slashing in v1. A signed voucher is not reversed. `sessionSigner` is not delegated to an orchestrator node in v1. Experimental sharding treats every shard holder as able to read the prompt, and the reference client refuses sharding and cross-node speculative decoding under mainnet parameters.
 

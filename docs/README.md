@@ -10,11 +10,11 @@ Created: 2026-10-12
 
 ## 1. Reading order
 
-This is a draft community proposal; nothing here runs yet. Paths in the table are relative to the repository root, while link destinations are relative to this index. Read in this order, then use the table for the complete document map.
+This is a draft community proposal; no protocol implementation runs yet; documentation checker scripts are included. Paths in the table are relative to the repository root, while link destinations are relative to this index. Read in this order, then use the table for the complete document map.
 
 1. [Repository introduction](../README.md), [Markdown pitch](../pitch/pitch-deck.md) and [printable pitch](../pitch/pitch-deck.html) — purpose and status.
 2. [Charter](project-charter.md), [evidence register](evidence-register.md) and [requirements](requirements.md) — proposed scope, evidence and traceability.
-3. [Governance](../GOVERNANCE.md), [contributing](../CONTRIBUTING.md), [CIP process](cip/README.md) and [baseline adoption CIP](cip/0001-adopt-baseline-adrs.md) — how the community changes the proposal.
+3. [Governance](../GOVERNANCE.md), [contributing](../CONTRIBUTING.md), [CIP process](cip/README.md), [baseline adoption CIP](cip/0001-adopt-baseline-adrs.md) (CIP-0001, Draft) and [bootstrap CIP](cip/0003-bootstrap-first-maintainer-and-channels.md) (CIP-0003, Draft; seats nobody today) — how the community changes the proposal.
 4. [System architecture](architecture/system-architecture.md), [deployment](architecture/deployment-and-decentralization.md) and [project plan](project-plan.md) — boundaries and phase gates.
 5. [Contracts and settlement](protocol/contracts-and-settlement.md), [off-chain API](protocol/off-chain-api.md) and [privacy and contexts](security/privacy-and-contexts.md) — credit-funded settlement, anonymous transport, authenticated jobs and readers. See proposed [ADR 0010](adr/0010-anonymous-by-default.md), [ADR 0011](adr/0011-anonymous-credits.md) and [ADR 0012](adr/0012-contexts-without-a-wallet-link.md).
 6. [Node design](node/node-design.md), [benchmarks](node/hardware-classes-and-benchmarks.md), [model registry](node/model-registry-and-licenses.md), [pricing](economics/cost-and-pricing.md) and [model-first pools ADR](adr/0008-model-first-pools.md) — model offers, hardware and costs.
@@ -49,6 +49,7 @@ Categories below describe the document or artifact. Companion titles and categor
 | [docs/review-report.md](review-report.md) | Review report — consistency pass | Analysis | Review of the document set: invariants, scenario traces, edits and handoffs. |
 | [docs/architecture/system-architecture.md](architecture/system-architecture.md) | System architecture — decentralized LLM inference on Arbitrum One | Technical Proposal | Components and flows. |
 | [docs/architecture/deployment-and-decentralization.md](architecture/deployment-and-decentralization.md) | Deployment and decentralization — stages, dependencies and what stays central | Technical Proposal | Deployment and decentralization limits. |
+| [docs/deployments/arbitrum-sepolia.md](deployments/arbitrum-sepolia.md) | Arbitrum Sepolia deployment record (testnet-only, non-normative) | Record | Unfilled record for deployment observations after CIP-0004 is Final; no deployment claimed. |
 | [docs/protocol/contracts-and-settlement.md](protocol/contracts-and-settlement.md) | Contracts and settlement — sessions, vouchers and registries on Arbitrum One | Technical Proposal | Registries, cumulative vouchers and ETH credits claimed through withdraw(). |
 | [docs/protocol/off-chain-api.md](protocol/off-chain-api.md) | Off-chain API — encrypted jobs, streaming frames and vouchers | Technical Proposal | Client–node API. |
 | [docs/protocol/orchestration.md](protocol/orchestration.md) | Orchestration — assess, plan with parallelism in mind, execute in waves, merge | Technical Proposal | Opt-in client planning, parallel sub-tasks across model pools, waves and confirmed reader disclosure. |
@@ -76,15 +77,22 @@ Categories below describe the document or artifact. Companion titles and categor
 | [docs/adr/0010-anonymous-by-default.md](adr/0010-anonymous-by-default.md) | ADR 0010: Anonymous by default: relays, unlinkable sessions and two content tiers | Decision | Proposed anonymous default and relay transport. |
 | [docs/adr/0011-anonymous-credits.md](adr/0011-anonymous-credits.md) | ADR 0011: Anonymous credits: Semaphore groups inside SessionEscrow | Decision | Proposed anonymous credits and the amended 23-function list. |
 | [docs/adr/0012-contexts-without-a-wallet-link.md](adr/0012-contexts-without-a-wallet-link.md) | ADR 0012: Contexts without a wallet link | Decision | Proposed context-key identity and optional public anchors. |
+| [docs/adr/0013-repositories-toolchains-ci-and-releases.md](adr/0013-repositories-toolchains-ci-and-releases.md) | ADR 0013: Repositories, toolchains, CI, DCO enforcement, code style and releases up to testnet | Decision | Proposed repository layout, toolchains, CI, DCO, style and testnet release gates; adoption proposed in CIP-0005. |
+| [docs/adr/0014-relay-authentication-to-gateways.md](adr/0014-relay-authentication-to-gateways.md) | ADR 0014: Relay authentication to gateways | Decision | Proposed relay authentication per connection without a contract change; adoption proposed in CIP-0005. |
+| [docs/adr/0015-node-key-possession.md](adr/0015-node-key-possession.md) | ADR 0015: Prove possession of node keys to the client, not to the contract | Decision | Proposed client key-possession probe before spending, without a contract change; adoption proposed in CIP-0005. |
 | [docs/cip/README.md](cip/README.md) | CIPs — Comuns Improvement Proposals | Process | CIP process. |
 | [docs/cip/0000-template.md](cip/0000-template.md) | CIP NNNN: Title | Process | CIP template. |
 | [docs/cip/0001-adopt-baseline-adrs.md](cip/0001-adopt-baseline-adrs.md) | CIP 0001: Adopt the baseline ADRs | Process | Draft CIP proposing adoption of the baseline ADRs. |
 | [docs/cip/0002-anonymous-credits-relays-and-ownerless-contexts.md](cip/0002-anonymous-credits-relays-and-ownerless-contexts.md) | CIP 0002: Anonymous credits, relays and ownerless contexts | Process | Draft amendment for anonymous credits, relays and contexts; no adoption yet. |
+| [docs/cip/0003-bootstrap-first-maintainer-and-channels.md](cip/0003-bootstrap-first-maintainer-and-channels.md) | CIP 0003: Bootstrap: first maintainer, enforcement contact and private security channel | Process | Draft bootstrap CIP; proposes seating the first maintainer and naming the private channels; seats nobody today. |
+| [docs/cip/0004-sepolia-testnet-configuration.md](cip/0004-sepolia-testnet-configuration.md) | CIP 0004: Arbitrum Sepolia testnet configuration (testnet-only, non-normative) | Process | Draft CIP proposing testnet-only, non-normative configuration and model registration; mainnet unchanged. |
+| [docs/cip/0005-phase-one-implementation.md](cip/0005-phase-one-implementation.md) | CIP 0005: Phase 1 implementation | Process | Draft implementation CIP proposing ADRs 0013–0015, completion gates and pre-code rechecks. |
 | [pitch/pitch-deck.md](../pitch/pitch-deck.md) | Comuns — pitch deck | Analysis | Pitch deck source. |
 | [pitch/pitch-deck.html](../pitch/pitch-deck.html) | Comuns — printable pitch deck | Presentation | Rendered pitch deck. |
-| [scripts/check-pricing.py](../scripts/check-pricing.py) | Pricing checker | Validation | Checks the pricing fixtures. |
-| [scripts/check-docs.py](../scripts/check-docs.py) | Documentation checker | Validation | Checks document conventions. |
-| [scripts/check-deck.py](../scripts/check-deck.py) | Pitch deck checker | Validation | Checks the pitch deck. |
+| [scripts/check-pricing.py](../scripts/check-pricing.py) | Pricing checker | Tooling | Checks the pricing fixtures. |
+| [scripts/check-docs.py](../scripts/check-docs.py) | Documentation checker | Tooling | Checks document conventions. |
+| [scripts/check-deck.py](../scripts/check-deck.py) | Pitch deck checker | Tooling | Checks the pitch deck. |
+| [scripts/check-dco.py](../scripts/check-dco.py) | DCO checker | Tooling | Checks DCO trailers on every commit in a pull-request range, including merges. |
 
 ## 3. Documentation conventions
 
@@ -104,7 +112,7 @@ Number H2 sections consecutively from 1. End with Risks, then Open questions. Id
 
 Put diagrams in fences tagged `mermaid`. The checker accepts declarations beginning with `flowchart`, `sequenceDiagram`, `stateDiagram-v2`, `graph` or `classDiagram`; it checks structure, not rendering. Fences must balance, and every `json` fence must contain valid JSON. Use document-relative Markdown links. On a **Reference:** line, bare paths beginning with docs/, pitch/ or scripts/ and root filenames are repository-relative; other bare paths are relative to the document.
 
-ADRs follow the [ADR index](adr/README.md): a four-digit numbered filename, a title beginning `# ADR NNNN:`, the fields `**Status:**`, `**Date:**`, `**Deciders:**`, and the H2 sections Context, Decision, Alternatives considered, Consequences and Links. Include at least three alternatives with rejection or deferral reasons. ADRs remain proposed until adopted through the baseline CIP; later contradictions require a superseding ADR.
+ADRs follow the [ADR index](adr/README.md): a four-digit numbered filename, a title beginning `# ADR NNNN:`, the fields `**Status:**`, `**Date:**`, `**Deciders:**`, and the H2 sections Context, Decision, Alternatives considered, Consequences and Links. Include at least three alternatives with rejection or deferral reasons. ADRs remain proposed until their adopting CIP is Final: CIP-0001 for ADRs 0001–0009, CIP-0002 for ADRs 0010–0012 and CIP-0005 for ADRs 0013–0015; later contradictions require a superseding ADR.
 
 CIPs follow the [CIP process](cip/README.md) and [template](cip/0000-template.md): a four-digit filename, a `# CIP NNNN:` title, Status, Type, Created and Requires fields, and Abstract, Motivation, Specification, Rationale, Backwards compatibility, Security considerations, Economic considerations, Reference implementation, Change log and Copyright sections. These ADR and CIP formats use their own unnumbered section headings. A CIP proceeds through Draft, Review, Last Call and Final under GOVERNANCE.md. A substantive Last Call edit returns it to Review; a Last Call CIP cannot become Stagnant. Seating and removal require a Final CIP.
 

@@ -8,7 +8,7 @@ Created: 2026-10-12
 
 ## 1 Summary
 
-Comuns is a community proposal for an open-source decentralized network for LLM inference. Nothing runs yet. No code exists in this repository. The project domain is comuns.ai, written here as plain text. This repository does not present that domain as a running service.
+Comuns is a community proposal for an open-source decentralized network for LLM inference. Nothing runs yet. No protocol implementation exists. `scripts/` holds documentation checkers, which are not a node, relay, client or contract. The project domain is comuns.ai, written here as plain text. This repository does not present that domain as a running service.
 
 Decisions are Comuns Improvement Proposals (CIPs). A CIP moves Draft → Review → Last Call (14 days) → Final. One clock only marks a Draft or Review CIP Stagnant after 6 months without activity; that clock is suspended during Last Call, so a CIP has exactly one terminal state. Comuns has no protocol token and no coin vote. ARB balances are not this project's votes. No maintainers are seated. The first people with merge authority must be named by a public CIP. Until then, nobody has private authority. The protocol fee is 0, so no treasury exists. Scope is LLM inference only.
 
@@ -118,7 +118,7 @@ A person who is temporarily excluded from discussion under CODE_OF_CONDUCT.md ke
 
 Any substantive edit made during Last Call returns the CIP to Review and stops the unfinished 14-day period. A new, full 14-day Last Call must then start from the edited text. A substantive edit is any change to normative text, to names of people or roles (including bootstrap maintainer names), to parameters, numbers or addresses, or to the decision itself. The only non-substantive edits are typo, formatting and link fixes that change no meaning; each such edit made during Last Call must be listed in the CIP's change log.
 
-While no shared repository history is the public record, the dates the author writes on the CIP are the start of Last Call and the mark of activity. Which hosted timestamp should replace those written dates is an open question. Any claim about a current public host is UNVERIFIED. This draft names no hosting provider.
+While no shared repository history is the public record, the dates the author writes on the CIP are the start of Last Call and the mark of activity. Which hosted timestamp should replace those written dates is an open question. The public repository is Comuns-ai/documentation on GitHub. Host product behaviour not in the evidence register is UNVERIFIED.
 
 ### 4.4 Reviews before Last Call
 
@@ -132,7 +132,7 @@ Architecture decision records live under docs/adr/, in files named docs/adr/NNNN
 
 Working groups review documents and recommend changes. A working group does not decide. A CIP decides. A working group has no token weight, no separate vote, and no chair. This draft seats no working-group chairs and sets no meeting schedule.
 
-Anyone may join a working group. Hardware class, stake, and holdings do not affect joining. To join, a person writes in public, on a relevant CIP or in an issue on the future public repository, which group they are taking part in, and then reviews that group's documents in public.
+Anyone may join a working group. Hardware class, stake, and holdings do not affect joining. To join, a person writes in public, on a relevant CIP or in an issue on the Comuns-ai/documentation repository, which group they are taking part in, and then reviews that group's documents in public.
 
 | Working group | What it reviews |
 | --- | --- |
@@ -167,13 +167,17 @@ Review policy until that seating is the rule in CONTRIBUTING.md. Seating does no
 
 Price bands, deadlines, and the bond are protocol parameters. The protocol fee is a protocol parameter too. Its value in this proposal is 0.
 
-A protocol parameter changes only by a CIP that reaches Final, then a timelock, executed by seated maintainers. Every CIP that changes a parameter states its own timelock in its Specification. The timelock that applies is the longer of 7 days and the timelock the CIP states, and both are counted from the date the CIP becomes Final. A CIP may not set a timelock shorter than 7 days. After the CIP is Final, seated maintainers announce the execution time in public; the announcement does not start or shorten the wait. They apply the change no sooner than the day that timelock ends.
+A protocol parameter changes only by a CIP that reaches Final, then a timelock, executed by seated maintainers. Every CIP that changes a parameter states its own timelock in its Specification. The timelock that applies is the longer of 7 days and the timelock the CIP states, and both are counted from the date the CIP becomes Final. A CIP may not set a timelock shorter than 7 days. Section 7.1 supersedes that longer-of-7-days rule and that ban for Arbitrum Sepolia only. After the CIP is Final, seated maintainers announce the execution time in public; the announcement does not start or shorten the wait. They apply the change no sooner than the day that timelock ends.
 
 Until maintainers are seated, no one can make that announcement, and a parameter does not change through this path. Numbers written in a draft specification are proposals.
 
-Optimism uses a 7-day veto window (evidence register §8 [V]). That window is a comparison only. Comuns uses a timelock of at least 7 days counted from the date the CIP becomes Final, executed by seated maintainers.
+Optimism uses a 7-day veto window (evidence register §8 [V]). That window is a comparison only. Comuns uses a timelock of at least 7 days counted from the date the CIP becomes Final, executed by seated maintainers. On Arbitrum Sepolia, section 7.1 applies; mainnet unchanged.
 
 Because the protocol fee is 0, no treasury exists. This repository does not hold funds. A CIP that would set the fee above 0 would also have to create a treasury this project does not have. No such CIP is Final.
+
+### 7.1 Disposable testnet configuration
+
+For Arbitrum Sepolia only, this subsection supersedes the longer-of-7-days rule and the ban on a timelock shorter than 7 days in section 7. It applies only to the deployment, and to `setBands`, `setCreditParameters`, `registerModel` and `updateModel`, executed with no timelock from a disposable testnet key held by the seated maintainer, after a Final CIP whose every value is labelled testnet-only and non-normative. The exception does not apply to Arbitrum One, does not permit a mainnet timelock under 7 days, and makes no testnet value a default. Section 7's rule that nothing changes before seating still holds. Mainnet stays at a timelock of at least 7 days. [docs/cip/0004-sepolia-testnet-configuration.md](docs/cip/0004-sepolia-testnet-configuration.md) (Draft) is the CIP that uses this exception.
 
 ## 8 Emergency actions
 
@@ -235,7 +239,7 @@ Arbitrum DAO governance, ARB balances, and external grant programs sit beside th
 
 ### R6 — Parameter changes have no executor **[RISK] · Medium**
 
-Price bands, deadlines, the bond, and the protocol fee change only by a Final CIP and a timelock of at least 7 days from the Final date, executed by seated maintainers. With none seated, that path cannot be executed. Draft numbers can be mistaken for parameters already in force. Nothing runs yet, so there is no network on which to apply them.
+Price bands, deadlines, the bond, and the protocol fee change only by a Final CIP and a timelock of at least 7 days from the Final date, executed by seated maintainers. On Arbitrum Sepolia, section 7.1 applies; mainnet unchanged. With none seated, that path cannot be executed. Draft numbers can be mistaken for parameters already in force. Nothing runs yet, so there is no network on which to apply them.
 
 ### R7 — License assumptions can diverge from Apache-2.0 **[RISK] · Medium**
 
@@ -255,15 +259,15 @@ An author could replace substantive text near the end of Last Call and claim Fin
 
 ## 12 Open questions
 
-- What is the minimum content of the bootstrap CIP: how many maintainers, whether the names must be distinct people, the wording of the enforcement contact, and the form of the private vulnerability channel it names?
+- What is the minimum content of the bootstrap CIP: how many maintainers, whether the names must be distinct people, the wording of the enforcement contact, and the form of the private vulnerability channel it names? [docs/cip/0003-bootstrap-first-maintainer-and-channels.md](docs/cip/0003-bootstrap-first-maintainer-and-channels.md) (Draft) proposes an answer.
 - Is 30 days the right maximum for an emergency pause (section 8.1)? This draft proposes 30 days as the most conservative bound that still lets an ordinary CIP run a 14-day Last Call to reverse a defective change.
 - Is 90 days the right maximum for temporary exclusion from discussion (CODE_OF_CONDUCT.md section 5.2)? This draft proposes 90 days; a longer sanction is a removal CIP, not a longer exclusion.
 - Should a Stagnant CIP ever be revived by comments alone? This draft says no: only a substantive edit returns it to Review, so that the status of a Stagnant CIP can be read from the file.
 - Should a working group have to concur before the author enters Last Call? This draft lets the author enter Last Call when blocking objections are addressed.
-- Which public timestamp should start the 14-day Last Call once a future public repository exists? While none is specified, the date written on the CIP is the record. Any claim about a current host is UNVERIFIED.
+- Which public timestamp should start the 14-day Last Call on the Comuns-ai/documentation repository? While none is specified, the date written on the CIP is the record. Host product behaviour not in the evidence register is UNVERIFIED. [docs/cip/0003-bootstrap-first-maintainer-and-channels.md](docs/cip/0003-bootstrap-first-maintainer-and-channels.md) (Draft) proposes an answer.
 - Should an author be able to close their own CIP before the 6-month clock runs out? This draft has no status for that, and a Draft or Review CIP goes Stagnant when the one clock expires.
 - Can the protocol fee ever move above 0, and where would value sit if it did? Today the fee is 0 and no treasury exists.
 - Should section 8 grow narrower once docs/security/threat-model.md is accepted?
-- How should participants treat dates on the bootstrap CIP if the file is copied in more than one place before anyone can merge? This draft has no hosting workflow. The repository mechanics of the first merge are UNVERIFIED.
+- How should participants treat dates on the bootstrap CIP if the file is copied in more than one place before anyone can merge? This draft has no hosting workflow. The repository mechanics of the first merge are UNVERIFIED. [docs/cip/0003-bootstrap-first-maintainer-and-channels.md](docs/cip/0003-bootstrap-first-maintainer-and-channels.md) (Draft) proposes an answer.
 - Hardware classes other than class S are not listed here. Every class has the same filing right. A taxonomy in docs/project-charter.md, if that file defines one, is outside this document. Any class list not written here is UNVERIFIED.
 - Should Last Call stay 14 days? The Rust RFC comparison is a 10-day final comment period (evidence register §8 [V]). This draft chooses 14 days.

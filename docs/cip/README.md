@@ -17,8 +17,11 @@ Links by path:
 - [docs/cip/0000-template.md](0000-template.md)
 - [docs/cip/0001-adopt-baseline-adrs.md](0001-adopt-baseline-adrs.md)
 - [docs/cip/0002-anonymous-credits-relays-and-ownerless-contexts.md](0002-anonymous-credits-relays-and-ownerless-contexts.md)
+- [docs/cip/0003-bootstrap-first-maintainer-and-channels.md](0003-bootstrap-first-maintainer-and-channels.md)
+- [docs/cip/0004-sepolia-testnet-configuration.md](0004-sepolia-testnet-configuration.md)
+- [docs/cip/0005-phase-one-implementation.md](0005-phase-one-implementation.md)
 
-The file docs/cip/0001-adopt-baseline-adrs.md holds CIP-0001, which is a Draft and is not Final. The file docs/cip/0002-anonymous-credits-relays-and-ownerless-contexts.md holds CIP-0002, which is a Draft and is not Final. Linking a path does not make it Final.
+The file docs/cip/0001-adopt-baseline-adrs.md holds CIP-0001, which is a Draft and is not Final. The file docs/cip/0002-anonymous-credits-relays-and-ownerless-contexts.md holds CIP-0002, which is a Draft and is not Final. Linking a path does not make it Final. CIP-0003, CIP-0004 and CIP-0005 are also Draft; their current status is recorded in section 6. Related artifacts are the unfilled [docs/deployments/arbitrum-sepolia.md](../deployments/arbitrum-sepolia.md) record for CIP-0004 and [scripts/check-dco.py](../../scripts/check-dco.py), the pull-request commit-range checker described by CIP-0003 and by [ADR 0013](../adr/0013-repositories-toolchains-ci-and-releases.md), which Draft CIP-0005 proposes to adopt.
 
 ## 2 Lifecycle
 
@@ -48,7 +51,11 @@ What counts as substantive activity, what counts as a blocking objection, and ho
 - 0000 is docs/cip/0000-template.md. It is the template. It is not a proposal, and it is not Final.
 - 0001 is reserved for docs/cip/0001-adopt-baseline-adrs.md. ADRs 0001–0009 under docs/adr/ are proposed until that CIP is accepted; ADRs 0010–0012 are proposed until docs/cip/0002-anonymous-credits-relays-and-ownerless-contexts.md is accepted. Accepted means Final. After acceptance, a change that contradicts an ADR needs a superseding ADR.
 - 0002 is allocated to docs/cip/0002-anonymous-credits-relays-and-ownerless-contexts.md, a Draft that proposes ADRs 0010–0012 and the amended closed function list.
-- The next CIP uses the lowest free number above 0002. The filename is docs/cip/NNNN-kebab-title.md. The slug is kebab-case: lowercase words separated by hyphens.
+- 0003 is allocated to docs/cip/0003-bootstrap-first-maintainer-and-channels.md, a Draft bootstrap proposal. Requires: None.
+- 0004 is allocated to docs/cip/0004-sepolia-testnet-configuration.md, a Draft testnet-only, non-normative configuration proposal. Requires: 0002, 0003, 0005.
+- 0005 is allocated to docs/cip/0005-phase-one-implementation.md, a Draft implementation proposal. Requires: 0002, 0003.
+- ADRs 0013–0015 are proposed until docs/cip/0005-phase-one-implementation.md is accepted.
+- The next CIP uses the lowest free number above 0005 (currently 0006). The filename is docs/cip/NNNN-kebab-title.md. The slug is kebab-case: lowercase words separated by hyphens.
 - If two authors take the same number, they resolve it in public and one author renames. Nobody has private authority to allocate numbers.
 
 ## 4 Required sections
@@ -62,7 +69,7 @@ Copy docs/cip/0000-template.md. The header fields are:
 
 The body sections, in order, are Abstract, Motivation, Specification, Rationale, Backwards compatibility, Security considerations, Economic considerations, Reference implementation, Change log, and Copyright. The Change log lists every non-substantive edit (typo, formatting, or link fix) made during Last Call, with its date; it is required, and a Last Call typo, formatting, or link fix that is not listed there is not permitted. Substantive edits are not logged there, because they return the CIP to Review. The Copyright section states Apache-2.0 and points at LICENSE. Italic guidance in the template is deleted by the author before Review.
 
-A CIP that changes price bands, deadlines, the bond, or the protocol fee says so in Specification and in Economic considerations, and states its own timelock. Those parameters change only by a Final CIP and then a timelock, executed by seated maintainers, that is the longer of 7 days and the CIP's stated timelock, counted from the date the CIP becomes Final. The protocol fee is 0, so no treasury exists. Scope is LLM inference only.
+A CIP that changes price bands, deadlines, the bond, or the protocol fee says so in Specification and in Economic considerations, and states its own timelock. Those parameters change only by a Final CIP and then a timelock, executed by seated maintainers, that is the longer of 7 days and the CIP's stated timelock, counted from the date the CIP becomes Final. On Arbitrum Sepolia, GOVERNANCE.md §7.1 applies; mainnet unchanged. The protocol fee is 0, so no treasury exists. Scope is LLM inference only.
 
 ## 5 Who may file and who may merge
 
@@ -72,7 +79,7 @@ Who may merge: nobody, until maintainers are seated by a public CIP. MAINTAINERS
 
 ## 6 Current CIP status
 
-None are Final. 0000 is a template. 0001 is reserved and is a Draft, not Final: [docs/cip/0001-adopt-baseline-adrs.md](0001-adopt-baseline-adrs.md). 0002 is allocated and is a Draft, not Final: [docs/cip/0002-anonymous-credits-relays-and-ownerless-contexts.md](0002-anonymous-credits-relays-and-ownerless-contexts.md). No other CIP number is allocated by this file.
+None are Final. 0000 is a template. 0001 is reserved and is a Draft, not Final: [docs/cip/0001-adopt-baseline-adrs.md](0001-adopt-baseline-adrs.md). 0002 is allocated and is a Draft, not Final: [docs/cip/0002-anonymous-credits-relays-and-ownerless-contexts.md](0002-anonymous-credits-relays-and-ownerless-contexts.md). 0003 is allocated and is a Draft, not Final: [docs/cip/0003-bootstrap-first-maintainer-and-channels.md](0003-bootstrap-first-maintainer-and-channels.md). 0004 is allocated and is a Draft, not Final: [docs/cip/0004-sepolia-testnet-configuration.md](0004-sepolia-testnet-configuration.md). 0005 is allocated and is a Draft, not Final: [docs/cip/0005-phase-one-implementation.md](0005-phase-one-implementation.md). No other CIP number is allocated by this file.
 
 ## 7 Risks
 
@@ -90,6 +97,6 @@ docs/cip/0001-adopt-baseline-adrs.md is linked by path while it is a Draft. A re
 
 ## 8 Open questions
 
-- Should a public issue be able to reserve a CIP number before the file exists? This draft identifies 0000 as the template and allocates 0001 and 0002 to existing proposal files.
+- Should a public issue be able to reserve a CIP number before the file exists? This draft identifies 0000 as the template and allocates 0001–0005 to existing proposal files.
 - After a CIP is Final, may the author add an editorial note, or does every change require a new CIP? This draft treats Final text as stable. A superseding CIP carries later changes. A superseding ADR carries a later change that contradicts an accepted ADR.
-- Who confirms, in the file, that Last Call's 14 days have elapsed, while no maintainers are seated? This draft uses the public record described in GOVERNANCE.md.
+- Who confirms, in the file, that Last Call's 14 days have elapsed, while no maintainers are seated? This draft uses the public record described in GOVERNANCE.md; CIP-0003 proposes the mechanism.

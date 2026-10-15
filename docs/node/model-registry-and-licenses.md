@@ -12,7 +12,7 @@ Created: 2026-10-12
 
 `ModelRegistry` is the on-chain list of models a Comuns node may be paid to serve. A model is identified by its **manifest**: a canonical JSON file naming the weight files, their SHA-256 hashes, the tokenizer digest, the quantization, the context limit and the license file. `manifestHash` is the SHA-256 of the canonical manifest bytes and `modelId = keccak256(manifestHash)`; a different manifest is a different model. The record also carries the model's **tier** (T0–T4, a parameter-count label), the license's SPDX identifier and a `commercialHosting` flag that `openSession` and `openSessionFromCredit` check: a model whose license forbids paid hosting cannot be the subject of a paid session or an offer.
 
-In v1 `registerModel` and `updateModel` are callable **only by the governance timelock**, acting on a CIP; with nobody seated there is no mainnet registration, and Arbitrum Sepolia models come from a testnet-only CIP. This prevents manifest squatting and false `commercialHosting` flags, at the price of making every registration a governance act.
+In v1 `registerModel` and `updateModel` are callable **only by the governance timelock**, acting on a CIP; with nobody seated there is no mainnet registration, and Arbitrum Sepolia models come from a testnet-only CIP; on Arbitrum Sepolia, GOVERNANCE.md §7.1 applies; mainnet unchanged. This prevents manifest squatting and false `commercialHosting` flags, at the price of making every registration a governance act.
 
 A **model pool** is not a registry field. It is the set of nodes whose `NodeRegistry` entry carries a current offer `prices[modelId] = (priceInPerMillion, priceOutPerMillion, modelBenchmarkHash)` with a non-zero `modelBenchmarkHash` — a filtered view of `NodeRegistry`, enumerated off-chain, never a payee.
 
@@ -46,7 +46,7 @@ The `Model` record, keyed by `modelId`, as defined in the contracts document (no
 | `metadataUri` | `string` | Where the manifest, the model card and the license file are published. Mutable. |
 | `publisher` | `address` | The registrant; in v1 always the governance timelock. |
 
-Only `registerModel(manifestHash, tier, licenseSpdx, commercialHosting, metadataUri)` and `updateModel(modelId, licenseSpdx, commercialHosting, metadataUri)` write this record, and only the timelock may call them in v1. `tier` and `manifestHash` never change: a new quantization, a new tokenizer or a corrected file is a new manifest and a new `modelId`. Setting `commercialHosting` to false blocks new sessions and new offers but does not close open sessions.
+Only `registerModel(manifestHash, tier, licenseSpdx, commercialHosting, metadataUri)` and `updateModel(modelId, licenseSpdx, commercialHosting, metadataUri)` write this record, and only the timelock may call them in v1 (on Arbitrum Sepolia, GOVERNANCE.md §7.1 applies; mainnet unchanged). `tier` and `manifestHash` never change: a new quantization, a new tokenizer or a corrected file is a new manifest and a new `modelId`. Setting `commercialHosting` to false blocks new sessions and new offers but does not close open sessions.
 
 ## 4. Manifest
 
@@ -175,7 +175,7 @@ Every model needs a CIP; a slow or captured governance blocks legitimate models.
 
 ## 10. Open questions
 
-1. **The class benchmark file.** Which Apache-2.0 or MIT T0 model and quantization becomes the class benchmark model.
+1. **The class benchmark file.** Which Apache-2.0 or MIT T0 model and quantization becomes the class benchmark model. Proposed resolution: CIP-0004 sets the Phase 1 predicate (Apache-2.0 or MIT, tier T0, and the registrant states which license text they read), and its "Model to register" item reads "Open; blocks Last Call" until CIP-0004 itself names the weight file, revision and quantization, the tokenizer and its test vector, the parameter count, the manifest and `manifestHash`, the license's SPDX identifier, and the sentence the registrant read. The deployment record does not name the file; it records the `modelId` and transaction hashes. This document asserts no family that has a T0 member.
 2. **Manifest schema details.** Whether the manifest should carry the chat template, stop tokens and sampling defaults, which affect token counts and reproducibility, and how schema upgrades are handled without changing `modelId` semantics.
 3. **Tokenizer pinning.** Whether a tokenizer digest alone is enough for client and node to agree on `inputTokens`, or whether the manifest must also pin the tokenizer library version (privacy doc, open question 10).
 4. **SPDX identifiers for bespoke licenses.** Which `LicenseRef-` identifiers the project standardizes for the Llama, Qwen and Gemma terms, so that indexers can filter consistently.
