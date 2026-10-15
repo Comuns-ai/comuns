@@ -103,7 +103,18 @@ So the session settles 128 × 1000000000000000 / 1000000 + 128 × 20000000000000
 
 ### Verifier
 
-The verifier is the Semaphore v4 Groth16 verifier bytecode from the Semaphore packages, immutable and owned by nobody, as ADR 0011 describes; `SessionEscrow` calls it and never a shared `validateProof`. Before deployment the deployer verifies the ceremony artifacts and the circuit, proving-key and verifying-key match (docs/project-plan.md section 11) and records the artifact hashes in the deployment record. This CIP pins no Semaphore version. It asserts nothing about the second Phase-2 ceremony's date or participant count; evidence register §15 marks those unconfirmed [L].
+The verifier is the Semaphore v4 Groth16 verifier bytecode from the Semaphore packages, immutable and owned by nobody, as ADR 0011 describes; `SessionEscrow` calls it and never a shared `validateProof`. The production artifacts and the verifier key points come from the 2025 Binary Merkle Root Fix ceremony, run after an under-constrained ZK-Kit BinaryMerkleRoot circuit bug fix [V]; its participant count, close date and final beacon were not found in the sources examined on 2026-10-15 [U]. Per-file hashes for the artifact files were not found in the sources examined on 2026-10-15 [U]; the artifacts are the flat files `semaphore-{1..32}.{json,wasm,zkey}` of the npm package @zk-kit/semaphore-artifacts [V]; and the artifact repository was archived on 2026-08-19 [V] (evidence register §15, recheck 2026-10-15). The deployer pins a Semaphore release only after CIP-0005's "Exact toolchain and dependency pins" row records one; until then the versions observed on 2026-10-15 are not that pin.
+
+Before deployment, the deployer:
+
+1. verifies the npm tarball checksum of the pinned @zk-kit/semaphore-artifacts version;
+2. vendors the artifact files for every depth the escrow accepts;
+3. pins the reproducible circuit and compiler inputs;
+4. exports each vendored zkey's verification key and compares it with the artifact JSON, with the verification keys in the proof package and with the verifier's packed key points;
+5. runs the circuit and zkey check against the ptau, or an explicitly reviewed equivalent; if an input is missing or the check cannot be run, deployment is blocked, and the check is never silently skipped;
+6. computes SHA-256 of `SemaphoreVerifier.sol` and `SemaphoreVerifierKeyPts.sol` at the pinned release and of every vendored file.
+
+After deployment and before use, the deployer compares the deployed verifier bytecode with the pinned build. The pre-deployment and post-deployment results and hashes are written into the deployment record. Locally computed hashes identify bytes; they do not establish ceremony soundness, which stays a recorded residual (RR-41). This CIP pins no Semaphore version and names no upstream address.
 
 ### Model selection predicate
 
@@ -115,7 +126,7 @@ Exactly one model is registered with `registerModel`. It must satisfy all of:
 - the registrant states, in this CIP, what they read in the license file shipped with the exact weight file (docs/node/model-registry-and-licenses.md section 5; RR-10);
 - its manifest includes the tokenizer test vector (docs/protocol/off-chain-api.md section 13, R2).
 
-Families the registrant may consider, all from evidence register §7: Gemma 4 (Apache-2.0, [V]), Phi-4 (MIT, [V]), and Qwen3 or Qwen3.5 (reported Apache-2.0, [L/V], so the sentence read is mandatory). Whether any of them has a T0 member at a quantization that fits class S is not recorded and is UNVERIFIED.
+Tier T0 is decided by the manifest's total stored parameter count, at most 4,000,000,000 (docs/node/model-registry-and-licenses.md section 4, which states this as a clarification of the existing tier rule, still open for the owner to confirm). At the 2026-10-15 recheck (evidence register §7, recheck 2026-10-15) the files satisfying the license and T0 rules are Qwen3-0.6B and Qwen3-1.7B (Apache-2.0 [V], official GGUF [V]), Qwen3.5-0.8B and 2B (Apache-2.0 [V], multimodal [V], official GGUF not found in the sources examined on 2026-10-15 [U]) and Phi-4-mini-instruct (MIT [V], official GGUF not found in the sources examined on 2026-10-15 [U]); Qwen3-4B (4,022,468,096), Qwen3.5-4B (4,659,865,088) and Gemma 4 E2B (5,123,178,051) are above the T0 bound by stored total [V]. This paragraph selects nothing; the registrant's reading of the shipped license file remains mandatory, and whether the chosen file fits class S is UNVERIFIED until measured.
 
 ### Model to register
 
@@ -160,7 +171,7 @@ The values are chosen to exercise every path of the Phase 1 exit, not to model c
 - **A testnet timelock.** Rejected by the owner's decision: nothing of value is at stake on Arbitrum Sepolia, and a delay would only slow the walkthrough. GOVERNANCE.md section 7.1 scopes the exception to this network and these setters.
 - **A multi-party testnet deployer key** (deployment open question 4). Not adopted for Phase 1: with one seated maintainer there is no second party to hold a share; the question stays open for later stages.
 
-The external facts relied on are Arbitrum's roughly one-day L1 force inclusion (evidence register §1, [V]), Semaphore's one-hour default root duration and its ceremony record (evidence register §15, [V] and [L]), and the model licenses (evidence register §7, [V] and [L/V]). The Arbitrum Sepolia chain id is not in the register and is UNVERIFIED.
+The external facts relied on are Arbitrum's roughly one-day L1 force inclusion (evidence register §1, [V]), Semaphore's one-hour default root duration and its ceremony record (evidence register §15, recheck 2026-10-15, [V]/[U]), and the model licenses (evidence register §7, [V] and [L/V]). The Arbitrum Sepolia chain id is not in the register and is UNVERIFIED.
 
 ## Backwards compatibility
 

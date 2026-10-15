@@ -588,7 +588,7 @@ The registry refuses one address in both roles and the spend refuses `relay == n
 
 ### R19 — Trusted setup, verifier and accounting bugs **[RISK] · High**
 
-Semaphore's Groth16 circuit relies on a trusted setup with more than 400 participants that finished 13 July 2024 (evidence register §15, [V]); a flaw in the setup, the verifier or the Comuns wrapper would break unlinkability or let notes be spent twice. The split, the dust branch and the root window are the highest-severity accounting risk. Mitigation: the escrow calls only the stateless verifier, keeps its own nullifier set, and is non-upgradeable; an external review is required before mainnet holds notes and none has been performed.
+Semaphore's Groth16 circuit relies on a trusted setup; the original 2024 ceremony had more than 400 participants and is historical (evidence register §15, [V]), and the production artifacts come from the 2025 Binary Merkle Root Fix ceremony [V]; its participant count, close date and final beacon were not found in the sources examined on 2026-10-15 [U] (evidence register §15, recheck 2026-10-15). A flaw in the setup, the verifier or the Comuns wrapper would break unlinkability or let notes be spent twice. The split, the dust branch and the root window are the highest-severity accounting risk. Mitigation: the escrow calls only the stateless verifier, keeps its own nullifier set, and is non-upgradeable; an external review is required before mainnet holds notes and none has been performed.
 
 ### R20 — Legal classification of credits and relays **[RISK] · Medium**
 

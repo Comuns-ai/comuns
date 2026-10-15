@@ -313,19 +313,19 @@ Phase 2 records independent operators, classes present, a shared model across cl
 
 ## 11 Time-sensitive assumptions to re-check before implementation
 
-These are future verification tasks against the evidence register, not claims of a live check in this plan. Proposed [ADR 0013](adr/0013-repositories-toolchains-ci-and-releases.md) assigns the engineering and release gates; Draft [CIP-0005](cip/0005-phase-one-implementation.md) owns the recorded rechecks and exact version pins. Its five pre-code rechecks cover Stylus/EVM, chunked OHTTP, Semaphore artifacts, model/dependency licenses, and the RFC 7748, 9180 and 9458 readings used by ADRs 0014 and 0015. Those records must be complete before CIP-0005 is Final and before protocol code starts; the Phase 4 legal-facts checks remain later gates.
+Dated research rechecks are now recorded in Draft [CIP-0005](cip/0005-phase-one-implementation.md) with their residuals, and are distinct from the implementation and release checks that remain pending. Proposed [ADR 0013](adr/0013-repositories-toolchains-ci-and-releases.md) assigns the engineering and release gates; CIP-0005 owns the recorded rechecks and exact version pins. Its five pre-code rechecks cover Stylus/EVM, chunked OHTTP, Semaphore artifacts, model/dependency licenses, and the RFC 7748, 9180 and 9458 readings used by ADRs 0014 and 0015. Those records were written into CIP-0005 on 2026-10-15 with their residuals (evidence register §1, §4, §7, §8 and §15, recheck blocks); the residuals must be accepted by review, and CIP-0005's other open rows including the exact pins must close, before CIP-0005 is Final and before protocol code starts; the Phase 4 legal-facts checks remain later gates.
 
 | Assumption | Recorded basis | Required re-check |
 |---|---|---|
-| Stylus pause | New activations paused since **2026-10-02**, no reopening recorded; evidence register §1 [V] | Confirm status before implementation; a reopening does not change the EVM v1 decision without a CIP. |
+| Stylus pause | New activations paused since **2026-10-02**, no reopening recorded; evidence register §1 [V] | Rechecked 2026-10-15: still paused, no reopening date, One on ArbOS 61 (evidence register §1, recheck 2026-10-15, [V]); solc evmVersion guidance was not found in the sources examined on 2026-10-15 [U]; no evmVersion is set; a reopening does not change the EVM v1 decision without a CIP. |
 | Fee snapshot | **Arbiscan, 2026-10-13**; evidence register §1 [V] for the recorded fees, [U] for the derived transfer estimate | Measure actual escrow, withdrawal, failed-open and multi-session costs; no current fee is inferred from a transfer snapshot. |
-| Crate and backend versions | Engine/binding snapshots in evidence register §3 [V]; HPKE crate snapshot in §4 [V] | Recheck maintained releases, supported kernels, cipher-suite behavior and reproducibility; pin versions only in CIP-0005 after its rechecks. |
-| Chunked OHTTP draft | Streaming draft -08 at the IESG in the research snapshot; evidence register §15 [V] | Recheck draft status and interoperability before pinning a streaming implementation; do not label the draft a final RFC. |
-| Semaphore second ceremony | A second Phase-2 ceremony followed a circuit fix; date and participant count unconfirmed, evidence register §15 [L] | Verify the ceremony artifacts, circuit and proving/verifying-key match before use; record unresolved provenance. |
-| Standards readings for relay authentication and node-key possession | RFC 7748, RFC 9180 and RFC 9458 readings in ADRs 0014 and 0015; UNVERIFIED in the evidence register | CIP-0005 records the pre-code confirmation of X25519 as Diffie–Hellman without a signature scheme in the HPKE suite, RFC 9180 secret export and RFC 9458 response-key derivation from the request HPKE context; no confirmation is claimed here. |
+| Crate and backend versions | Engine/binding snapshots in evidence register §3 [V]; HPKE crate snapshot in §4 [V] | Recheck maintained releases, supported kernels, cipher-suite behavior and reproducibility; pin versions only in CIP-0005 after its rechecks. Observed versions of 2026-10-15 are recheck inputs, not pins. |
+| Chunked OHTTP draft | Streaming draft -08 at the IESG in the 2026-10-13 snapshot; evidence register §15 [V] | Rechecked 2026-10-15: draft -08 approved, in the RFC Editor queue, blocked on references, no RFC number [V] (evidence register §15, recheck 2026-10-15); the off-chain API now uses non-interactive per-message exchanges with streamed responses (its section 3); independent interop is a release gate. Do not label the draft a final RFC. |
+| Semaphore second ceremony | The production artifacts come from the 2025 Binary Merkle Root Fix ceremony [V]; its participant count, close date and final beacon were not found in the sources examined on 2026-10-15 [U]; per-file artifact hashes were not found in the sources examined on 2026-10-15 [U]; the artifact repository is archived [V] (evidence register §15, recheck 2026-10-15) | Deployment vendors the artifact files, computes and records its own hashes and key-point comparison (CIP-0004 Verifier item); RR-41 and RR-50 record the residuals. |
+| Standards readings for relay authentication and node-key possession | RFC 7748, RFC 9180 and RFC 9458 readings in ADRs 0014 and 0015; confirmed in evidence register §4 (recheck 2026-10-15) | Confirmed 2026-10-15 from the primary standards: X25519 is Diffie–Hellman with no signature scheme [V]; RFC 9180 export on both contexts in base mode [V]; RFC 9458 response key by Export then Extract with salt concat(enc, response_nonce) [V], the combined client-and-gateway conclusion [L]; recorded in CIP-0005 and ADR 0015; conformance vectors remain release gates. |
 | AMLR applicability | Application from **10 July 2027**, evidence register §16 [L]; Article 79(1) text [V] | Recheck the recorded legal facts for Phase 4; classification remains UNVERIFIED, not legal advice. |
 | Storm proceedings | Retrial set for **26 April 2027** in evidence register §16 [V] | Recheck the docket and motion/retrial status for the Phase 4 legal-facts review; no legal conclusion is inferred. |
-| Model and dependency licenses | Model snapshots in evidence register §7 with their original marks; project licensing context in §8 [V/L] | Check exact manifest files and dependencies; confirm paid-hosting conditions and LICENSE against canonical Apache-2.0 text. |
+| Model and dependency licenses | Model snapshots in evidence register §7 with their original marks; project licensing context in §8 [V/L] | Rechecked 2026-10-15: dependency licenses and candidate T0 files recorded (evidence register §7 and §8, recheck 2026-10-15); no model selected; GPL-3.0 tooling is review item RR-50, no legal conclusion; the exact manifest file is CIP-0004's open item; LICENSE comparison against canonical Apache-2.0 stays a Phase 4 check. |
 
 ## 12 Risks
 
@@ -347,7 +347,7 @@ Ordered floors may make a batched provider's small-model offer unattractive. Nod
 
 ### R5 — Stylus confusion **[RISK] · Medium**
 
-Rust can be mistaken for on-chain execution. Documentation repeats off-chain Rust, C/C++ kernels and Arbitrum One EVM; pause re-checks do not silently change v1 (RR-16).
+Rust can be mistaken for on-chain execution. Documentation repeats off-chain Rust, C/C++ kernels and Arbitrum One EVM; pause re-checks do not silently change v1 (RR-16). The pause was rechecked on 2026-10-15 (RR-16).
 
 ### R6 — No seated maintainers **[RISK] · High**
 
@@ -383,7 +383,7 @@ A denomination group can be small, and timing, change amounts or common operator
 
 ### R14 — Trusted setup and verifier integration **[RISK] · High**
 
-Groth16 depends on the setup and the exact circuit/key artifacts (evidence register §15 [V]); second-ceremony details remain [L]. A wrong binding, root window or nullifier integration can break credits despite a sound primitive. Contracts keeps trees and nullifiers inside SessionEscrow and uses only the stateless verifier; Phase 4 requires independent integration and verifier review. No upstream audit claim transfers to the Comuns wrapper.
+Groth16 depends on the setup and the exact circuit/key artifacts (evidence register §15 [V]); the production artifacts come from the 2025 Binary Merkle Root Fix ceremony [V]; its participant count, close date and final beacon were not found in the sources examined on 2026-10-15 [U] (evidence register §15, recheck 2026-10-15). A wrong binding, root window or nullifier integration can break credits despite a sound primitive. Contracts keeps trees and nullifiers inside SessionEscrow and uses only the stateless verifier; Phase 4 requires independent integration and verifier review. No upstream audit claim transfers to the Comuns wrapper.
 
 ## 13 Open questions
 
