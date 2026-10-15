@@ -15,7 +15,7 @@ People who write, review, or discuss Comuns pledge to treat one another as equal
 - Read the CIP or the document before you object to it.
 - Make each objection specific, and say what change would answer it.
 - Talk about the text, and keep personal characterization out of the review.
-- Cite an external fact as the evidence register section that contains it (§1–§13), and mark a claim that is not in the register UNVERIFIED.
+- Cite an external fact as the evidence register section that contains it (docs/evidence-register.md, §1–§16, with How to cite at §17), and mark a claim that is not in the register UNVERIFIED.
 - Leave prompts, keys, and seed phrases out of issues, CIPs, and comments.
 - Add the Developer Certificate of Origin trailer when you offer a commit, as CONTRIBUTING.md describes.
 - Assume the lifecycle in GOVERNANCE.md is the way a disagreement gets a decision.
@@ -32,9 +32,9 @@ People who write, review, or discuss Comuns pledge to treat one another as equal
 
 ## 4 Reporting
 
-Until maintainers are seated, see MAINTAINERS.md; this repository has no private enforcement contact, and the bootstrap CIP must name one before enforcement is active.
+Until maintainers are seated, see MAINTAINERS.md; this repository has no private enforcement contact. [docs/cip/0003-bootstrap-first-maintainer-and-channels.md](docs/cip/0003-bootstrap-first-maintainer-and-channels.md) (Draft) proposes the contact. Enforcement is inactive until that CIP is Final. The contact and the maintainer are the same person, a known limitation.
 
-Enforcement is inactive until that condition is met. Before then, a person may describe conduct in a public issue on the future public repository only when the issue contains no prompts, no keys, no seed phrases, and no other person's private information. The issue records what happened. It does not start a sanction, and it does not seat a maintainer.
+Enforcement is inactive until that CIP is Final. Before then, a person may describe conduct in a public issue on the Comuns-ai/documentation repository only when the issue contains no prompts, no keys, no seed phrases, and no other person's private information. The issue records what happened. It does not start a sanction, and it does not seat a maintainer.
 
 ## 5 Enforcement ladder
 
@@ -74,7 +74,7 @@ Temporary exclusion from discussion is limited to discussion so that equal propo
 
 ## 7 Open questions
 
-- The bootstrap CIP must name the enforcement contact. This draft leaves the role's wording to that CIP.
+- The bootstrap CIP must name the enforcement contact. This draft leaves the role's wording to that CIP. [docs/cip/0003-bootstrap-first-maintainer-and-channels.md](docs/cip/0003-bootstrap-first-maintainer-and-channels.md) (Draft) proposes the contact. Enforcement is inactive until that CIP is Final. The contact and the maintainer are the same person, a known limitation.
 - What period should be the usual length of temporary exclusion from discussion? This draft sets no default and proposes a 90-day maximum.
 - May a person removed from a maintainer role be named again in a later CIP? This draft allows a later CIP to propose it, with Last Call as the check.
 - Should temporary exclusion from discussion ever pause new CIP filings, or must proposal rights stay intact in every case? This draft keeps them intact.

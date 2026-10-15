@@ -149,7 +149,7 @@ Not edited, by rule: LICENSE, MAINTAINERS.md, GOVERNANCE.md, CONTRIBUTING.md, CO
 
 Each of these was left as found because repairing it would have meant choosing a design the decisions do not state, or because the review scope says to record rather than repair.
 
-1. docs/security/privacy-and-contexts.md §5, docs/security/threat-model.md T7 and docs/node/node-design.md §7 describe node registration as carrying a proof of possession of the HPKE private key, while `registerNode` and `updateNode` in docs/protocol/contracts-and-settlement.md §6 take plain `hpkePublicKey` bytes. Recorded as contracts open question 18 (KI-3); the sentences were not changed because the proof's form and location are undecided. This is a release blocker for any implementation.
+1. docs/security/privacy-and-contexts.md §5, docs/security/threat-model.md T7 and docs/node/node-design.md §7 describe node registration as carrying a proof of possession of the HPKE private key, while `registerNode` and `updateNode` in docs/protocol/contracts-and-settlement.md §6 take plain `hpkePublicKey` bytes. Recorded as contracts open question 18 (KI-3); the sentences were not changed because the proof's form and location are undecided. This is a release blocker for any implementation. A proposed resolution exists in docs/adr/0015-node-key-possession.md and docs/cip/0005-phase-one-implementation.md; it is not Final, and KI-3 remains a release blocker until it is adopted and tested.
 2. docs/protocol/off-chain-api.md §7 still says a client "signs nothing further for the job" after a truncation, which read literally stalls a resumed job; recorded as its open question 12 (KI-12) rather than rewritten, because the review scope asked for a record.
 3. docs/protocol/off-chain-api.md §9 still has the inline retry after `blob_url_refused` reuse the job; recorded as its open question 13 (KI-13).
 4. docs/architecture/deployment-and-decentralization.md §1 and §3 label the last stage "Phase 4 — External review and a go/no-go CIP"; the four files named by invariant 14 (charter, plan, README, pitch) now agree on "External review", and the deployment label was left as a description of the stage. Repaired after the review: the deployment document and docs/requirements.md now use "External review" as the name.
@@ -211,7 +211,7 @@ Before this review the same command exited 1 with one failure: `FAIL docs/projec
 ## 9. Open questions
 
 1. Whether `openSession` should bind the expected `hpkePublicKey` hash (or a whole-offer hash) so that a same-price key or endpoint swap in flight reverts the open (contracts §16 questions 8 and 17; privacy §14 question 11).
-2. The form and location of the proof of possession for `hpkePublicKey` at registration (contracts §16 question 18; privacy §14 question 6).
+2. The form and location of the proof of possession for `hpkePublicKey` at registration (contracts §16 question 18; privacy §14 question 6). A proposed resolution exists in docs/adr/0015-node-key-possession.md and docs/cip/0005-phase-one-implementation.md; it is not Final, and KI-3 remains a release blocker until it is adopted and tested.
 3. Whether `BandsSet` should omit the `initialized` bit or the contract should force it true before emitting (contracts §16 question 19).
 4. The disclosure-sheet extension for non-session readers that the sharding spike needs (privacy §14 question 12; RR-38).
 5. Whether chunk tokens should travel as token IDs inside the sealed frame, or a bounded tokenizer tolerance should apply (off-chain-api §14 question 5).
@@ -229,7 +229,7 @@ Status of every item from the cross-vendor reviews, as the review scope requires
 |---|---|
 | KI-1 | Repaired in docs/cip/README.md §5 (merge authority follows the currently seated maintainers per MAINTAINERS.md and GOVERNANCE.md §6.1). |
 | KI-2 | Repaired in docs/security/privacy-and-contexts.md §5 (key read from the latest `NodeRegistered` / `NodeUpdated` event, as contracts §9); the openSession key binding is recorded as an open question in docs/protocol/contracts-and-settlement.md §16 (question 17) and docs/security/privacy-and-contexts.md §14 (question 11). |
-| KI-3 | Recorded as an open question in docs/protocol/contracts-and-settlement.md §16 (question 18); release blocker for any implementation. |
+| KI-3 | Recorded as an open question in docs/protocol/contracts-and-settlement.md §16 (question 18); release blocker for any implementation. A proposed resolution exists in docs/adr/0015-node-key-possession.md and docs/cip/0005-phase-one-implementation.md; it is not Final, and KI-3 remains a release blocker until it is adopted and tested. |
 | KI-4 | Recorded as an open question in docs/protocol/contracts-and-settlement.md §16 (question 19). |
 | KI-5 | Repaired: canonical token list named in docs/security/privacy-and-contexts.md §6 and reused in §8.3, docs/protocol/orchestration.md §4 and §13, docs/protocol/off-chain-api.md §6.1 and docs/project-charter.md 4.16. |
 | KI-6 | Repaired in docs/protocol/contracts-and-settlement.md §9 (shard holders hold no session; the reference client never opens a session or signs a voucher for one); docs/node/distributed-execution.md §5 already states it. |

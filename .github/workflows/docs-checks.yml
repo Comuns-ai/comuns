@@ -1,0 +1,36 @@
+# Read-only documentation checks. No deploy step and no write permission.
+name: Documentation checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Check the documents
+        run: python3 scripts/check-docs.py
+
+      - name: Check the pricing figures
+        run: python3 scripts/check-pricing.py
+
+      - name: Check the deck
+        run: python3 scripts/check-deck.py --html pitch/pitch-deck.html --markdown pitch/pitch-deck.md --expected-slides 14
+
+      - name: Check the DCO trailers
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python3 scripts/check-dco.py --base "$BASE_SHA" --head "$HEAD_SHA"

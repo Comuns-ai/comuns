@@ -17,11 +17,11 @@ Requires: None
 
 ## Specification
 
-*Write the normative text. If you change price bands, deadlines, the bond, or the protocol fee, say so in numbers and state this CIP's timelock; execution waits the longer of 7 days and that timelock, counted from the date this CIP becomes Final, by seated maintainers. If you change no parameter, say that. The protocol fee is 0 unless a Final CIP changes it. Delete this guidance.*
+*Write the normative text. If you change price bands, deadlines, the bond, or the protocol fee, say so in numbers and state this CIP's timelock; execution waits the longer of 7 days and that timelock, counted from the date this CIP becomes Final, by seated maintainers. On Arbitrum Sepolia, GOVERNANCE.md §7.1 applies; mainnet unchanged. If you change no parameter, say that. The protocol fee is 0 unless a Final CIP changes it. Delete this guidance.*
 
 ## Rationale
 
-*Explain why you chose this design. Mention alternatives you considered. Cite an external fact as the evidence register section that contains it (docs/evidence-register.md, §1–§13) with its mark, and mark a fact that is not in the register UNVERIFIED. Delete this guidance.*
+*Explain why you chose this design. Mention alternatives you considered. Cite an external fact as the evidence register section that contains it (docs/evidence-register.md, §1–§16, with How to cite at §17) with its mark, and mark a fact that is not in the register UNVERIFIED. Delete this guidance.*
 
 ## Backwards compatibility
 

@@ -14,7 +14,7 @@ Comuns is a community proposal for open-source decentralized LLM inference. Noth
 
 Every (tier, class) pair has a band in the proposed complete table. Classes price but do not gate which model a node offers. For the same model tier, stronger classes charge more, even if batching makes their production cost lower. This is the project brief's democratic-access rule, not cost-plus pricing or a claim of lower prices than hosted APIs.
 
-This document sets no normative wei values. Every numeric wei example below is **FIXTURE — not an adopted price**, illustrative and derived/UNVERIFIED. A later CIP must set all bands; mainnet is not deployable until then. The accompanying JSON fixtures are non-normative; the standard-library checker exercises arithmetic, not a deployed service. Credit denominations and `RELAY_FEE_WEI` also remain unset.
+This document sets no normative wei values. Every numeric wei example below is **FIXTURE — not an adopted price**, illustrative and derived/UNVERIFIED. A later CIP must set all bands; mainnet is not deployable until then. The accompanying JSON fixtures are non-normative; the standard-library checker exercises arithmetic, not a deployed service. Credit denominations and `RELAY_FEE_WEI` also remain unset for mainnet. CIP-0004 proposes a testnet ladder and testnet bands, testnet-only and non-normative, never production defaults; the fixture values in `pricing-examples.json` must not be copied into production, nor taken from CIP-0004.
 
 ## 2 Scope
 
@@ -291,7 +291,7 @@ Assessment, planning, cross-check, synthesis and review calls are ordinary meter
 
 Operators choose their asks within the adopted band and may remove offers. A class change revalidates all listed offers against the new class's bands; removal remains allowed. Governance alone can call `setBands(tier, bands[4])`; users and operators cannot silently change floors or ceilings. Existing sessions keep their copied prices. Governance also sets denominations and `RELAY_FEE_WEI` through `setCreditParameters(uint256 denominationWei, uint256 relayFeeWei)` under the same timelock. Denominations are append-only and must satisfy `MIN_DEPOSIT_WEI` and the change compatibility rule; all values remain unset. Existing credit sessions retain their copied relay fee.
 
-Under GOVERNANCE.md and docs/cip/README.md, parameter changes require a CIP that becomes Final, followed by the longer of seven days and the CIP's specified timelock, counted from its Final date, executed by seated maintainers. Last Call lasts fourteen days. Substantive edits return it to Review and restart a full Last Call; a CIP in Last Call cannot become Stagnant. Seating and removal occur only through a Final CIP. **Nobody is seated**, no parameter CIP is Final, and draft examples confer no execution authority. The same process must resolve all forty directional band entries before mainnet is deployable.
+Under GOVERNANCE.md and docs/cip/README.md, parameter changes require a CIP that becomes Final, followed by the longer of seven days and the CIP's specified timelock, counted from its Final date, executed by seated maintainers. On Arbitrum Sepolia, GOVERNANCE.md section 7.1 applies; mainnet unchanged. Last Call lasts fourteen days. Substantive edits return it to Review and restart a full Last Call; a CIP in Last Call cannot become Stagnant. Seating and removal occur only through a Final CIP. **Nobody is seated**, no parameter CIP is Final, and draft examples confer no execution authority. The same process must resolve all forty directional band entries before mainnet is deployable.
 
 ## 13 Risks
 
@@ -357,4 +357,4 @@ Greedy change leaves dust below the smallest denomination under the compatibilit
 - Would orchestrator nodes ever need a separate band, given that planning and merging are already ordinary inference?
 - How should future cap policy handle signer rotation/revocation, idle sessions and an anyone-can-close timeout? None is available in v1.
 - How should actual credit deposit, spend, change and withdrawal gas, prefill, TTFT and privacy-mode overhead be measured before recommending session sizes?
-- Which denomination ladder, `MAX_CHANGE_NOTES` and `RELAY_FEE_WEI` can support small sessions while bounding change dust? All remain unset; the Phase 1 CIP needs at least two testnet-only denominations.
+- Which denomination ladder, `MAX_CHANGE_NOTES` and `RELAY_FEE_WEI` can support small sessions while bounding change dust? All remain unset for mainnet; CIP-0004 proposes testnet-only values (non-normative, never production defaults), and the fixture values in `pricing-examples.json` are not copied from or into it.
