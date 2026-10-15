@@ -73,7 +73,7 @@ The manifest is the one document that says what "this model" means. It is canoni
 |---|---|
 | `schema` | Manifest schema version; this document describes schema 1. |
 | `name`, `version` | Human-readable; carry no authority. The **name must not imply rights the license withholds** (section 9, R3) and must follow the license's naming rule where one exists. |
-| `parameters` | Total parameter count, which decides `tier` by the partition in section 3 (8,000,000,000 is T1: more than 4B and at most 8B). |
+| `parameters` | Total stored parameter count of the weight files, including embeddings, in decimal (B = 1,000,000,000); it decides `tier` by the partition in section 3 (8,000,000,000 is T1: more than 4B and at most 8B). A card's rounded figure, an "effective" count or a non-embedding count does not override the stored count. This is a clarification of how the existing tier rule reads, not a new rule, and it stays open for the owner to confirm (section 10, question 1). |
 | `files[]` | Every weight file with its SHA-256 and size. A node loads only files whose hashes match; any mismatch is a refusal, not a warning. |
 | `format`, `quantization` | The container and quantization the files are in; a node reports the same quantization in its per-model benchmark. |
 | `tokenizer` | The tokenizer file and its digest — the **pinned tokenizer** that node and client both use for input receipts and token counting (privacy doc). |
@@ -100,6 +100,20 @@ Snapshot taken **2026-10-12** from docs/evidence-register.md §7. It records wha
 | gpt-oss | Apache-2.0 plus a usage policy | Allowed | Apache-2.0 terms plus a separate usage policy the operator must follow | [V] |
 
 Reading the table: "Allowed" is this document's reading of the register's entry, not legal advice, and the user-count thresholds (700M, 100M) are conditions on the **operator**, not on the protocol. An operator below a threshold may host; one above it needs its own license; the protocol cannot know which applies and does not try. A mixed row ("Allowed if confirmed", "Registrant decides") means the CIP that registers the model must state what the registrant read.
+
+Candidate T0 files, recheck 2026-10-15 (evidence register §7, recheck 2026-10-15; observations, not a selection):
+
+| Model | Stored parameters | License (source) | Official GGUF | Within T0 by stored total | Mark |
+|---|---|---|---|---|---|
+| Qwen3-0.6B | 751,632,384 | Apache-2.0 (LICENSE file) | Qwen/Qwen3-0.6B-GGUF Q8_0 | yes | [V] |
+| Qwen3-1.7B | 2,031,739,904 | Apache-2.0 (LICENSE) | Qwen/Qwen3-1.7B-GGUF Q8_0 | yes | [V] |
+| Qwen3-4B | 4,022,468,096 (card: 4.0B) | Apache-2.0 (LICENSE) | Qwen/Qwen3-4B-GGUF Q4_K_M … Q8_0 | no, above 4,000,000,000 | [V] |
+| Qwen3.5-0.8B / 2B | 873,438,784 / 2,274,069,824 | Apache-2.0 (LICENSE); multimodal | not found in the sources examined on 2026-10-15 | yes | [V] license, [U] GGUF |
+| Qwen3.5-4B | 4,659,865,088 | Apache-2.0 (LICENSE); multimodal | not found in the sources examined on 2026-10-15 | no | [V]/[U] |
+| Phi-4-mini-instruct | 3,836,021,760 | MIT (LICENSE) | not found in the sources examined on 2026-10-15 | yes | [V] license, [U] GGUF |
+| Gemma 4 E2B | 5,123,178,051 (2.3B effective) | Apache-2.0 (card and Google license page; no LICENSE file in the repository) | google/gemma-4-E2B-it-qat-q4_0-gguf | no | [V] |
+
+This table selects nothing and decides no `commercialHosting` flag; no added hosting restriction was found in the Qwen and Phi LICENSE files, which is a file fact, not a flag. Whether llama.cpp runs the Qwen3.5 or Gemma 4 architectures is not recorded [U]; whether Google's Prohibited Use Policy binds Gemma 4 is not stated in the sources examined on 2026-10-15 [U]. The Qwen3 / Qwen3.5 row of the snapshot table is [V] for the files named here only.
 
 ## 6. What may be paid
 
@@ -145,7 +159,7 @@ The class benchmark of docs/node/hardware-classes-and-benchmarks.md needs one mo
 - it is **small enough for class S** — a T0 model at a quantization that fits CPU-only machines and 8–16 GB unified memory by the illustrative memory-fit formula;
 - its manifest is registered like any other model, so that `benchmarkHash` pins a `modelId`.
 
-The **concrete file is open** (section 10). This document does **not** mandate a Llama file: the Llama license's attribution and naming conditions are workable for an operator but needless for a benchmark artefact, and an Apache-2.0 or MIT model avoids them entirely. Candidates in the snapshot with a permissive license and small sizes exist (Phi-4 under MIT, the Qwen3 family if its Apache-2.0 status is confirmed, Gemma 4 under Apache-2.0 — all evidence register §7); which of them has a T0-sized member at a suitable quantization is for the CIP to establish.
+The **concrete file is open** (section 10). This document does **not** mandate a Llama file: the Llama license's attribution and naming conditions are workable for an operator but needless for a benchmark artefact, and an Apache-2.0 or MIT model avoids them entirely. At the 2026-10-15 recheck the files that satisfy the license rule and the T0 stored-total rule are Qwen3-0.6B and Qwen3-1.7B (official GGUF), Qwen3.5-0.8B and 2B (multimodal, official GGUF not found in the sources examined on 2026-10-15) and Phi-4-mini-instruct (official GGUF not found in the sources examined on 2026-10-15); Qwen3-4B, Qwen3.5-4B and Gemma 4 E2B exceed 4,000,000,000 stored parameters (evidence register §7, recheck 2026-10-15, [V]/[U]). Which file, quantization and tokenizer become the benchmark model is for CIP-0004 to establish; this document selects none.
 
 ## 9. Risks
 
@@ -175,7 +189,7 @@ Every model needs a CIP; a slow or captured governance blocks legitimate models.
 
 ## 10. Open questions
 
-1. **The class benchmark file.** Which Apache-2.0 or MIT T0 model and quantization becomes the class benchmark model. Proposed resolution: CIP-0004 sets the Phase 1 predicate (Apache-2.0 or MIT, tier T0, and the registrant states which license text they read), and its "Model to register" item reads "Open; blocks Last Call" until CIP-0004 itself names the weight file, revision and quantization, the tokenizer and its test vector, the parameter count, the manifest and `manifestHash`, the license's SPDX identifier, and the sentence the registrant read. The deployment record does not name the file; it records the `modelId` and transaction hashes. This document asserts no family that has a T0 member.
+1. **The class benchmark file.** Which Apache-2.0 or MIT T0 model and quantization becomes the class benchmark model. Proposed resolution: CIP-0004 sets the Phase 1 predicate (Apache-2.0 or MIT, tier T0, and the registrant states which license text they read), and its "Model to register" item reads "Open; blocks Last Call" until CIP-0004 itself names the weight file, revision and quantization, the tokenizer and its test vector, the parameter count, the manifest and `manifestHash`, the license's SPDX identifier, and the sentence the registrant read. The deployment record does not name the file; it records the `modelId` and transaction hashes. Candidate stored totals are recorded in section 5; no benchmark file is selected. The 2026-10-15 recheck narrows the field (section 5) and selects nothing; the stored-total rule in section 4 governs the T0 boundary, and that reading of the existing tier rule stays open for the owner to confirm. CIP-0004's "Model to register" item remains Open and blocks its Last Call.
 2. **Manifest schema details.** Whether the manifest should carry the chat template, stop tokens and sampling defaults, which affect token counts and reproducibility, and how schema upgrades are handled without changing `modelId` semantics.
 3. **Tokenizer pinning.** Whether a tokenizer digest alone is enough for client and node to agree on `inputTokens`, or whether the manifest must also pin the tokenizer library version (privacy doc, open question 10).
 4. **SPDX identifiers for bespoke licenses.** Which `LicenseRef-` identifiers the project standardizes for the Llama, Qwen and Gemma terms, so that indexers can filter consistently.
