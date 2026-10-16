@@ -113,6 +113,9 @@ Never paste prompts, keys or seed phrases into issues.
 - [docs/adr/0013-repositories-toolchains-ci-and-releases.md](docs/adr/0013-repositories-toolchains-ci-and-releases.md) — Proposed repository layout, toolchains, CI, DCO, style and testnet release gates; adoption proposed in CIP-0005.
 - [docs/adr/0014-relay-authentication-to-gateways.md](docs/adr/0014-relay-authentication-to-gateways.md) — Proposed relay authentication per connection without a contract change; adoption proposed in CIP-0005.
 - [docs/adr/0015-node-key-possession.md](docs/adr/0015-node-key-possession.md) — Proposed client key-possession probe before spending, without a contract change; adoption proposed in CIP-0005.
+- [docs/adr/0016-funding-edge-and-deposit-key.md](docs/adr/0016-funding-edge-and-deposit-key.md) — Proposed ETH-only escrow with funding at the edge from the user's own account and a deposit key that can only call depositNote; no adopting CIP yet.
+- [docs/adr/0017-accounts-and-decentralized-access.md](docs/adr/0017-accounts-and-decentralized-access.md) — Proposed core path with no hosted service, optional embedded wallets and social login, an independent note vault and an isolated funding surface; no adopting CIP yet.
+- [docs/adr/0018-one-client-stack.md](docs/adr/0018-one-client-stack.md) — Proposed one TypeScript-over-Rust client stack for web, desktop and mobile; prover and store facts recorded, nothing selected; no adopting CIP yet.
 
 ### docs/cip
 

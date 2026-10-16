@@ -536,7 +536,7 @@ The N credit spends of one request, and the relay traffic of its sessions, fall 
 2. **Plan caching.** Whether a validated plan for a request shape may be reused for a later request, and how the sheet re-confirmation rule applies.
 3. **Reputation for planners.** How indexers can score planner nodes when the plan's quality is only visible to the client.
 4. **Standard plan schema CIP.** Whether the JSON of section 6 should be frozen by a CIP so that orchestrator nodes and clients interoperate.
-5. **Thin clients that cannot sign per chunk.** Whether delegation of `sessionSigner`, session keys or account abstraction should be proposed in a later CIP, and with what bounds.
+5. **Thin clients that cannot sign per chunk.** Whether delegation of `sessionSigner`, session keys or account abstraction should be proposed in a later CIP, and with what bounds. The deposit key of proposed [ADR 0016](../adr/0016-funding-edge-and-deposit-key.md) is a deposit-only authority, not a delegation of `sessionSigner`; `sessionSigner` delegation stays deferred and would need its own CIP.
 6. **Client-side caps on k and wave width.** Reasonable defaults for the number of answerers and the number of concurrent tasks per wave; these are client settings, **not protocol constants**.
 7. **Sub-task payload verification.** A reliable client-side test that a sub-task contains no prompt text, so that an executor may leave `readersOfFullPrompt`.
 8. **Second sessions on one pair.** Whether the reference client should offer a second session for the same `(node, modelId)` automatically when two tasks of a wave land on it, or always run them sequentially; the trade is another note and credit spend against wave latency.

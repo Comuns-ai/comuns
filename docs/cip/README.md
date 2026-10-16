@@ -55,6 +55,7 @@ What counts as substantive activity, what counts as a blocking objection, and ho
 - 0004 is allocated to docs/cip/0004-sepolia-testnet-configuration.md, a Draft testnet-only, non-normative configuration proposal. Requires: 0002, 0003, 0005.
 - 0005 is allocated to docs/cip/0005-phase-one-implementation.md, a Draft implementation proposal. Requires: 0002, 0003.
 - ADRs 0013–0015 are proposed until docs/cip/0005-phase-one-implementation.md is accepted.
+- ADRs 0016–0018 are proposed with no adopting CIP yet.
 - The next CIP uses the lowest free number above 0005 (currently 0006). The filename is docs/cip/NNNN-kebab-title.md. The slug is kebab-case: lowercase words separated by hyphens.
 - If two authors take the same number, they resolve it in public and one author renames. Nobody has private authority to allocate numbers.
 

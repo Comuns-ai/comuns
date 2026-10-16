@@ -352,7 +352,7 @@ Greedy change leaves dust below the smallest denomination under the compatibilit
 - What floors and ceilings should a CIP adopt for all forty directional band entries across T0–T4 and S/M/L/X?
 - What benchmark bars substantiate each hardware class without turning `maxTier` into an eligibility gate?
 - What value and scope should `CHUNK_TOKENS` have, and how should it trade signature overhead against per-session unpaid exposure?
-- Should a later CIP add stablecoin payments? v1 uses ETH and has no protocol token.
+- Should a later CIP add stablecoin payments? v1 uses ETH and has no protocol token. Proposed [ADR 0016](../adr/0016-funding-edge-and-deposit-key.md) keeps v1 settlement in ETH, rejects a stablecoin escrow and allows conversion at the funding edge; funding-provider fees are shown separately and are not service cost; no CIP is proposed.
 - What activation meter and disclosure/accounting rules would make experimental sharding payable?
 - Would orchestrator nodes ever need a separate band, given that planning and merging are already ordinary inference?
 - How should future cap policy handle signer rotation/revocation, idle sessions and an anyone-can-close timeout? None is available in v1.
