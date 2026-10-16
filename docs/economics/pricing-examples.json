@@ -29,13 +29,13 @@
         {"jobId": "job-2", "promptTokens": "2", "grantedContextTokens": "0", "outputChunks": ["4", "2"]}
       ],
       "vouchers": [
-        {"seq": "1", "inputTokens": "3", "outputTokens": "0", "cumulativeWei": "0", "final": false, "action": "sign", "expectedPayoutWei": "0"},
-        {"seq": "2", "inputTokens": "3", "outputTokens": "4", "cumulativeWei": "3", "final": false, "action": "redeemVoucher", "expectedPayoutWei": "3"},
-        {"seq": "3", "inputTokens": "3", "outputTokens": "5", "cumulativeWei": "4", "final": false, "action": "sign", "expectedPayoutWei": "0"},
-        {"seq": "4", "inputTokens": "5", "outputTokens": "5", "cumulativeWei": "5", "final": false, "action": "sign", "expectedPayoutWei": "0"},
-        {"seq": "5", "inputTokens": "5", "outputTokens": "9", "cumulativeWei": "7", "final": false, "action": "sign", "expectedPayoutWei": "0"},
-        {"seq": "6", "inputTokens": "5", "outputTokens": "11", "cumulativeWei": "9", "final": false, "action": "sign", "expectedPayoutWei": "0"},
-        {"seq": "7", "inputTokens": "5", "outputTokens": "11", "cumulativeWei": "9", "final": true, "action": "closeWithVoucher", "expectedPayoutWei": "6"}
+        {"seq": "1", "inputTokens": "3", "outputTokens": "0", "cumulativeWei": "0", "isFinal": false, "action": "sign", "expectedPayoutWei": "0"},
+        {"seq": "2", "inputTokens": "3", "outputTokens": "4", "cumulativeWei": "3", "isFinal": false, "action": "redeemVoucher", "expectedPayoutWei": "3"},
+        {"seq": "3", "inputTokens": "3", "outputTokens": "5", "cumulativeWei": "4", "isFinal": false, "action": "sign", "expectedPayoutWei": "0"},
+        {"seq": "4", "inputTokens": "5", "outputTokens": "5", "cumulativeWei": "5", "isFinal": false, "action": "sign", "expectedPayoutWei": "0"},
+        {"seq": "5", "inputTokens": "5", "outputTokens": "9", "cumulativeWei": "7", "isFinal": false, "action": "sign", "expectedPayoutWei": "0"},
+        {"seq": "6", "inputTokens": "5", "outputTokens": "11", "cumulativeWei": "9", "isFinal": false, "action": "sign", "expectedPayoutWei": "0"},
+        {"seq": "7", "inputTokens": "5", "outputTokens": "11", "cumulativeWei": "9", "isFinal": true, "action": "closeWithVoucher", "expectedPayoutWei": "6"}
       ],
       "expectedInputTokens": "5", "expectedOutputTokens": "11",
       "expectedSettledWei": "9", "expectedRefundWei": "11", "expectedCapWei": "20"
@@ -47,11 +47,11 @@
       "depositWei": "8", "maxSpendWei": "10",
       "jobs": [{"jobId": "job-1", "promptTokens": "4", "grantedContextTokens": "1", "outputChunks": ["4", "4", "3"]}],
       "vouchers": [
-        {"seq": "1", "inputTokens": "5", "outputTokens": "0", "cumulativeWei": "1", "final": false, "action": "sign", "expectedPayoutWei": "0"},
-        {"seq": "2", "inputTokens": "5", "outputTokens": "4", "cumulativeWei": "4", "final": false, "action": "sign", "expectedPayoutWei": "0"},
-        {"seq": "3", "inputTokens": "5", "outputTokens": "8", "cumulativeWei": "7", "final": false, "action": "redeemVoucher", "expectedPayoutWei": "7"},
-        {"seq": "4", "inputTokens": "5", "outputTokens": "11", "cumulativeWei": "9", "final": false, "action": "sign", "expectedPayoutWei": "0"},
-        {"seq": "5", "inputTokens": "5", "outputTokens": "11", "cumulativeWei": "9", "final": true, "action": "closeWithVoucher", "expectedPayoutWei": "1"}
+        {"seq": "1", "inputTokens": "5", "outputTokens": "0", "cumulativeWei": "1", "isFinal": false, "action": "sign", "expectedPayoutWei": "0"},
+        {"seq": "2", "inputTokens": "5", "outputTokens": "4", "cumulativeWei": "4", "isFinal": false, "action": "sign", "expectedPayoutWei": "0"},
+        {"seq": "3", "inputTokens": "5", "outputTokens": "8", "cumulativeWei": "7", "isFinal": false, "action": "redeemVoucher", "expectedPayoutWei": "7"},
+        {"seq": "4", "inputTokens": "5", "outputTokens": "11", "cumulativeWei": "9", "isFinal": false, "action": "sign", "expectedPayoutWei": "0"},
+        {"seq": "5", "inputTokens": "5", "outputTokens": "11", "cumulativeWei": "9", "isFinal": true, "action": "closeWithVoucher", "expectedPayoutWei": "1"}
       ],
       "expectedInputTokens": "5", "expectedOutputTokens": "11",
       "expectedSettledWei": "8", "expectedRefundWei": "0", "expectedCapWei": "8",
