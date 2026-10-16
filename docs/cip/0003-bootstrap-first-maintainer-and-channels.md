@@ -1,11 +1,11 @@
 # CIP 0003: Bootstrap: first maintainer, enforcement contact and private security channel
 
-Status: Draft
+Status: Review
 Type: process
 Created: 2026-10-15
 Requires: None
 
-This CIP is Draft. It is not in Last Call and it is not Final. It proposes the first maintainer, the enforcement contact and the private security channel that GOVERNANCE.md section 6 requires. A name written in a Draft seats nobody, as [MAINTAINERS.md](../../MAINTAINERS.md) states. Seating and adoption take effect only when this CIP is Final; item 7 governs the review process before then, and item 9 requires sign-off from the commit that adds this file.
+This CIP is in Review. It is not in Last Call and it is not Final. It proposes the first maintainer, the enforcement contact and the private security channel that GOVERNANCE.md section 6 requires. A name written in a Draft or Review copy seats nobody, as [MAINTAINERS.md](../../MAINTAINERS.md) states. Seating and adoption take effect only when this CIP is Final; item 7 governs the review process before then, and item 9 requires sign-off from the commit that adds this file.
 
 ## Abstract
 
@@ -47,7 +47,7 @@ The proposal does not rely on a token, a coin vote or an ARB balance. ARB balanc
 6. **Operating texts.** On the day this CIP becomes Final, it adopts by reference GOVERNANCE.md, CONTRIBUTING.md, SECURITY.md and CODE_OF_CONDUCT.md, as they stand at the commit whose hash is written on the line below the Last Call date (item 7). A substantive change to any of the four texts after that commit and before Final returns this CIP to Review. The four texts remain amendable by a later CIP. This CIP does not adopt CIP-0001, CIP-0002 or any ADR; CIP-0001 stays Draft. This answers the question in [docs/project-plan.md](../project-plan.md) section 13 on which CIPs establish executable authority while CIP-0001 stays Draft, and open question 8 of [docs/project-charter.md](../project-charter.md): participants follow GOVERNANCE.md section 4 for this CIP, and nobody is seated by a private act.
 
 7. **Host of record and dating.** The public record of this CIP is this file on the default branch of Comuns-ai/documentation, together with the public pull request described here. Copies elsewhere do not start or stop any clock.
-   - **The Draft.** This file reaches the default branch through the pull request that adds it. The repository owner merges that pull request as a pre-authority act that grants no authority, like pull requests #1–#3. GitHub administrator rights on the repository are not merge authority under GOVERNANCE.md.
+   - **The Draft.** This file reached the default branch through the pull request that added it (#4). The repository owner merged that pull request as a pre-authority act that grants no authority, like pull requests #1–#3. GitHub administrator rights on the repository are not merge authority under GOVERNANCE.md.
    - **Status changes.** Review, Last Call and Final are made in one public, unmerged pull request on Comuns-ai/documentation that edits this file's status line.
    - **Last Call date.** The commit in that pull request that sets `Status: Last Call` also adds, directly below the status line, a line `Last Call started: YYYY-MM-DD` and, on the next line, `Operating texts at: <full commit hash>`, naming the commit of the default branch at which item 6 reads the four operating texts. The date written in that line starts the 14 days, following the written-dates rule of GOVERNANCE.md section 4.3. GitHub's own timeline is corroboration only, and its behaviour is UNVERIFIED.
    - **Final.** Anyone may state in public, on that pull request, that 14 days have elapsed with no open blocking objection. The author then sets `Status: Final` in a commit to that pull request whose message lists the disposition of every review and every blocking objection. Final is a state of that public record, not a merge.
@@ -70,7 +70,7 @@ The proposal does not rely on a token, a coin vote or an ARB balance. ARB balanc
    Removal follows GOVERNANCE.md section 6.1. A later CIP may seat more people or split these roles.
    ```
 
-8. **Prior acts.** Pull requests #1–#3 were merged, and the pull request that adds this file will be merged, by the author onto the author's own repository before any authority existed. This CIP does not authorize those merges retroactively; GOVERNANCE.md section 6 says authority does not reach backward. This CIP acknowledges the public record described in item 7 as the record whose process texts it adopts under item 6. It adopts no ADR, nor CIP-0001 or CIP-0002, and it grants no retroactive authority for the earlier merges.
+8. **Prior acts.** Pull requests #1–#3, the pull request that added this file (#4), and every later pull request that the repository owner merges onto the author's own repository before this CIP is Final, which at the time this CIP entered Review were #5 and #6, are merges made by the author before any authority exists. This CIP does not authorize those merges retroactively; GOVERNANCE.md section 6 says authority does not reach backward. This CIP acknowledges the public record described in item 7 as the record whose process texts it adopts under item 6. It adopts no ADR, nor CIP-0001 or CIP-0002, and it grants no retroactive authority for the earlier merges.
 
 9. **DCO.** The repository history before the pull request that adds this file holds seven commits without a Signed-off-by trailer, listed here by full hash as git prints them:
    - `95a91c8a22ebbdc25a557c50c1a37ce106ff7386`
@@ -110,7 +110,7 @@ Alternatives considered:
 
 Nothing is deployed. No contract, client or node exists to migrate. This CIP does not contradict an ADR.
 
-The pull request that adds this file also reconciles texts written before a host existed: the GOVERNANCE.md section 4.3 sentence on which hosted record dates Last Call; the sentences in SECURITY.md and CONTRIBUTING.md that send issues and objections to a public repository not yet named; and the Phase 0 content in [docs/project-charter.md](../project-charter.md), which listed only the documentation and is updated in the same pull request to name this bootstrap CIP. Those edits change no rule; they point at this CIP, which is Draft.
+The pull request that adds this file also reconciles texts written before a host existed: the GOVERNANCE.md section 4.3 sentence on which hosted record dates Last Call; the sentences in SECURITY.md and CONTRIBUTING.md that send issues and objections to a public repository not yet named; and the Phase 0 content in [docs/project-charter.md](../project-charter.md), which listed only the documentation and is updated in the same pull request to name this bootstrap CIP. Those edits change no rule; they point at this CIP, which was then Draft.
 
 ## Security considerations
 
