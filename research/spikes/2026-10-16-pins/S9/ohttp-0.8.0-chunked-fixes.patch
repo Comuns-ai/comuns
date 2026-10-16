@@ -1,0 +1,74 @@
+diff -ruN -x target ohttp-0.8.0-orig/src/stream.rs ohttp-0.8.0-patched/src/stream.rs
+--- ohttp-0.8.0-orig/src/stream.rs	2026-10-16 16:18:58
++++ ohttp-0.8.0-patched/src/stream.rs	2026-10-16 16:20:23
+@@ -28,6 +28,9 @@
+ const MAX_CHUNK_PLAINTEXT: usize = 1 << 14;
+ const CHUNK_AAD: &[u8] = b"";
+ const FINAL_CHUNK_AAD: &[u8] = b"final";
++/// The largest response nonce, `max(Nn, Nk)`, over the AEADs this crate supports.
++/// AES-256-GCM and ChaCha20-Poly1305 have `Nk = 32`.
++const MAX_ENTROPY: usize = 32;
+ 
+ #[allow(clippy::unnecessary_wraps)]
+ fn ioerror<T, E>(e: E) -> Poll<IoResult<T>>
+@@ -149,6 +152,10 @@
+         if *this.closed {
+             return ioerror(Error::WriteAfterClose);
+         }
++        // A zero-length non-final chunk must not be sent, so an empty write is a no-op.
++        if input.is_empty() {
++            return Poll::Ready(Ok(0));
++        }
+ 
+         // We have buffered data, so dump it into the output directly.
+         let flushed = Self::flush(&mut this, cx);
+@@ -241,7 +248,7 @@
+             state: ClientResponseState::Header {
+                 enc,
+                 secret,
+-                nonce: [0; 16],
++                nonce: [0; MAX_ENTROPY],
+                 read: 0,
+             },
+         })
+@@ -420,6 +427,10 @@
+                         Ok(pt) => pt,
+                         Err(e) => return Some(ioerror(e)),
+                     };
++                    if pt.is_empty() {
++                        // A zero-length non-final chunk is treated as a decryption error.
++                        return Some(ioerror(Error::Format));
++                    }
+                     output[..pt.len()].copy_from_slice(&pt);
+                     *self = Self::length();
+                     Some(Poll::Ready(Ok(pt.len())))
+@@ -536,16 +547,15 @@
+                 };
+                 output.len()
+             } else {
++                if !last && pt.is_empty() {
++                    // A zero-length non-final chunk is treated as a decryption error.
++                    return ioerror(Error::Format);
++                }
+                 output[..pt.len()].copy_from_slice(&pt);
+                 if last {
+                     *self = Self::Done;
+                 } else {
+                     *self = Self::length();
+-                    if pt.is_empty() {
+-                        // We can't return zero length, as that means "end of stream".
+-                        // So read the next chunk if this one was empty.
+-                        continue;
+-                    }
+                 }
+                 pt.len()
+             };
+@@ -740,7 +750,7 @@
+     Header {
+         enc: Vec<u8>,
+         secret: SymKey,
+-        nonce: [u8; 16],
++        nonce: [u8; MAX_ENTROPY],
+         read: usize,
+     },
+     Body {

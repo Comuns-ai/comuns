@@ -1,0 +1,31 @@
+[package]
+name = "comuns-crypto-spike"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.99"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+hpke = { version = "=0.14.1", default-features = false, features = ["alloc", "x25519", "chacha", "getrandom"] }
+ohttp = { version = "=0.8.0", default-features = false, features = ["client", "server", "rust-hpke", "stream"] }
+bhttp = { version = "=0.8.0", default-features = false, features = ["stream"] }
+# Spike-only: AsyncRead/AsyncWrite extension traits to drive ohttp's stream API.
+futures = { version = "=0.3.34", default-features = false, features = ["std"] }
+# S9 test (c) only: hand-build a response with an injected zero-length non-final chunk.
+# Same versions ohttp 0.8.0 already resolves (no new crates in the graph).
+chacha20poly1305 = { version = "=0.11.0", default-features = false }
+hkdf = { version = "=0.13.0", default-features = false }
+sha2 = { version = "=0.11.1", default-features = false }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "=0.2.129"
+# getrandom 0.4.x on wasm32-unknown-unknown: the `wasm_js` feature is the whole opt-in
+# (no --cfg getrandom_backend rustflag, unlike 0.3). Pinned to the version hpke resolves.
+getrandom = { version = "=0.4.3", features = ["wasm_js"] }
+
+# S9: ohttp 0.8.0 with the chunked fixes (nonce buffer, zero-length chunks).
+[patch.crates-io]
+ohttp = { path = "../ohttp-0.8.0-patched" }

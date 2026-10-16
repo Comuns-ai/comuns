@@ -1,0 +1,18 @@
+S1 browser leg: run by the orchestrator on 2026-10-16 in a Chromium-based desktop browser pane.
+
+Server: python3 -m http.server 8765 --bind 127.0.0.1 --directory <scratch>/spikes/S1/web (background task, stopped afterwards)
+URL:    http://127.0.0.1:8765/index.html   (tab-2)
+
+get_page_text (page body, <pre id="out">):
+FAIL(b) a: RFC9458 ok (cfg 41B, req 144B, resp 83B); b[ChaCha20Poly1305]: not run under wasm guard: ohttp 0.8.0 stream client nonce buffer is 16 bytes, suite needs 32 (panics natively at stream.rs:775); diagnostic b[Aes128Gcm]: chunked ok (req 164B, resp 108B, 3 frames + final, incremental first frame ok, truncation rejected)
+
+read_console_messages:
+[log] FAIL(b) a: RFC9458 ok (cfg 41B, req 144B, resp 83B); b[ChaCha20Poly1305]: not run under wasm guard: ohttp 0.8.0 stream client nonce buffer is 16 bytes, suite needs 32 (panics natively at stream.rs:775); diagnostic b[Aes128Gcm]: chunked ok (req 164B, resp 108B, 3 frames + final, incremental first frame ok, truncation rejected)
+
+javascript_exec ({ua, out, secure, crypto}):
+  ua:     Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) <desktop-app> Chrome/152.0.7977.149 Safari/537.36
+  secure: true
+  crypto: function   (typeof crypto.getRandomValues)
+  out:    (same string as above)
+
+Reading: (a) the RFC 9458 round trip with the fixed suite ran inside wasm in this browser and passed. (b) the chunked fixed-suite test is guarded off in the wasm build because it traps (see log.txt). The AES-128-GCM chunked diagnostic passed in the browser.

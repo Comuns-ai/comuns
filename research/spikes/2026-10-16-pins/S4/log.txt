@@ -1,0 +1,290 @@
+$ node --version
+v24.22.0
+exit=0
+$ npm view eslint@latest version
+10.13.0
+$ npm view @eslint/js@latest version
+10.0.1
+$ npm view typescript-eslint@latest version
+8.71.2
+$ npm view prettier@latest version
+3.9.10
+$ npm view @typescript/typescript6@latest version
+6.0.2
+$ npm view typescript@latest version
+7.0.2
+$ npm view typescript versions --json (6.x)
+  "6.0.0-dev.20260322",
+  "6.0.0-dev.20260323",
+  "6.0.0-dev.20260324",
+  "6.0.0-dev.20260401",
+  "6.0.0-dev.20260416",
+  "6.0.1-rc",
+  "6.0.2",
+  "6.0.3",
+$ npm view typescript dist-tags
+{
+  "dev": "3.9.4",
+  "tag-for-publishing-older-releases": "4.1.6",
+  "insiders": "4.6.2-insiders.20220225",
+  "beta": "6.0.0-beta",
+  "rc": "7.0.1-rc",
+  "latest": "7.0.2",
+  "next": "7.1.0-dev.20261016.1"
+}
+$ npm install --prefix deps/pnpm pnpm@12.14.0 --ignore-scripts
+
+added 2 packages in 14s
+exit=0
+$ ls deps/pnpm/node_modules/.bin
+pn
+pnpm
+pnpx
+pnx
+exit=0
+$ $SPIKE/S4/deps/pnpm/node_modules/.bin/pnpm --version
+12.14.0
+exit=0
+$ $SPIKE/S4/deps/pnpm/node_modules/.bin/pnpm install --ignore-scripts
+Progress: resolved 0, reused 0, downloaded 1, added 0
+Progress: resolved 0, reused 7, downloaded 2, added 0
+Progress: resolved 0, reused 11, downloaded 38, added 0
+[WARN] Tarball download average speed 5 KiB/s (size 6 KiB) is below 50 KiB/s: https://registry.npmjs.org/@types/json-schema/-/json-schema-7.0.15.tgz (GET)
+[WARN] Tarball download average speed 26 KiB/s (size 31 KiB) is below 50 KiB/s: https://registry.npmjs.org/hookified/-/hookified-1.15.1.tgz (GET)
+[WARN] Tarball download average speed 33 KiB/s (size 52 KiB) is below 50 KiB/s: https://registry.npmjs.org/@cacheable/utils/-/utils-2.5.0.tgz (GET)
+Progress: resolved 0, reused 12, downloaded 64, added 0
+Progress: resolved 0, reused 12, downloaded 67, added 0
+Progress: resolved 0, reused 12, downloaded 69, added 0
+[WARN] Request took 13564ms: https://registry.npmjs.org/@typescript-eslint%2Ftypescript-estree
+Downloading @typescript/typescript-darwin-arm64@7.0.2: 0.00 B/9.27 MB
+Progress: resolved 0, reused 12, downloaded 70, added 0
+Downloading @typescript/typescript-darwin-arm64@7.0.2: 770.04 kB/9.27 MB
+Downloading @typescript/typescript-darwin-arm64@7.0.2: 1.36 MB/9.27 MB
+[WARN] Request took 18108ms: https://registry.npmjs.org/@typescript-eslint%2Feslint-plugin
+Downloading @typescript/typescript-darwin-arm64@7.0.2: 2.17 MB/9.27 MB
+Downloading @typescript/typescript-darwin-arm64@7.0.2: 2.68 MB/9.27 MB
+Downloading @typescript/typescript-darwin-arm64@7.0.2: 3.03 MB/9.27 MB
+Downloading @typescript/typescript-darwin-arm64@7.0.2: 3.27 MB/9.27 MB
+Downloading @typescript/typescript-darwin-arm64@7.0.2: 3.53 MB/9.27 MB
+Downloading @typescript/typescript-darwin-arm64@7.0.2: 3.85 MB/9.27 MB
+Downloading @typescript/typescript-darwin-arm64@7.0.2: 4.11 MB/9.27 MB
+Downloading @typescript/typescript-darwin-arm64@7.0.2: 4.55 MB/9.27 MB
+[WARN] Request took 17284ms: https://registry.npmjs.org/@typescript-eslint%2Fparser
+Downloading @typescript/typescript-darwin-arm64@7.0.2: 5.16 MB/9.27 MB
+[WARN] Request took 15424ms: https://registry.npmjs.org/@typescript-eslint%2Ftypes
+Downloading @typescript/typescript-darwin-arm64@7.0.2: 5.86 MB/9.27 MB
+Downloading @typescript/typescript-darwin-arm64@7.0.2: 6.17 MB/9.27 MB
+[WARN] Request took 18117ms: https://registry.npmjs.org/@typescript-eslint%2Fscope-manager
+[WARN] Request took 17123ms: https://registry.npmjs.org/@typescript-eslint%2Ftypescript-estree
+Progress: resolved 0, reused 13, downloaded 77, added 0
+Progress: resolved 0, reused 13, downloaded 79, added 0
+[WARN] Request took 15844ms: https://registry.npmjs.org/@typescript-eslint%2Feslint-plugin
+Downloading @typescript/typescript-darwin-arm64@7.0.2: 7.60 MB/9.27 MB
+Downloading @typescript/typescript-darwin-arm64@7.0.2: 7.94 MB/9.27 MB
+Downloading @typescript/typescript-darwin-arm64@7.0.2: 8.30 MB/9.27 MB
+Downloading @typescript/typescript-darwin-arm64@7.0.2: 8.68 MB/9.27 MB
+Downloading @typescript/typescript-darwin-arm64@7.0.2: 9.07 MB/9.27 MB
+Added 1 entry to minimumReleaseAgeExclude in pnpm-workspace.yaml (set minimumReleaseAgeStrict to true to gate these updates with a prompt):
+  eslint@10.13.0
+Packages are cloned from the content-addressable store to the virtual store.
+  Content-addressable store is at: $HOME/Library/pnpm/store/v11
+  Virtual store is at:             node_modules/.pnpm
+Packages: +100
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 100, reused 13, downloaded 87, added 100, done
+[WARN] Issues with peer dependencies found. Run "pnpm peers check" to list them.
+
+devDependencies:
++ @eslint/js 10.0.1
++ @typescript/typescript6 6.0.2
++ eslint 10.13.0
++ prettier 3.9.10
++ typescript 7.0.2
++ typescript-eslint 8.71.2
+
+Done in 43s using pnpm v12.14.0
+exit=0
+$ ls node_modules node_modules/.bin
+node_modules:
+@eslint
+@typescript
+eslint
+prettier
+typescript
+typescript-eslint
+
+node_modules/.bin:
+eslint
+prettier
+tsc
+tsc6
+exit=0
+$ node_modules/.bin/tsc --version
+Version 7.0.2
+exit=0
+$ node_modules/.bin/tsc --strict --noEmit -p .
+src/bad.ts(1,14): error TS2322: Type 'string' is not assignable to type 'number'.
+exit=1
+$ node_modules/.bin/eslint src
+typescript-eslint does not support TS 7.0.
+Please see https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-6.0 to run typescript-eslint using the TS 6 API.
+See also https://github.com/typescript-eslint/typescript-eslint/issues/10940 for tracking typescript-eslint's support for TS >=7.1
+
+Oops! Something went wrong! :(
+
+ESLint: 10.13.0
+
+Error: typescript-eslint does not support TS 7.0.
+    at Object.<anonymous> ($SPIKE/S4/node_modules/.pnpm/typescript-eslint@8.71.2_eslint@10.13.0_typescript@7.0.2/node_modules/typescript-eslint/dist/index.js:52:11)
+    at Module._compile (node:internal/modules/cjs/loader:1929:14)
+    at Object..js (node:internal/modules/cjs/loader:2060:10)
+    at Module.load (node:internal/modules/cjs/loader:1651:32)
+    at Module._load (node:internal/modules/cjs/loader:1443:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+    at loadCJSModuleWithModuleLoad (node:internal/modules/esm/translators:372:15)
+    at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:244:9)
+    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)
+    at async node:internal/modules/esm/loader:647:26
+exit=2
+$ node_modules/.bin/prettier --check src eslint.config.js
+Checking formatting...
+[warn] eslint.config.js
+[warn] Code style issues found in the above file. Run Prettier with --write to fix.
+exit=1
+$ $SPIKE/S4/node_modules/.bin/prettier --check src
+Checking formatting...
+All matched files use Prettier code style!
+exit=0
+$ $SPIKE/S4/node_modules/.bin/prettier --write eslint.config.js
+eslint.config.js 10ms
+exit=0
+$ $SPIKE/S4/node_modules/.bin/prettier --check src eslint.config.js
+Checking formatting...
+All matched files use Prettier code style!
+exit=0
+$ $SPIKE/S4/deps/pnpm/node_modules/.bin/pnpm install --ignore-scripts
+Progress: resolved 0, reused 1, downloaded 0, added 0
+Added 1 entry to minimumReleaseAgeExclude in pnpm-workspace.yaml (set minimumReleaseAgeStrict to true to gate these updates with a prompt):
+  eslint@10.13.0
+Packages are cloned from the content-addressable store to the virtual store.
+  Content-addressable store is at: $HOME/Library/pnpm/store/v11
+  Virtual store is at:             node_modules/.pnpm
+Packages: +97
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 97, reused 97, downloaded 0, added 97, done
+
+devDependencies:
++ @eslint/js 10.0.1
++ eslint 10.13.0
++ typescript <- @typescript/typescript6 6.0.2
++ typescript-eslint 8.71.2
+
+Done in 242ms using pnpm v12.14.0
+exit=0
+$ ls -la node_modules node_modules/typescript
+lrwxr-xr-x@ 1 user  wheel  72 Oct 16 15:48 node_modules/typescript -> .pnpm/@typescript+typescript6@6.0.2/node_modules/@typescript/typescript6
+
+node_modules:
+total 24
+drwxr-xr-x@  10 user  wheel   320 Oct 16 15:48 .
+drwxr-xr-x@   7 user  wheel   224 Oct 16 15:48 ..
+drwxr-xr-x@   4 user  wheel   128 Oct 16 15:48 .bin
+-rw-r--r--@   1 user  wheel  7409 Oct 16 15:48 .modules.yaml
+drwxr-xr-x@ 101 user  wheel  3232 Oct 16 15:48 .pnpm
+-rw-------@   1 user  wheel   937 Oct 16 15:48 .pnpm-workspace-state-v1.json
+drwxr-xr-x@   3 user  wheel    96 Oct 16 15:48 @eslint
+lrwxr-xr-x@   1 user  wheel    40 Oct 16 15:48 eslint -> .pnpm/eslint@10.13.0/node_modules/eslint
+lrwxr-xr-x@   1 user  wheel    72 Oct 16 15:48 typescript -> .pnpm/@typescript+typescript6@6.0.2/node_modules/@typescript/typescript6
+lrwxr-xr-x@   1 user  wheel   106 Oct 16 15:48 typescript-eslint -> .pnpm/typescript-eslint@8.71.2_@typescript+typescript6@6.0.2_eslint@10.13.0/node_modules/typescript-eslint
+exit=0
+$ node -e console.log(require('typescript').version)
+6.0.3
+exit=0
+$ node_modules/.bin/eslint --config eslint.config.js ../src
+
+Oops! Something went wrong! :(
+
+ESLint: 10.13.0
+
+You are linting "../src", but all of the files matching the glob pattern "../src" are ignored.
+
+If you don't want to lint these files, remove the pattern "../src" from the list of arguments passed to ESLint.
+
+If you do want to lint these files, explicitly list one or more of the files from this glob that you'd like to lint to see more details about why they are ignored.
+
+  * If the file is ignored because of a matching ignore pattern, check global ignores in your config file.
+    https://eslint.org/docs/latest/use/configure/ignore
+
+  * If the file is ignored because no matching configuration was supplied, check file patterns in your config file.
+    https://eslint.org/docs/latest/use/configure/configuration-files#specify-files-with-arbitrary-extensions
+
+  * If the file is ignored because it is located outside of the base path, change the location of your config file to be in a parent directory.
+
+exit=2
+$ node_modules/.bin/tsc --version
+Version 7.0.2
+exit=0
+$ node_modules/.bin/tsc6 --version
+Version 6.0.3
+exit=0
+294:  '@typescript/typescript6@6.0.2':
+295-    resolution: {integrity: sha512-mbCddXd+jm7hfx7w2YU64/Av4/NqqeG3GoRZgxPcgoTxYjhrcfJRw9ULch71SS4G+Q3bOXFhRvPqjguN0Hyp5w==}
+296-    hasBin: true
+297-
+--
+547:  typescript-eslint@8.71.2:
+548-    resolution: {integrity: sha512-Rz4effbMy2g9wnvOJZG6SbVavX313Lap1vNEbk1RUochzickvzP8P4HB+bkNg5e50eVz1hQGjh9K1omI1xB4Bw==}
+549-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+550-    peerDependencies:
+--
+554:  typescript@6.0.3:
+555-    resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
+556-    engines: {node: '>=14.17'}
+557-    hasBin: true
+--
+559:  typescript@7.0.2:
+560-    resolution: {integrity: sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA==}
+561-    engines: {node: '>=16.20.0'}
+562-    hasBin: true
+--
+809:  '@typescript/typescript6@6.0.2':
+810-    dependencies:
+811-      '@typescript/old': typescript@6.0.3
+812-
+--
+1050:  typescript-eslint@8.71.2(eslint@10.13.0)(typescript@7.0.2):
+1051-    dependencies:
+1052-      '@typescript-eslint/eslint-plugin': 8.71.2(@typescript-eslint/parser@8.71.2(eslint@10.13.0)(typescript@7.0.2))(eslint@10.13.0)(typescript@7.0.2)
+1053-      '@typescript-eslint/parser': 8.71.2(eslint@10.13.0)(typescript@7.0.2)
+--
+1061:  typescript@6.0.3: {}
+1062-
+1063:  typescript@7.0.2:
+1064-    optionalDependencies:
+1065-      '@typescript/typescript-aix-ppc64': 7.0.2
+1066-      '@typescript/typescript-darwin-arm64': 7.0.2
+$ ln -sfn ../src src
+exit=0
+$ node -e console.log(require('typescript').version)
+6.0.3
+exit=0
+$ node_modules/.bin/eslint src
+
+$SPIKE/S4/lint6/src/good.ts
+  14:3  error  Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+
+✖ 1 problem (1 error, 0 warnings)
+
+exit=1
+$ node_modules/.bin/prettier --check src eslint.config.js
+Checking formatting...
+All matched files use Prettier code style!
+exit=0
+$ npm view pnpm@12.14.0 dist.integrity dist.shasum
+dist.integrity = 'sha512-wYum2HmT09Fky16JSPMrLAbuhUSH4GzY2GeBNC+z5btGNDZwNHEehoArqpw3vqkGzhkprQjXCITJfYAd8TOJpg=='
+dist.shasum = 'b589f9374f009fa90d07b42e803ef0ac646dffb5'
+$ npm view typescript@7.0.2 dist.integrity dist.shasum
+dist.integrity = 'sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=='
+dist.shasum = '9ec773d7954a8c182c17cc5bbd575aa28bc51582'
+$ npm view @typescript/typescript6@6.0.2 dist.integrity
+sha512-mbCddXd+jm7hfx7w2YU64/Av4/NqqeG3GoRZgxPcgoTxYjhrcfJRw9ULch71SS4G+Q3bOXFhRvPqjguN0Hyp5w==

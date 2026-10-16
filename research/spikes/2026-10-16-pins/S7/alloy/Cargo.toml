@@ -1,0 +1,11 @@
+[package]
+name = "s7-alloy"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+alloy = { version = "=2.5.0", default-features = false, features = ["sol-types", "signer-local", "dyn-abi", "eip712", "serde"] }
+serde_json = "=1.0.154"
+
+[workspace]

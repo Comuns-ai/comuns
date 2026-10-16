@@ -1,0 +1,1413 @@
+$ (cd $SPIKE/S5/contracts) $F --version
+forge Version: 1.8.5
+Commit SHA: 51a52c59cffd940f76eddd0b4bb1791aa4b5ac7f
+Build Timestamp: 2026-10-05T17:07:33.315474000Z (1791220053)
+Build Profile: dist
+exit=0
+$ (cd $SPIKE/S5/contracts) $F init --no-git --offline --force .
+Initializing $SPIKE/S5/contracts...
+    Initialized forge project
+exit=0
+$ (cd $SPIKE/S5/contracts) ls -la
+total 16
+drwxr-xr-x@ 7 user  wheel  224 Oct 16 15:46 .
+drwxr-xr-x@ 8 user  wheel  256 Oct 16 15:46 ..
+-rw-r--r--@ 1 user  wheel  972 Oct 16 15:46 README.md
+-rw-r--r--@ 1 user  wheel  170 Oct 16 15:46 foundry.toml
+drwxr-xr-x@ 3 user  wheel   96 Oct 16 15:46 script
+drwxr-xr-x@ 3 user  wheel   96 Oct 16 15:46 src
+drwxr-xr-x@ 3 user  wheel   96 Oct 16 15:46 test
+exit=0
+$ (cd $SPIKE/S5/contracts) cat foundry.toml
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+
+# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+exit=0
+$ (cd $SPIKE/S5/contracts) $F config | grep -nE "evm_version|solc|optimizer|^auto_detect|via_ir"
+8:auto_detect_remappings = true
+21:evm_version = "osaka"
+25:auto_detect_solc = true
+27:optimizer = false
+28:optimizer_runs = 200
+69:via_ir = false
+exit=0
+$ (cd $SPIKE/S5/contracts) $F config --json | head -c 3000
+{
+  "src": "src",
+  "test": "test",
+  "script": "script",
+  "out": "out",
+  "libs": [
+    "lib"
+  ],
+  "remappings": [],
+  "auto_detect_remappings": true,
+  "libraries": [],
+  "cache": true,
+  "cache_path": "cache",
+  "dynamic_test_linking": true,
+  "snapshots": "snapshots",
+  "gas_snapshot_check": false,
+  "gas_snapshot_emit": true,
+  "broadcast": "broadcast",
+  "allow_paths": [],
+  "include_paths": [],
+  "skip": [],
+  "force": false,
+  "evm_version": "osaka",
+  "hardfork": null,
+  "gas_reports": [
+    "*"
+  ],
+  "gas_reports_ignore": [],
+  "gas_reports_include_tests": false,
+  "solc": null,
+  "auto_detect_solc": true,
+  "offline": false,
+  "optimizer": false,
+  "optimizer_runs": 200,
+  "optimizer_details": null,
+  "model_checker": null,
+  "verbosity": 0,
+  "eth_rpc_url": null,
+  "eth_rpc_accept_invalid_certs": false,
+  "eth_rpc_no_proxy": false,
+  "eth_rpc_jwt": null,
+  "eth_rpc_timeout": null,
+  "eth_rpc_headers": null,
+  "eth_rpc_curl": false,
+  "etherscan_api_key": null,
+  "ignored_error_codes": [
+    "license",
+    "code-size",
+    "init-code-size",
+    "transient-storage",
+    "transfer-deprecated",
+    "natspec-memory-safe-assembly-deprecated"
+  ],
+  "ignored_error_codes_from": [],
+  "ignored_warnings_from": [],
+  "deny": "never",
+  "match_test": null,
+  "no_match_test": null,
+  "match_contract": null,
+  "no_match_contract": null,
+  "match_path": null,
+  "no_match_path": null,
+  "no_match_coverage": null,
+  "test_failures_file": "cache/test-failures",
+  "mutation_dir": "cache/mutation",
+  "threads": null,
+  "show_progress": false,
+  "fuzz": {
+    "runs": 256,
+    "run": null,
+    "worker": null,
+    "fail_on_revert": true,
+    "max_test_rejects": 65536,
+    "seed": null,
+    "dictionary_weight": 40,
+    "include_storage": true,
+    "include_push_bytes": true,
+    "max_fuzz_dictionary_addresses": 15728640,
+    "max_fuzz_dictionary_values": 9830400,
+    "max_fuzz_dictionary_literals": 6553600,
+    "gas_report_samples": 256,
+    "corpus_dir": null,
+    "frontier_dir": null,
+    "frontier_limit": 256,
+    "corpus_gzip": true,
+    "corpus_min_mutations": 5,
+    "corpus_min_size": 0,
+    "show_edge_coverage": false,
+    "evm_edge_coverage_collision_free": true,
+    "evm_edge_coverage_include_call_depth": false,
+    "sancov_edges": false,
+    "sancov_trace_cmp": false,
+    "corpus_random_sequence_weight": 10,
+    "payable_value_weight": 0,
+    "mutation_weight_splice": 1,
+    "mutation_weight_repeat": 1,
+    "mutation_weight_interleave": 1,
+    "mutation_weight_prefix": 1,
+    "mutation_weight_suffix": 1,
+    "mutation_weight_abi": 1,
+    "mutation_weight_cmp": 1,
+    "failure_persist_dir": "cache/fuzz",
+    "show_logs": false,
+    "timeout": null
+  },
+  "invariant": {
+    "runs": 256,
+    "depth": 500,
+    "min_depth": 1,
+    "depth_mode": "fixed",
+    "workers": "auto",
+    "fail_on_revert": false,
+    "call_override": false,
+    "dictionary_weight": 80,
+    "include_storage": true,
+    "include_push_bytes": true,
+    "max_fuzz_dictionary_addrexit=0
+$ (cd $SPIKE/S5/contracts) rm -rf src/Counter.sol test script
+exit=0
+$ (cd $SPIKE/S5/contracts) $F config | grep -nE "evm_version|solc|optimizer"
+21:evm_version = "cancun"
+25:solc = "0.8.37"
+26:auto_detect_solc = true
+28:optimizer = true
+29:optimizer_runs = 200
+exit=0
+$ (cd $SPIKE/S5/contracts) $F build --sizes
+Compiling 1 files with Solc 0.8.37
+Solc 0.8.37 finished in 375.77ms
+Compiler run successful!
+
+╭----------+------------------+-------------------+--------------------+---------------------╮
+| Contract | Runtime Size (B) | Initcode Size (B) | Runtime Margin (B) | Initcode Margin (B) |
++============================================================================================+
+| Mini     | 121              | 147               | 24,455             | 49,005              |
+╰----------+------------------+-------------------+--------------------+---------------------╯
+
+exit=0
+$ (cd $SPIKE/S5) mkdir -p $SPIKE/S5/deps/sem
+exit=0
+$ (cd $SPIKE/S5) cd $SPIKE/S5/deps/sem && npm init -y
+Wrote to $SPIKE/S5/deps/sem/package.json:
+
+{
+  "name": "sem",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
+
+
+exit=0
+$ (cd $SPIKE/S5) cd $SPIKE/S5/deps/sem && npm install --ignore-scripts --save-exact @semaphore-protocol/contracts@4.14.3
+
+added 3 packages, and audited 4 packages in 3s
+
+found 0 vulnerabilities
+exit=0
+$ (cd $SPIKE/S5) ls $SPIKE/S5/deps/sem/node_modules $SPIKE/S5/deps/sem/node_modules/@semaphore-protocol/contracts
+$SPIKE/S5/deps/sem/node_modules:
+@semaphore-protocol
+@zk-kit
+poseidon-solidity
+
+$SPIKE/S5/deps/sem/node_modules/@semaphore-protocol/contracts:
+LICENSE
+README.md
+Semaphore.sol
+base
+interfaces
+package.json
+exit=0
+$ (cd $SPIKE/S5) grep -rn "pragma solidity\|^import" $SPIKE/S5/deps/sem/node_modules/@semaphore-protocol/contracts --include=*.sol
+(eval):1: no matches found: --include=*.sol
+exit=1
+$ (cd $SPIKE/S5/contracts) grep -rn --include='*.sol' -E 'pragma solidity|^import' ../deps/sem/node_modules/@semaphore-protocol/contracts
+../deps/sem/node_modules/@semaphore-protocol/contracts/Semaphore.sol:2:pragma solidity >=0.8.23 <0.9.0;
+../deps/sem/node_modules/@semaphore-protocol/contracts/Semaphore.sol:4:import {ISemaphore} from "./interfaces/ISemaphore.sol";
+../deps/sem/node_modules/@semaphore-protocol/contracts/Semaphore.sol:5:import {ISemaphoreVerifier} from "./interfaces/ISemaphoreVerifier.sol";
+../deps/sem/node_modules/@semaphore-protocol/contracts/Semaphore.sol:6:import {SemaphoreGroups} from "./base/SemaphoreGroups.sol";
+../deps/sem/node_modules/@semaphore-protocol/contracts/Semaphore.sol:7:import {MIN_DEPTH, MAX_DEPTH} from "./base/Constants.sol";
+../deps/sem/node_modules/@semaphore-protocol/contracts/base/SemaphoreGroups.sol:2:pragma solidity >=0.8.23 <0.9.0;
+../deps/sem/node_modules/@semaphore-protocol/contracts/base/SemaphoreGroups.sol:4:import {ISemaphoreGroups} from "../interfaces/ISemaphoreGroups.sol";
+../deps/sem/node_modules/@semaphore-protocol/contracts/base/SemaphoreGroups.sol:5:import {InternalLeanIMT, LeanIMTData} from "@zk-kit/lean-imt.sol/InternalLeanIMT.sol";
+../deps/sem/node_modules/@semaphore-protocol/contracts/base/SemaphoreVerifier.sol:4:pragma solidity >=0.8.23 <0.9.0;
+../deps/sem/node_modules/@semaphore-protocol/contracts/base/SemaphoreVerifier.sol:6:import {MAX_DEPTH} from "./Constants.sol";
+../deps/sem/node_modules/@semaphore-protocol/contracts/base/SemaphoreVerifier.sol:7:import {SemaphoreVerifierKeyPts} from "./SemaphoreVerifierKeyPts.sol";
+../deps/sem/node_modules/@semaphore-protocol/contracts/base/SemaphoreVerifierKeyPts.sol:3:pragma solidity >=0.8.23 <0.9.0;
+../deps/sem/node_modules/@semaphore-protocol/contracts/base/Constants.sol:2:pragma solidity >=0.8.23 <0.9.0;
+../deps/sem/node_modules/@semaphore-protocol/contracts/interfaces/ISemaphoreGroups.sol:2:pragma solidity >=0.8.23 <0.9.0;
+../deps/sem/node_modules/@semaphore-protocol/contracts/interfaces/ISemaphore.sol:2:pragma solidity >=0.8.23 <0.9.0;
+../deps/sem/node_modules/@semaphore-protocol/contracts/interfaces/ISemaphoreVerifier.sol:2:pragma solidity >=0.8.23 <0.9.0;
+exit=0
+$ (cd $SPIKE/S5/contracts) find ../deps/sem/node_modules -name '*.sol' | head -30
+../deps/sem/node_modules/poseidon-solidity/PoseidonT2.sol
+../deps/sem/node_modules/poseidon-solidity/PoseidonT3.sol
+../deps/sem/node_modules/poseidon-solidity/PoseidonT4.sol
+../deps/sem/node_modules/poseidon-solidity/PoseidonT5.sol
+../deps/sem/node_modules/poseidon-solidity/PoseidonT6.sol
+../deps/sem/node_modules/@zk-kit/lean-imt.sol
+../deps/sem/node_modules/@zk-kit/lean-imt.sol/InternalLeanIMT.sol
+../deps/sem/node_modules/@zk-kit/lean-imt.sol/LeanIMT.sol
+../deps/sem/node_modules/@zk-kit/lean-imt.sol/Constants.sol
+../deps/sem/node_modules/@semaphore-protocol/contracts/Semaphore.sol
+../deps/sem/node_modules/@semaphore-protocol/contracts/base/SemaphoreGroups.sol
+../deps/sem/node_modules/@semaphore-protocol/contracts/base/SemaphoreVerifier.sol
+../deps/sem/node_modules/@semaphore-protocol/contracts/base/SemaphoreVerifierKeyPts.sol
+../deps/sem/node_modules/@semaphore-protocol/contracts/base/Constants.sol
+../deps/sem/node_modules/@semaphore-protocol/contracts/interfaces/ISemaphoreGroups.sol
+../deps/sem/node_modules/@semaphore-protocol/contracts/interfaces/ISemaphore.sol
+../deps/sem/node_modules/@semaphore-protocol/contracts/interfaces/ISemaphoreVerifier.sol
+exit=0
+$ (cd $SPIKE/S5/contracts) grep -E '"version"|"_resolved"' ../deps/sem/node_modules/@semaphore-protocol/contracts/package.json ../deps/sem/node_modules/@zk-kit/*/package.json
+../deps/sem/node_modules/@semaphore-protocol/contracts/package.json:  "version": "4.14.3",
+../deps/sem/node_modules/@zk-kit/lean-imt.sol/package.json:  "version": "2.0.1",
+exit=0
+$ (cd $SPIKE/S5/contracts) $F build --sizes
+Compiling 13 files with Solc 0.8.37
+Solc 0.8.37 finished in 34.97ms
+Error: Compiler run failed:
+Error (6275): Source "../deps/sem/node_modules/@zk-kit/lean-imt.solInternalLeanIMT.sol" not found: File not found. Searched the following locations: "$SPIKE/S5/contracts".
+ParserError: Source "../deps/sem/node_modules/@zk-kit/lean-imt.solInternalLeanIMT.sol" not found: File not found. Searched the following locations: "$SPIKE/S5/contracts".
+ --> $SPIKE/S5/deps/sem/node_modules/@semaphore-protocol/contracts/base/SemaphoreGroups.sol:5:1:
+  |
+5 | import {InternalLeanIMT, LeanIMTData} from "@zk-kit/lean-imt.sol/InternalLeanIMT.sol";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "../deps/sem/node_modules/@zk-kit/lean-imt.solInternalLeanIMT.sol" not found: File not found. Searched the following locations: "$SPIKE/S5/contracts".
+ParserError: Source "../deps/sem/node_modules/@zk-kit/lean-imt.solInternalLeanIMT.sol" not found: File not found. Searched the following locations: "$SPIKE/S5/contracts".
+ --> ../deps/sem/node_modules/@semaphore-protocol/contracts/base/SemaphoreGroups.sol:5:1:
+  |
+5 | import {InternalLeanIMT, LeanIMTData} from "@zk-kit/lean-imt.sol/InternalLeanIMT.sol";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+exit=1
+$ (cd $SPIKE/S5/contracts) $F inspect SemaphoreVerifier deployedBytecode > $SPIKE/S5/verifier-cancun.hex; wc -c $SPIKE/S5/verifier-cancun.hex
+   31715 $SPIKE/S5/verifier-cancun.hex
+exit=0
+$ (cd $SPIKE/S5/contracts) $F inspect Semaphore deployedBytecode > $SPIKE/S5/semaphore-cancun.hex; wc -c $SPIKE/S5/semaphore-cancun.hex
+Error: Compiler run failed:
+Error (6275): Source "../deps/sem/node_modules/@zk-kit/lean-imt.solInternalLeanIMT.sol" not found: File not found. Searched the following locations: "$SPIKE/S5/contracts".
+ParserError: Source "../deps/sem/node_modules/@zk-kit/lean-imt.solInternalLeanIMT.sol" not found: File not found. Searched the following locations: "$SPIKE/S5/contracts".
+ --> $SPIKE/S5/deps/sem/node_modules/@semaphore-protocol/contracts/base/SemaphoreGroups.sol:5:1:
+  |
+5 | import {InternalLeanIMT, LeanIMTData} from "@zk-kit/lean-imt.sol/InternalLeanIMT.sol";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "../deps/sem/node_modules/@zk-kit/lean-imt.solInternalLeanIMT.sol" not found: File not found. Searched the following locations: "$SPIKE/S5/contracts".
+ParserError: Source "../deps/sem/node_modules/@zk-kit/lean-imt.solInternalLeanIMT.sol" not found: File not found. Searched the following locations: "$SPIKE/S5/contracts".
+ --> ../deps/sem/node_modules/@semaphore-protocol/contracts/base/SemaphoreGroups.sol:5:1:
+  |
+5 | import {InternalLeanIMT, LeanIMTData} from "@zk-kit/lean-imt.sol/InternalLeanIMT.sol";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+       0 $SPIKE/S5/semaphore-cancun.hex
+exit=0
+$ (cd $SPIKE/S5/contracts) FOUNDRY_PROFILE=osaka $F config | grep -nE "evm_version|solc|optimizer|^out"
+5:out = "out-osaka"
+25:evm_version = "osaka"
+29:solc = "0.8.37"
+30:auto_detect_solc = true
+32:optimizer = true
+33:optimizer_runs = 200
+158:out = "docs"
+281:out = "utils/JsonBindings.sol"
+exit=0
+$ (cd $SPIKE/S5/contracts) FOUNDRY_PROFILE=osaka $F build --sizes
+Compiling 13 files with Solc 0.8.37
+Solc 0.8.37 finished in 23.75ms
+Error: Compiler run failed:
+Error (6275): Source "../deps/sem/node_modules/@zk-kit/lean-imt.solInternalLeanIMT.sol" not found: File not found. Searched the following locations: "$SPIKE/S5/contracts".
+ParserError: Source "../deps/sem/node_modules/@zk-kit/lean-imt.solInternalLeanIMT.sol" not found: File not found. Searched the following locations: "$SPIKE/S5/contracts".
+ --> $SPIKE/S5/deps/sem/node_modules/@semaphore-protocol/contracts/base/SemaphoreGroups.sol:5:1:
+  |
+5 | import {InternalLeanIMT, LeanIMTData} from "@zk-kit/lean-imt.sol/InternalLeanIMT.sol";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "../deps/sem/node_modules/@zk-kit/lean-imt.solInternalLeanIMT.sol" not found: File not found. Searched the following locations: "$SPIKE/S5/contracts".
+ParserError: Source "../deps/sem/node_modules/@zk-kit/lean-imt.solInternalLeanIMT.sol" not found: File not found. Searched the following locations: "$SPIKE/S5/contracts".
+ --> ../deps/sem/node_modules/@semaphore-protocol/contracts/base/SemaphoreGroups.sol:5:1:
+  |
+5 | import {InternalLeanIMT, LeanIMTData} from "@zk-kit/lean-imt.sol/InternalLeanIMT.sol";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+exit=1
+$ (cd $SPIKE/S5/contracts) FOUNDRY_PROFILE=osaka $F inspect SemaphoreVerifier deployedBytecode > $SPIKE/S5/verifier-osaka.hex; wc -c $SPIKE/S5/verifier-osaka.hex
+   31715 $SPIKE/S5/verifier-osaka.hex
+exit=0
+$ (cd $SPIKE/S5/contracts) FOUNDRY_PROFILE=osaka $F inspect Semaphore deployedBytecode > $SPIKE/S5/semaphore-osaka.hex; wc -c $SPIKE/S5/semaphore-osaka.hex
+Error: Compiler run failed:
+Error (6275): Source "../deps/sem/node_modules/@zk-kit/lean-imt.solInternalLeanIMT.sol" not found: File not found. Searched the following locations: "$SPIKE/S5/contracts".
+ParserError: Source "../deps/sem/node_modules/@zk-kit/lean-imt.solInternalLeanIMT.sol" not found: File not found. Searched the following locations: "$SPIKE/S5/contracts".
+ --> $SPIKE/S5/deps/sem/node_modules/@semaphore-protocol/contracts/base/SemaphoreGroups.sol:5:1:
+  |
+5 | import {InternalLeanIMT, LeanIMTData} from "@zk-kit/lean-imt.sol/InternalLeanIMT.sol";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "../deps/sem/node_modules/@zk-kit/lean-imt.solInternalLeanIMT.sol" not found: File not found. Searched the following locations: "$SPIKE/S5/contracts".
+ParserError: Source "../deps/sem/node_modules/@zk-kit/lean-imt.solInternalLeanIMT.sol" not found: File not found. Searched the following locations: "$SPIKE/S5/contracts".
+ --> ../deps/sem/node_modules/@semaphore-protocol/contracts/base/SemaphoreGroups.sol:5:1:
+  |
+5 | import {InternalLeanIMT, LeanIMTData} from "@zk-kit/lean-imt.sol/InternalLeanIMT.sol";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+       0 $SPIKE/S5/semaphore-osaka.hex
+exit=0
+$ (cd $SPIKE/S5/contracts) cmp $SPIKE/S5/verifier-cancun.hex $SPIKE/S5/verifier-osaka.hex && echo VERIFIER_IDENTICAL
+$SPIKE/S5/verifier-cancun.hex $SPIKE/S5/verifier-osaka.hex differ: char 31629, line 1
+exit=1
+$ (cd $SPIKE/S5/contracts) cmp $SPIKE/S5/semaphore-cancun.hex $SPIKE/S5/semaphore-osaka.hex && echo SEMAPHORE_IDENTICAL
+SEMAPHORE_IDENTICAL
+exit=0
+$ (cd $SPIKE/S5/contracts) shasum -a 256 $SPIKE/S5/*.hex
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  $SPIKE/S5/semaphore-cancun.hex
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  $SPIKE/S5/semaphore-osaka.hex
+643a87f26990a031b36c641aaf9c3a0b7d86c80fa994d8ca422133f45f5acef7  $SPIKE/S5/verifier-cancun.hex
+a58544a2865608ff4d9cf9d5efce14ee3ceee4d429299325de4029a339cbc104  $SPIKE/S5/verifier-osaka.hex
+exit=0
+$ (cd $SPIKE/S5/contracts) $F build --sizes
+Compiling 13 files with Solc 0.8.37
+Solc 0.8.37 finished in 231.90ms
+Compiler run successful!
+
+╭-------------------+------------------+-------------------+--------------------+---------------------╮
+| Contract          | Runtime Size (B) | Initcode Size (B) | Runtime Margin (B) | Initcode Margin (B) |
++=====================================================================================================+
+| Mini              | 121              | 147               | 24,455             | 49,005              |
+|-------------------+------------------+-------------------+--------------------+---------------------|
+| PoseidonT3        | 16,466           | 16,518            | 8,110              | 32,634              |
+|-------------------+------------------+-------------------+--------------------+---------------------|
+| Semaphore         | 7,934            | 8,069             | 16,642             | 41,083              |
+|-------------------+------------------+-------------------+--------------------+---------------------|
+| SemaphoreVerifier | 15,856           | 30,413            | 8,720              | 18,739              |
+╰-------------------+------------------+-------------------+--------------------+---------------------╯
+
+Warning: AST source not found for $SPIKE/S5/contracts/src/Imports.sol
+exit=0
+$ (cd $SPIKE/S5/contracts) $F inspect SemaphoreVerifier deployedBytecode > $SPIKE/S5/verifier-cancun.hex; wc -c $SPIKE/S5/verifier-cancun.hex
+   31715 $SPIKE/S5/verifier-cancun.hex
+exit=0
+$ (cd $SPIKE/S5/contracts) $F inspect Semaphore deployedBytecode > $SPIKE/S5/semaphore-cancun.hex; wc -c $SPIKE/S5/semaphore-cancun.hex
+   15871 $SPIKE/S5/semaphore-cancun.hex
+exit=0
+$ (cd $SPIKE/S5/contracts) FOUNDRY_PROFILE=osaka $F config | grep -nE "evm_version|solc|optimizer|^out"
+5:out = "out-osaka"
+25:evm_version = "osaka"
+29:solc = "0.8.37"
+30:auto_detect_solc = true
+32:optimizer = true
+33:optimizer_runs = 200
+158:out = "docs"
+281:out = "utils/JsonBindings.sol"
+exit=0
+$ (cd $SPIKE/S5/contracts) FOUNDRY_PROFILE=osaka $F build --sizes
+Compiling 13 files with Solc 0.8.37
+Solc 0.8.37 finished in 237.52ms
+Compiler run successful!
+
+╭-------------------+------------------+-------------------+--------------------+---------------------╮
+| Contract          | Runtime Size (B) | Initcode Size (B) | Runtime Margin (B) | Initcode Margin (B) |
++=====================================================================================================+
+| Mini              | 121              | 147               | 24,455             | 49,005              |
+|-------------------+------------------+-------------------+--------------------+---------------------|
+| PoseidonT3        | 16,466           | 16,518            | 8,110              | 32,634              |
+|-------------------+------------------+-------------------+--------------------+---------------------|
+| Semaphore         | 7,934            | 8,069             | 16,642             | 41,083              |
+|-------------------+------------------+-------------------+--------------------+---------------------|
+| SemaphoreVerifier | 15,856           | 30,413            | 8,720              | 18,739              |
+╰-------------------+------------------+-------------------+--------------------+---------------------╯
+
+Warning: AST source not found for $SPIKE/S5/contracts/src/Imports.sol
+exit=0
+$ (cd $SPIKE/S5/contracts) FOUNDRY_PROFILE=osaka $F inspect SemaphoreVerifier deployedBytecode > $SPIKE/S5/verifier-osaka.hex; wc -c $SPIKE/S5/verifier-osaka.hex
+   31715 $SPIKE/S5/verifier-osaka.hex
+exit=0
+$ (cd $SPIKE/S5/contracts) FOUNDRY_PROFILE=osaka $F inspect Semaphore deployedBytecode > $SPIKE/S5/semaphore-osaka.hex; wc -c $SPIKE/S5/semaphore-osaka.hex
+   15871 $SPIKE/S5/semaphore-osaka.hex
+exit=0
+$ (cd $SPIKE/S5/contracts) cmp $SPIKE/S5/verifier-cancun.hex $SPIKE/S5/verifier-osaka.hex && echo VERIFIER_IDENTICAL
+$SPIKE/S5/verifier-cancun.hex $SPIKE/S5/verifier-osaka.hex differ: char 31629, line 1
+exit=1
+$ (cd $SPIKE/S5/contracts) cmp $SPIKE/S5/semaphore-cancun.hex $SPIKE/S5/semaphore-osaka.hex && echo SEMAPHORE_IDENTICAL
+$SPIKE/S5/semaphore-cancun.hex $SPIKE/S5/semaphore-osaka.hex differ: char 15785, line 1
+exit=1
+$ (cd $SPIKE/S5/contracts) shasum -a 256 $SPIKE/S5/*.hex
+99023c4ee6d9a4165a1b0ba4ac5cdf1f09ba74a7fcc3043887c2652944850e91  $SPIKE/S5/semaphore-cancun.hex
+2edc00f0a584bbb2c1f4deb2f74a86d0b5f096fa0feadec88bcb3e62712e3a1f  $SPIKE/S5/semaphore-osaka.hex
+3d27005f6beba2fa49b1bddbe7fe55161ab6dbdd5b1d83fef622e4a8ef06d675  $SPIKE/S5/verifier-cancun.hex
+1d8abe5b4839338a063a663b75d1804cacbd1d31304d18145b715f27c850a75d  $SPIKE/S5/verifier-osaka.hex
+exit=0
+$ (cd $SPIKE/S5/contracts) $F build --sizes --force
+Compiling 13 files with Solc 0.8.37
+Solc 0.8.37 finished in 241.51ms
+Compiler run successful!
+
+╭-------------------+------------------+-------------------+--------------------+---------------------╮
+| Contract          | Runtime Size (B) | Initcode Size (B) | Runtime Margin (B) | Initcode Margin (B) |
++=====================================================================================================+
+| Mini              | 121              | 147               | 24,455             | 49,005              |
+|-------------------+------------------+-------------------+--------------------+---------------------|
+| PoseidonT3        | 16,466           | 16,518            | 8,110              | 32,634              |
+|-------------------+------------------+-------------------+--------------------+---------------------|
+| Semaphore         | 7,934            | 8,069             | 16,642             | 41,083              |
+|-------------------+------------------+-------------------+--------------------+---------------------|
+| SemaphoreVerifier | 15,856           | 30,413            | 8,720              | 18,739              |
+╰-------------------+------------------+-------------------+--------------------+---------------------╯
+
+Warning: AST source not found for $SPIKE/S5/contracts/src/Imports.sol
+exit=0
+$ (cd $SPIKE/S5/contracts) FOUNDRY_PROFILE=osaka $F build --sizes --force
+Compiling 13 files with Solc 0.8.37
+Solc 0.8.37 finished in 233.07ms
+Compiler run successful!
+
+╭-------------------+------------------+-------------------+--------------------+---------------------╮
+| Contract          | Runtime Size (B) | Initcode Size (B) | Runtime Margin (B) | Initcode Margin (B) |
++=====================================================================================================+
+| Mini              | 121              | 147               | 24,455             | 49,005              |
+|-------------------+------------------+-------------------+--------------------+---------------------|
+| PoseidonT3        | 16,466           | 16,518            | 8,110              | 32,634              |
+|-------------------+------------------+-------------------+--------------------+---------------------|
+| Semaphore         | 7,934            | 8,069             | 16,642             | 41,083              |
+|-------------------+------------------+-------------------+--------------------+---------------------|
+| SemaphoreVerifier | 15,856           | 30,413            | 8,720              | 18,739              |
+╰-------------------+------------------+-------------------+--------------------+---------------------╯
+
+Warning: AST source not found for $SPIKE/S5/contracts/src/Imports.sol
+exit=0
+$ (cd $SPIKE/S5/contracts) node $SPIKE/S5/cmp.js $SPIKE/S5
+SemaphoreVerifier cancun bytes 15856 osaka bytes 15856 full identical false | metadata-stripped cancun 15803 osaka 15803 stripped identical true differing bytes 0 first diff offset -1
+ metadata cancun 706673582212201d855baf49449052f5b3efaa3c10189bb8b1a452297069a3d6816f075e97713e64736f6c63430008250033 
+ metadata osaka  70667358221220ad2fa6ae59cca2084632ff1bebdf1ef38e6a269c2f201ded4c44b8c4c5c403d364736f6c63430008250033
+Semaphore cancun bytes 7934 osaka bytes 7934 full identical false | metadata-stripped cancun 7881 osaka 7881 stripped identical true differing bytes 0 first diff offset -1
+ metadata cancun 706673582212200b5b3c9d02aed5e0d73a73c564ed12344b52c11daae36948486faff89d00412864736f6c63430008250033 
+ metadata osaka  70667358221220957daf592bbcf4b99291203afee89b74d0259f848b2d3bacd8f1d525ba2b7edc64736f6c63430008250033
+exit=0
+$ (cd $SPIKE/S5/contracts) mkdir -p $SPIKE/S5/deps/upstream
+exit=0
+$ (cd $SPIKE/S5/contracts) curl -fsS -o $SPIKE/S5/deps/upstream/hardhat.config.ts https://raw.githubusercontent.com/semaphore-protocol/semaphore/v4.14.3/packages/contracts/hardhat.config.ts
+exit=0
+$ (cd $SPIKE/S5/contracts) cat $SPIKE/S5/deps/upstream/hardhat.config.ts
+import "@nomicfoundation/hardhat-chai-matchers"
+import "@nomicfoundation/hardhat-ethers"
+import "@nomicfoundation/hardhat-verify"
+import { getHardhatNetworks } from "@semaphore-protocol/utils"
+import "@typechain/hardhat"
+import { config as dotenvConfig } from "dotenv"
+import "hardhat-gas-reporter"
+import { HardhatUserConfig } from "hardhat/config"
+import { resolve } from "path"
+import "solidity-coverage"
+import "./tasks/accounts"
+import "./tasks/deploy"
+
+dotenvConfig({ path: resolve(__dirname, "../../.env") })
+
+const hardhatConfig: HardhatUserConfig = {
+    solidity: {
+        version: "0.8.23",
+        settings: {
+            optimizer: {
+                enabled: true,
+                runs: 200
+            }
+        }
+    },
+    networks: {
+        hardhat: {
+            chainId: 1337,
+            allowUnlimitedContractSize: true
+        },
+        ...getHardhatNetworks(process.env.BACKEND_PRIVATE_KEY)
+    },
+    gasReporter: {
+        currency: "USD",
+        enabled: process.env.REPORT_GAS === "true",
+        coinmarketcap: process.env.COINMARKETCAP_API_KEY
+    },
+    typechain: {
+        target: "ethers-v6"
+    },
+    etherscan: {
+        apiKey: process.env.ETHERSCAN_API_KEY,
+        customChains: [
+            {
+                network: "optimism-sepolia",
+                chainId: 11155420,
+                urls: {
+                    apiURL: "https://api-sepolia-optimistic.etherscan.io/api",
+                    browserURL: "https://sepolia-optimistic.etherscan.io"
+                }
+            },
+            {
+                network: "linea-sepolia",
+                chainId: 59141,
+                urls: {
+                    apiURL: "https://api-sepolia.lineascan.build/api",
+                    browserURL: "https://sepolia.lineascan.build"
+                }
+            },
+            {
+                network: "linea",
+                chainId: 59144,
+                urls: {
+                    apiURL: "https://api.lineascan.build/api",
+                    browserURL: "https://lineascan.build"
+                }
+            },
+            {
+                network: "scroll-sepolia",
+                chainId: 534351,
+                urls: {
+                    apiURL: "https://api-sepolia.scrollscan.com/api",
+                    browserURL: "https://sepolia.scrollscan.com"
+                }
+            },
+            {
+                network: "gnosis-chiado",
+                chainId: 10200,
+                urls: {
+                    apiURL: "https://gnosis-chiado.blockscout.com/api",
+                    browserURL: "https://gnosis-chiado.blockscout.com"
+                }
+            },
+            {
+                network: "gnosis",
+                chainId: 100,
+                urls: {
+                    apiURL: "https://api.etherscan.io/v2/api?chainid=100",
+                    browserURL: "https://gnosisscan.io"
+                }
+            }
+        ]
+    },
+    sourcify: {
+        enabled: true
+    }
+}
+
+export default hardhatConfig
+exit=0
+$ (cd $SPIKE/S5/contracts) curl -sS -o /dev/null -w 'foundry.toml http=%{http_code}
+' https://raw.githubusercontent.com/semaphore-protocol/semaphore/v4.14.3/packages/contracts/foundry.toml
+foundry.toml http=404
+exit=0
+$ (cd $SPIKE/S5/contracts) curl -sS -o /dev/null -w 'root foundry.toml http=%{http_code}
+' https://raw.githubusercontent.com/semaphore-protocol/semaphore/v4.14.3/foundry.toml
+root foundry.toml http=404
+exit=0
+$ (cd $SPIKE/S5) mkdir -p $SPIKE/S5/deps/artifacts
+exit=0
+$ (cd $SPIKE/S5) cd $SPIKE/S5/deps/artifacts && npm pack @zk-kit/semaphore-artifacts@4.13.0 --json --ignore-scripts
+[
+  {
+    "id": "@zk-kit/semaphore-artifacts@4.13.0",
+    "name": "@zk-kit/semaphore-artifacts",
+    "version": "4.13.0",
+    "size": 109100273,
+    "unpackedSize": 170928598,
+    "shasum": "efe54e9ae463f748198f3d769f846224310caad9",
+    "integrity": "sha512-UgFQkcwI63XT1Xk8fkUYMNfcuR85LiSL3Of9XLsyMLflHkiwXP9D1WC8hnpD8Tp2HoAMJ/mCv7ZMlU7TC0mvdQ==",
+    "filename": "zk-kit-semaphore-artifacts-4.13.0.tgz",
+    "files": [
+      {
+        "path": "CHANGELOG.md",
+        "size": 386,
+        "mode": 420
+      },
+      {
+        "path": "LICENSE",
+        "size": 1076,
+        "mode": 420
+      },
+      {
+        "path": "README.md",
+        "size": 341,
+        "mode": 420
+      },
+      {
+        "path": "package.json",
+        "size": 561,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-1.json",
+        "size": 3746,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-1.wasm",
+        "size": 1798638,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-1.zkey",
+        "size": 1552601,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-2.json",
+        "size": 3745,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-2.wasm",
+        "size": 1801079,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-2.zkey",
+        "size": 1653555,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-3.json",
+        "size": 3743,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-3.wasm",
+        "size": 1802902,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-3.zkey",
+        "size": 1899542,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-4.json",
+        "size": 3745,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-4.wasm",
+        "size": 1804630,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-4.zkey",
+        "size": 1852550,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-5.json",
+        "size": 3745,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-5.wasm",
+        "size": 1806499,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-5.zkey",
+        "size": 1951788,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-6.json",
+        "size": 3745,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-6.wasm",
+        "size": 1808368,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-6.zkey",
+        "size": 2038580,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-7.json",
+        "size": 3743,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-7.wasm",
+        "size": 1810182,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-7.zkey",
+        "size": 2113447,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-8.json",
+        "size": 3741,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-8.wasm",
+        "size": 1811974,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-8.zkey",
+        "size": 2231251,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-9.json",
+        "size": 3744,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-9.wasm",
+        "size": 1813749,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-9.zkey",
+        "size": 2350717,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-10.json",
+        "size": 3747,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-10.wasm",
+        "size": 1815560,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-10.zkey",
+        "size": 2422238,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-11.json",
+        "size": 3744,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-11.wasm",
+        "size": 1817368,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-11.zkey",
+        "size": 2801799,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-12.json",
+        "size": 3743,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-12.wasm",
+        "size": 1819277,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-12.zkey",
+        "size": 2922502,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-13.json",
+        "size": 3749,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-13.wasm",
+        "size": 1821139,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-13.zkey",
+        "size": 3043615,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-14.json",
+        "size": 3744,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-14.wasm",
+        "size": 1822994,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-14.zkey",
+        "size": 3164733,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-15.json",
+        "size": 3742,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-15.wasm",
+        "size": 1842748,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-15.zkey",
+        "size": 3286261,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-16.json",
+        "size": 3744,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-16.wasm",
+        "size": 1843806,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-16.zkey",
+        "size": 3408199,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-17.json",
+        "size": 3746,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-17.wasm",
+        "size": 1844794,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-17.zkey",
+        "size": 3529723,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-18.json",
+        "size": 3744,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-18.wasm",
+        "size": 1845967,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-18.zkey",
+        "size": 3650014,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-19.json",
+        "size": 3741,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-19.wasm",
+        "size": 1846956,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-19.zkey",
+        "size": 3770297,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-20.json",
+        "size": 3744,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-20.wasm",
+        "size": 1847949,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-20.zkey",
+        "size": 3890175,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-21.json",
+        "size": 3742,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-21.wasm",
+        "size": 1848938,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-21.zkey",
+        "size": 4011703,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-22.json",
+        "size": 3740,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-22.wasm",
+        "size": 1849926,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-22.zkey",
+        "size": 4133225,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-23.json",
+        "size": 3743,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-23.wasm",
+        "size": 1850914,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-23.zkey",
+        "size": 4253927,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-24.json",
+        "size": 3745,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-24.wasm",
+        "size": 1851902,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-24.zkey",
+        "size": 4376277,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-25.json",
+        "size": 3743,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-25.wasm",
+        "size": 1852890,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-25.zkey",
+        "size": 4473015,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-26.json",
+        "size": 3743,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-26.wasm",
+        "size": 1853878,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-26.zkey",
+        "size": 4595368,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-27.json",
+        "size": 3747,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-27.wasm",
+        "size": 1854866,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-27.zkey",
+        "size": 4717308,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-28.json",
+        "size": 3745,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-28.wasm",
+        "size": 1855855,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-28.zkey",
+        "size": 5363125,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-29.json",
+        "size": 3741,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-29.wasm",
+        "size": 1856843,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-29.zkey",
+        "size": 5484650,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-30.json",
+        "size": 3742,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-30.wasm",
+        "size": 1857834,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-30.zkey",
+        "size": 5606178,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-31.json",
+        "size": 3746,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-31.wasm",
+        "size": 1858825,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-31.zkey",
+        "size": 5728530,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-32.json",
+        "size": 3746,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-32.wasm",
+        "size": 1859813,
+        "mode": 420
+      },
+      {
+        "path": "semaphore-32.zkey",
+        "size": 5850470,
+        "mode": 420
+      }
+    ],
+    "entryCount": 100,
+    "bundled": []
+  }
+]
+exit=0
+$ (cd $SPIKE/S5) cd $SPIKE/S5/deps/artifacts && ls -la
+total 213088
+drwxr-xr-x@ 3 user  wheel         96 Oct 16 15:50 .
+drwxr-xr-x@ 5 user  wheel        160 Oct 16 15:49 ..
+-rw-r--r--@ 1 user  wheel  109100273 Oct 16 15:50 zk-kit-semaphore-artifacts-4.13.0.tgz
+exit=0
+$ (cd $SPIKE/S5) cd $SPIKE/S5/deps/artifacts && shasum -a 1 *.tgz
+efe54e9ae463f748198f3d769f846224310caad9  zk-kit-semaphore-artifacts-4.13.0.tgz
+exit=0
+$ (cd $SPIKE/S5) cd $SPIKE/S5/deps/artifacts && echo "sha512-$(openssl dgst -sha512 -binary *.tgz | openssl base64 -A)"
+sha512-UgFQkcwI63XT1Xk8fkUYMNfcuR85LiSL3Of9XLsyMLflHkiwXP9D1WC8hnpD8Tp2HoAMJ/mCv7ZMlU7TC0mvdQ==
+exit=0
+$ (cd $SPIKE/S5) npm view @zk-kit/semaphore-artifacts@4.13.0 dist.shasum dist.integrity
+dist.shasum = 'efe54e9ae463f748198f3d769f846224310caad9'
+dist.integrity = 'sha512-UgFQkcwI63XT1Xk8fkUYMNfcuR85LiSL3Of9XLsyMLflHkiwXP9D1WC8hnpD8Tp2HoAMJ/mCv7ZMlU7TC0mvdQ=='
+exit=0
+$ (cd $SPIKE/S5) cd $SPIKE/S5/deps/artifacts && mkdir -p unpacked && tar -xzf zk-kit-semaphore-artifacts-4.13.0.tgz -C unpacked
+exit=0
+$ (cd $SPIKE/S5) cd $SPIKE/S5/deps/artifacts/unpacked && find . -type f | wc -l
+     100
+exit=0
+$ (cd $SPIKE/S5) cd $SPIKE/S5/deps/artifacts/unpacked && find . -type f -exec stat -f '%z %N' {} + | sort -k2 | head -150
+386 ./package/CHANGELOG.md
+1076 ./package/LICENSE
+341 ./package/README.md
+561 ./package/package.json
+3746 ./package/semaphore-1.json
+1798638 ./package/semaphore-1.wasm
+1552601 ./package/semaphore-1.zkey
+3747 ./package/semaphore-10.json
+1815560 ./package/semaphore-10.wasm
+2422238 ./package/semaphore-10.zkey
+3744 ./package/semaphore-11.json
+1817368 ./package/semaphore-11.wasm
+2801799 ./package/semaphore-11.zkey
+3743 ./package/semaphore-12.json
+1819277 ./package/semaphore-12.wasm
+2922502 ./package/semaphore-12.zkey
+3749 ./package/semaphore-13.json
+1821139 ./package/semaphore-13.wasm
+3043615 ./package/semaphore-13.zkey
+3744 ./package/semaphore-14.json
+1822994 ./package/semaphore-14.wasm
+3164733 ./package/semaphore-14.zkey
+3742 ./package/semaphore-15.json
+1842748 ./package/semaphore-15.wasm
+3286261 ./package/semaphore-15.zkey
+3744 ./package/semaphore-16.json
+1843806 ./package/semaphore-16.wasm
+3408199 ./package/semaphore-16.zkey
+3746 ./package/semaphore-17.json
+1844794 ./package/semaphore-17.wasm
+3529723 ./package/semaphore-17.zkey
+3744 ./package/semaphore-18.json
+1845967 ./package/semaphore-18.wasm
+3650014 ./package/semaphore-18.zkey
+3741 ./package/semaphore-19.json
+1846956 ./package/semaphore-19.wasm
+3770297 ./package/semaphore-19.zkey
+3745 ./package/semaphore-2.json
+1801079 ./package/semaphore-2.wasm
+1653555 ./package/semaphore-2.zkey
+3744 ./package/semaphore-20.json
+1847949 ./package/semaphore-20.wasm
+3890175 ./package/semaphore-20.zkey
+3742 ./package/semaphore-21.json
+1848938 ./package/semaphore-21.wasm
+4011703 ./package/semaphore-21.zkey
+3740 ./package/semaphore-22.json
+1849926 ./package/semaphore-22.wasm
+4133225 ./package/semaphore-22.zkey
+3743 ./package/semaphore-23.json
+1850914 ./package/semaphore-23.wasm
+4253927 ./package/semaphore-23.zkey
+3745 ./package/semaphore-24.json
+1851902 ./package/semaphore-24.wasm
+4376277 ./package/semaphore-24.zkey
+3743 ./package/semaphore-25.json
+1852890 ./package/semaphore-25.wasm
+4473015 ./package/semaphore-25.zkey
+3743 ./package/semaphore-26.json
+1853878 ./package/semaphore-26.wasm
+4595368 ./package/semaphore-26.zkey
+3747 ./package/semaphore-27.json
+1854866 ./package/semaphore-27.wasm
+4717308 ./package/semaphore-27.zkey
+3745 ./package/semaphore-28.json
+1855855 ./package/semaphore-28.wasm
+5363125 ./package/semaphore-28.zkey
+3741 ./package/semaphore-29.json
+1856843 ./package/semaphore-29.wasm
+5484650 ./package/semaphore-29.zkey
+3743 ./package/semaphore-3.json
+1802902 ./package/semaphore-3.wasm
+1899542 ./package/semaphore-3.zkey
+3742 ./package/semaphore-30.json
+1857834 ./package/semaphore-30.wasm
+5606178 ./package/semaphore-30.zkey
+3746 ./package/semaphore-31.json
+1858825 ./package/semaphore-31.wasm
+5728530 ./package/semaphore-31.zkey
+3746 ./package/semaphore-32.json
+1859813 ./package/semaphore-32.wasm
+5850470 ./package/semaphore-32.zkey
+3745 ./package/semaphore-4.json
+1804630 ./package/semaphore-4.wasm
+1852550 ./package/semaphore-4.zkey
+3745 ./package/semaphore-5.json
+1806499 ./package/semaphore-5.wasm
+1951788 ./package/semaphore-5.zkey
+3745 ./package/semaphore-6.json
+1808368 ./package/semaphore-6.wasm
+2038580 ./package/semaphore-6.zkey
+3743 ./package/semaphore-7.json
+1810182 ./package/semaphore-7.wasm
+2113447 ./package/semaphore-7.zkey
+3741 ./package/semaphore-8.json
+1811974 ./package/semaphore-8.wasm
+2231251 ./package/semaphore-8.zkey
+3744 ./package/semaphore-9.json
+1813749 ./package/semaphore-9.wasm
+2350717 ./package/semaphore-9.zkey
+exit=0
+$ (cd $SPIKE/S5) cd $SPIKE/S5/deps/artifacts/unpacked && du -sk . && find . -type f -exec stat -f '%z' {} + | awk '{s+=$1} END {print "total_bytes=" s}'
+167084	.
+total_bytes=170928598
+exit=0
+$ (cd $SPIKE/S5) cd $SPIKE/S5/deps/artifacts/unpacked && find . -type f | sort | xargs shasum -a 256 > $SPIKE/S5/artifacts-sha256.txt
+exit=0
+$ (cd $SPIKE/S5) wc -l $SPIKE/S5/artifacts-sha256.txt
+     100 $SPIKE/S5/artifacts-sha256.txt
+exit=0
+$ (cd $SPIKE/S5) cat $SPIKE/S5/deps/artifacts/unpacked/package/README.md
+# [@zk-kit/semaphore-artifacts](https://www.npmjs.com/package/@zk-kit/semaphore-artifacts)
+
+- Circuits: [`semaphore.circom`](https://github.com/semaphore-protocol/semaphore/blob/main/packages/circuits/src/semaphore.circom)
+- JS library: [`@semaphore-protocol/proof`](https://github.com/semaphore-protocol/semaphore/tree/main/packages/proof)
+exit=0
+$ (cd $SPIKE/S5) cd $SPIKE/S5/proof && npm init -y
+Wrote to $SPIKE/S5/proof/package.json:
+
+{
+  "name": "proof",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
+
+
+exit=0
+$ (cd $SPIKE/S5) cd $SPIKE/S5/proof && npm install --ignore-scripts --save-exact @semaphore-protocol/core@4.14.3 @semaphore-protocol/proof@4.14.3
+
+added 173 packages, and audited 174 packages in 50s
+
+40 packages are looking for funding
+  run `npm fund` for details
+
+14 vulnerabilities (5 moderate, 9 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+Some issues need review, and may require choosing
+a different dependency.
+
+Run `npm audit` for details.
+exit=0
+$ (cd $SPIKE/S5) cd $SPIKE/S5/proof && npm ls --all 2>&1 | grep -E "semaphore|snarkjs|zk-kit"
++-- @semaphore-protocol/core@4.14.3
+| +-- @semaphore-protocol/group@4.14.3
+| | +-- @zk-kit/lean-imt@2.2.5
+| | | `-- @zk-kit/utils@1.4.1
+| | +-- @zk-kit/utils@1.3.0 deduped
+| +-- @semaphore-protocol/identity@4.14.3
+| | +-- @zk-kit/baby-jubjub@1.0.3
+| | | `-- @zk-kit/utils@1.2.1
+| | +-- @zk-kit/eddsa-poseidon@1.0.4
+| | | +-- @zk-kit/baby-jubjub@1.0.3 deduped
+| | | +-- @zk-kit/utils@1.2.1
+| | +-- @zk-kit/utils@1.3.0 deduped
+| `-- @semaphore-protocol/proof@4.14.3 deduped
+`-- @semaphore-protocol/proof@4.14.3
+  +-- @semaphore-protocol/group@4.14.3 deduped
+  +-- @semaphore-protocol/identity@4.14.3 deduped
+  +-- @semaphore-protocol/utils@4.14.3
+  +-- @zk-kit/artifacts@2.0.1
+  | | +-- @types/snarkjs@0.7.9
+  | | | +-- snarkjs@0.5.0
+  | | `-- snarkjs@0.7.5 deduped
+  | `-- snarkjs@0.7.5 deduped
+  +-- @zk-kit/utils@1.3.0
+  `-- snarkjs@0.7.5
+exit=0
+$ (cd $SPIKE/S5) sed -n 1,80p $SPIKE/S5/proof/node_modules/@semaphore-protocol/proof/dist/types/generateProof.d.ts
+sed: $SPIKE/S5/proof/node_modules/@semaphore-protocol/proof/dist/types/generateProof.d.ts: No such file or directory
+exit=1
+$ (cd $SPIKE/S5) grep -rn "semaphore.hash\|\.hash\|download" $SPIKE/S5/proof/node_modules/@semaphore-protocol/proof/dist/index.node.js | head -20
+$SPIKE/S5/proof/node_modules/@semaphore-protocol/proof/dist/index.node.js:104:    // If the Snark artifacts are not defined they will be automatically downloaded.
+exit=0
+$ (cd $SPIKE/S5/proof) node --version
+v24.22.0
+exit=0
+$ (cd $SPIKE/S5/proof) /usr/bin/time -l node $SPIKE/S5/proof/prove.js 1 2>&1 | grep -vE 'page|swap|context|signals|messages|faults|reclaims|block|volunt|instructions|cycles'
+node:internal/modules/cjs/loader:761
+      throw e;
+      ^
+
+Error [ERR_PACKAGE_PATH_NOT_EXPORTED]: Package subpath './package.json' is not defined by "exports" in $SPIKE/S5/proof/node_modules/snarkjs/package.json
+    at exportsNotFound (node:internal/modules/esm/resolve:315:10)
+    at packageExportsResolve (node:internal/modules/esm/resolve:663:9)
+    at resolveExports (node:internal/modules/cjs/loader:754:36)
+    at Module._findPath (node:internal/modules/cjs/loader:821:31)
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1557:27)
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+    at Module._load (node:internal/modules/cjs/loader:1341:5)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19) {
+  code: 'ERR_PACKAGE_PATH_NOT_EXPORTED'
+}
+
+Node.js v24.22.0
+        0.11 real         0.08 user         0.02 sys
+            80068608  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+            36737320  peak memory footprint
+exit=0
+$ (cd $SPIKE/S5/proof) /usr/bin/time -l node $SPIKE/S5/proof/prove.js 32 2>&1 | grep -vE 'page|swap|context|signals|messages|faults|reclaims|block|volunt|instructions|cycles'
+node:internal/modules/cjs/loader:761
+      throw e;
+      ^
+
+Error [ERR_PACKAGE_PATH_NOT_EXPORTED]: Package subpath './package.json' is not defined by "exports" in $SPIKE/S5/proof/node_modules/snarkjs/package.json
+    at exportsNotFound (node:internal/modules/esm/resolve:315:10)
+    at packageExportsResolve (node:internal/modules/esm/resolve:663:9)
+    at resolveExports (node:internal/modules/cjs/loader:754:36)
+    at Module._findPath (node:internal/modules/cjs/loader:821:31)
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1557:27)
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+    at Module._load (node:internal/modules/cjs/loader:1341:5)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19) {
+  code: 'ERR_PACKAGE_PATH_NOT_EXPORTED'
+}
+
+Node.js v24.22.0
+        0.07 real         0.08 user         0.01 sys
+            80429056  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+            37114176  peak memory footprint
+exit=0
+$ (cd $SPIKE/S5/proof) node --version
+v24.22.0
+exit=0
+$ (cd $SPIKE/S5/proof) /usr/bin/time -l node $SPIKE/S5/proof/prove.js 1 2>&1 | grep -vE 'page|swap|context|signals|messages|faults|reclaims|block|volunt|instructions|cycles'
+snarkjs 0.7.5 | depth 1
+wasm $SPIKE/S5/deps/artifacts/unpacked/package/semaphore-1.wasm
+zkey $SPIKE/S5/deps/artifacts/unpacked/package/semaphore-1.zkey
+merkleTreeDepth 1 root 11208494155612071903...
+nullifier 15076197869370443388...
+generateProof_ms 217
+verifyProof_ms 7
+verify_result true
+tampered_verify_result false
+network_attempts 0
+rss_at_end_MB 336
+        0.34 real         1.05 user         0.12 sys
+           353026048  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+           313195048  peak memory footprint
+exit=0
+$ (cd $SPIKE/S5/proof) /usr/bin/time -l node $SPIKE/S5/proof/prove.js 32 2>&1 | grep -vE 'page|swap|context|signals|messages|faults|reclaims|block|volunt|instructions|cycles'
+snarkjs 0.7.5 | depth 32
+wasm $SPIKE/S5/deps/artifacts/unpacked/package/semaphore-32.wasm
+zkey $SPIKE/S5/deps/artifacts/unpacked/package/semaphore-32.zkey
+merkleTreeDepth 32 root 11208494155612071903...
+nullifier 15076197869370443388...
+generateProof_ms 458
+verifyProof_ms 8
+verify_result true
+tampered_verify_result false
+network_attempts 0
+rss_at_end_MB 631
+        0.59 real         2.88 user         0.17 sys
+           661635072  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+           548778448  peak memory footprint
+exit=0

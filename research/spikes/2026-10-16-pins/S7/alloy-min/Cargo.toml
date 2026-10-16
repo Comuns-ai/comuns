@@ -1,0 +1,10 @@
+[package]
+name = "s7-alloy"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+alloy = { version = "=2.5.0", default-features = false, features = ["sol-types", "signer-local"] }
+
+[workspace]
