@@ -138,7 +138,7 @@ Pitch files were not edited. Every edit below repairs a contradiction against th
 - docs/project-plan.md — §6 Phase 0 exit includes the Final bootstrap seating CIP (KI-20); §6 Phase 2 "disclosure table" → table generated from the disclosure sheet (invariant 11); §9 Documentation-baseline milestone row aligned.
 - docs/cip/README.md — §5 merge rule refers to the currently seated maintainers per MAINTAINERS.md and GOVERNANCE.md §6.1 (KI-1).
 - docs/node/node-design.md — §13 open question 11 (session store kept until settlement is final under a confirmation policy, KI-17).
-- docs/product/dapp-and-sdk.md — §13 open question 8 (`SessionMap` maps a pair to a list of session ids, KI-14).
+- docs/product/dapp-and-sdk.md — §16 open question 8 (`SessionMap` maps a pair to a list of session ids, KI-14).
 - README.md — document map links docs/review-report.md.
 - docs/README.md — reading order and complete map link docs/review-report.md with its title.
 - docs/review-report.md — this report (new file).
@@ -240,7 +240,7 @@ Status of every item from the cross-vendor reviews, as the review scope requires
 | KI-11 | Recorded as an open question in docs/protocol/off-chain-api.md §14 (question 5, extended). |
 | KI-12 | Recorded as an open question in docs/protocol/off-chain-api.md §14 (question 12). |
 | KI-13 | Recorded as an open question in docs/protocol/off-chain-api.md §14 (question 13). |
-| KI-14 | Recorded as an open question in docs/product/dapp-and-sdk.md §13 (question 8). |
+| KI-14 | Recorded as an open question in docs/product/dapp-and-sdk.md §16 (question 8). |
 | KI-15 | Repaired in docs/node/distributed-execution.md (status line after the header; defects (a)–(g) in §13 question 11; no redesign). |
 | KI-16 | Repaired in docs/protocol/collective-answers.md §4, §5, §8 and §12 (two review jobs per reviewer, sequential on the session), with docs/economics/cost-and-pricing.md §9 aligned. |
 | KI-17 | Recorded as an open question in docs/node/node-design.md §13 (question 11). |

@@ -43,7 +43,7 @@ Rejected. The right to file a CIP does not depend on hardware class, stake or ho
 
 ### Burn-and-mint credits
 
-Rejected. A credit that is burned to buy inference and minted to pay nodes is a second currency beside ETH. Bands, vouchers and `cumulativeWei` are already defined in wei. A credit would need an issuer, a mint rule and a redemption rule, which is a token system. v1 does not add one. A later stablecoin settlement asset, if any, is a CIP about the escrow's asset, and it still has to pass the test in this decision: what ETH cannot do.
+Rejected. A credit that is burned to buy inference and minted to pay nodes is a second currency beside ETH. Bands, vouchers and `cumulativeWei` are already defined in wei. A credit would need an issuer, a mint rule and a redemption rule, which is a token system. v1 does not add one. A later stablecoin settlement asset, if any, is a CIP about the escrow's asset, and it still has to pass the test in this decision: what ETH cannot do. Proposed [ADR 0016](0016-funding-edge-and-deposit-key.md) records why a stablecoin escrow is rejected for this proposal and keeps stablecoins at the funding edge; it does not amend this decision.
 
 ### Using ARB votes
 
@@ -70,3 +70,4 @@ Rejected. ARB balances are not this project's votes. The Arbitrum DAO has its ow
 - [ADR 0005](0005-hardware-classes-and-price-bands.md)
 - [ADR 0006](0006-apache-2-0-and-dco.md)
 - [docs/cip/0001-adopt-baseline-adrs.md](../cip/0001-adopt-baseline-adrs.md)
+- [ADR 0016](0016-funding-edge-and-deposit-key.md) (proposed)

@@ -21,7 +21,7 @@ Training, fine-tuning and federated learning are non-goals. Other non-goals are 
 
 ## 3 How the community builds this
 
-Decisions land as CIPs under [GOVERNANCE.md](../GOVERNANCE.md) and [docs/cip/README.md](cip/README.md). ADRs remain proposed until their adopting CIP is Final: CIP-0001 for ADRs 0001–0009, CIP-0002 for ADRs 0010–0012 and CIP-0005 for ADRs 0013–0015; a later contradictory decision requires a superseding ADR. The lifecycle is Draft → Review → **14-day Last Call** → Final. Substantive edits during Last Call return a CIP to Review and require a fresh full Last Call; a CIP in Last Call cannot become Stagnant. The governing documents own the inactivity rules. Seating and removal occur only through a Final CIP. No maintainers are seated and no private authority is implied by assigning work here.
+Decisions land as CIPs under [GOVERNANCE.md](../GOVERNANCE.md) and [docs/cip/README.md](cip/README.md). ADRs remain proposed until their adopting CIP is Final: CIP-0001 for ADRs 0001–0009, CIP-0002 for ADRs 0010–0012 and CIP-0005 for ADRs 0013–0015; a later contradictory decision requires a superseding ADR. The lifecycle is Draft → Review → **14-day Last Call** → Final. Substantive edits during Last Call return a CIP to Review and require a fresh full Last Call; a CIP in Last Call cannot become Stagnant. The governing documents own the inactivity rules. Seating and removal occur only through a Final CIP. No maintainers are seated and no private authority is implied by assigning work here. ADRs 0016–0018 are proposed with no adopting CIP yet.
 
 Issues and CIP comments on the Comuns-ai/documentation repository are the community channel. No private channel is created by this plan. Rough consensus is written down: specific objections, their disposition and the reason for accepting or deferring a change remain in the CIP. Review policy follows CONTRIBUTING.md. Working groups recommend and review; they cannot replace a CIP decision.
 
@@ -132,6 +132,9 @@ This map reproduces every path in the charter's section 5. A link records a dest
 | [docs/adr/0013-repositories-toolchains-ci-and-releases.md](adr/0013-repositories-toolchains-ci-and-releases.md) | Proposed repository layout, toolchains, CI, DCO, style and testnet release gates; adoption proposed in CIP-0005. |
 | [docs/adr/0014-relay-authentication-to-gateways.md](adr/0014-relay-authentication-to-gateways.md) | Proposed relay authentication per connection without a contract change; adoption proposed in CIP-0005. |
 | [docs/adr/0015-node-key-possession.md](adr/0015-node-key-possession.md) | Proposed client key-possession probe before spending, without a contract change; adoption proposed in CIP-0005. |
+| [docs/adr/0016-funding-edge-and-deposit-key.md](adr/0016-funding-edge-and-deposit-key.md) | Proposed ETH-only escrow with funding at the edge from the user's own account and a deposit key that can only call depositNote; no adopting CIP yet. |
+| [docs/adr/0017-accounts-and-decentralized-access.md](adr/0017-accounts-and-decentralized-access.md) | Proposed core path with no hosted service, optional embedded wallets and social login, an independent note vault and an isolated funding surface; no adopting CIP yet. |
+| [docs/adr/0018-one-client-stack.md](adr/0018-one-client-stack.md) | Proposed one TypeScript-over-Rust client stack for web, desktop and mobile; prover and store facts recorded, nothing selected; no adopting CIP yet. |
 | [docs/cip/README.md](cip/README.md) | CIP process. |
 | [docs/cip/0000-template.md](cip/0000-template.md) | CIP template. |
 | [docs/cip/0001-adopt-baseline-adrs.md](cip/0001-adopt-baseline-adrs.md) | Draft CIP proposing adoption of the baseline ADRs. |

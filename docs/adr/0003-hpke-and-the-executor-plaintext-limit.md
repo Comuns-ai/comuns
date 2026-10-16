@@ -69,7 +69,7 @@ Rejected. The sequencer, RPC providers and every observer on the path would read
 
 ### Sign-to-derive keys as the default
 
-Rejected. Deriving an encryption key from a fixed wallet signature needs deterministic signatures (evidence register §4, [L]). Contract wallets and some hardware wallets may not sign deterministically, so the key would not reproduce and the contexts would become unreadable. One phished signature would also expose every context ever derived from it. A labelled opt-in may be proposed later. The client must not fall back to it silently.
+Rejected. Deriving an encryption key from a fixed wallet signature needs deterministic signatures (evidence register §4, [L]). Contract wallets and some hardware wallets may not sign deterministically, so the key would not reproduce and the contexts would become unreadable. One phished signature would also expose every context ever derived from it. A labelled opt-in may be proposed later. The client must not fall back to it silently. Proposed [ADR 0017](0017-accounts-and-decentralized-access.md) removes that later opt-in: no vault key is ever derived from a wallet signature.
 
 ### TEE-only membership
 

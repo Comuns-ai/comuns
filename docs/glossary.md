@@ -13,7 +13,7 @@ Comuns is a community proposal for open-source decentralized LLM inference. Noth
 
 ### ADR
 
-An ADR is an architecture decision record under `docs/adr/`. The records ADR 0001 through ADR 0012 are proposed, and none is adopted, because adoption requires a Final CIP; [CIP-0001](cip/0001-adopt-baseline-adrs.md) and [CIP-0002](cip/0002-anonymous-credits-relays-and-ownerless-contexts.md) remain Draft. ADR 0003 is superseded in part by ADR 0010–0012. With nobody seated, nobody has authority to mark a record adopted.
+An ADR is an architecture decision record under `docs/adr/`. The records ADR 0001 through ADR 0018 are proposed, and none is adopted, because adoption requires a Final CIP; [CIP-0001](cip/0001-adopt-baseline-adrs.md) and [CIP-0002](cip/0002-anonymous-credits-relays-and-ownerless-contexts.md) remain Draft, and [CIP-0005](cip/0005-phase-one-implementation.md) (Draft) names ADR 0013–0015. ADR 0016–0018 have no adopting CIP yet. ADR 0003 is superseded in part by ADR 0010–0012. With nobody seated, nobody has authority to mark a record adopted.
 
 ### anonymous by default
 
@@ -71,6 +71,10 @@ A context grant is EIP-712 typed data signed by the independent context key, car
 
 A context key is a random per-context signing key from the operating-system CSPRNG, never the wallet key or derived from it. It signs grants, head records and optional public anchors. The client checks `keccak256(contextPubKey) == contextId`. It is distinct from the per-version content encryption keys `K_v`; its wallet association stays in the vault and backup.
 
+### core path
+
+The core path is the proposed way of using the client that needs nothing hosted beyond a user-chosen Arbitrum RPC and the permissionless relays and nodes: a content-hash-pinned static build reached by a verifying fetch, a locally run gateway or a local run, and the user's own ETH account. Hosted conveniences (social login, embedded wallet, on-ramp, intent orchestrator, gas sponsor, bundler, indexer, public gateway) are optional, disclosed, replaceable and never in the spend path. It is proposed in [ADR 0017](adr/0017-accounts-and-decentralized-access.md) and [ADR 0018](adr/0018-one-client-stack.md), and it is not adopted; there is no adopting CIP yet.
+
 ### credit
 
 A credit is ETH held as an unspent fixed-denomination note in the non-upgradeable SessionEscrow. A public `depositNote` creates it; a membership proof and nullifier fund `openSessionFromCredit` without naming the deposit wallet. It is not a protocol token or a withdrawable `balances[address]` entry. Change creates fresh notes, and ragequit is a public exit bounded by the caller’s deposits in that denomination group.
@@ -83,6 +87,10 @@ The DCO, the Developer Certificate of Origin, is the per-commit certification th
 
 A denomination is the fixed ETH face value of a note and its Semaphore group, selected by denomination index. Governance appends values through `setCreditParameters`; existing values never change. Each value satisfies `MIN_DEPOSIT_WEI`, and an append must preserve greedy decomposition of every remainder below the largest denomination into at most `MAX_CHANGE_NOTES` notes with dust below the smallest denomination. Values remain unset.
 
+### deposit key
+
+The deposit key is a client-managed key (`depositKey`), proposed and not adopted. It exists only on an EIP-7702 EOA or a smart account, because a plain EOA "does not support ERC-7579 modules, session keys, multisig, account deployment, or ERC-4337 user operations" (evidence register §1, client UX research 2026-10-15, [V]). Its on-chain permission names exactly SessionEscrow's `depositNote`, with a per-call native ceiling set equal to one denomination, a use limit and a validity window. Each permission is bound to one contract and its listed selectors, and the native limit is a per-call ceiling (evidence register §4, client UX research 2026-10-15, [V]). Whether that permission can require exact equality, rather than a ceiling, is not documented (evidence register §4, client UX research 2026-10-15, [U]), so SessionEscrow's own value check is the equality rule. The documented spending-limit policy covers ERC-20 tokens and does not mention native ETH (evidence register §4, client UX research 2026-10-15, [V]), so no cumulative native limit is claimed. It never names a node, relay or other contract, never signs a voucher, envelope, spend, close, `claimChange`, `ragequit`, `withdraw` or grant, never pays a node or relay, is never in the spend path, and is never sent to a node or a relay. Refills follow a threshold or schedule with jitter, and no threshold, schedule or jitter is set; a refill never fires at cap exhaustion, on send or resume, or immediately before a spend. Automatic refills remain unavailable until a reviewed timing policy is adopted and its eligibility and trigger rules are demonstrated, and a fee-policy review is also required before the convenience is enabled. It is not a session key, not the session signer and not `commitKey`. The ragequit allowance (`depositedWei`) accrues to the account that is `msg.sender` of `depositNote`, which under the caller invariant is the user's own account; a deposit key never calls `ragequit`. If enforcement is correct, a stolen deposit key can move at most cap × uses of principal per grant and per chain, and only into `depositNote`. Gas and fees are separate and not bounded here. A validator or account defect is not bounded. A stolen key can create notes whose secrets the attacker holds, and the user cannot recover them. [ADR 0016](adr/0016-funding-edge-and-deposit-key.md) proposes it, and there is no adopting CIP yet.
+
 ### disclosure sheet
 
 The disclosure sheet is the record the user confirms before a credit spend or job: recipient roles, payloads, modes, prices and caps, plus `anonymity.transport`, `relay`, `funding` and `contextLinkage`. `readersOfFullPrompt` remains a floor on distinct recipients and operators across all modes. `recipients[].operatorReadable` is false only for attested recipients; `counts.operatorReadable` drives the banner, alongside `counts.attestedRecipients`. An attested request fails closed unless every plaintext recipient is attested. A change to the node, model, scope, price, cap or reader set requires a new confirmed sheet.
@@ -94,6 +102,10 @@ A draft node is the node, in the experimental cross-node speculation spike, that
 ### dust
 
 Dust is `pendingWei` minus the value of the notes minted by `claimChange`. It is credited once to `balances[node]`, then `pendingWei` becomes zero. The reference client decomposes change greedily, leaving dust below the smallest denomination. An empty change list is the dust-only branch.
+
+### embedded wallet
+
+An embedded wallet is a provider-hosted account opened with an email, social or passkey identity. In this proposal it is an optional funding-surface convenience, proposed and not adopted, that signs `depositNote`, `ragequit` and `withdraw`; only if the user opts in does it also sign account setup, bounded swaps or intents in its own account, and a deposit-key grant and its revocation ([ADR 0016](adr/0016-funding-edge-and-deposit-key.md), proposed). The deposit key signs only `depositNote`. No account key, deposit key or login ever signs a voucher, envelope, spend, close or `claimChange`, and none is sent to a node or a relay. It never pays a node or relay and is never in the spend path. A researcher analysis, not upgraded here, holds that the provider can map the login identity to the deposit address (evidence register §4, client UX research 2026-10-15, [U]). The note vault is never derived from, wrapped by, stored with or recoverable through it. Candidates are recorded, none selected ([ADR 0017](adr/0017-accounts-and-decentralized-access.md), proposed; no adopting CIP yet).
 
 ### escrow
 
@@ -151,6 +163,10 @@ A nullifier is the public single-use identifier proved for a note under the fixe
 
 An offer is the registry entry `prices[modelId] = (priceInPerMillion, priceOutPerMillion, modelBenchmarkHash)` with a non-zero `modelBenchmarkHash`. `updateNode` replaces the whole list: it emits `OfferSet` for every model added or changed, and a cleared `OfferSet` with zero prices and a zero `modelBenchmarkHash` for every model removed, and clearing is always allowed. A hardware-class change revalidates every listed offer against the new class's bands and reverts if any price sits outside its band.
 
+### on-ramp
+
+An on-ramp is a hosted service, proposed and not adopted, that sells ETH on Arbitrum One for fiat and delivers it to an address the buyer controls after the provider's KYC or identity step. It never delivers to the escrow and never calls `depositNote`. `depositNote` credits the public-exit allowance (`depositedWei`) of its caller, and `ragequit` lets an address exit only up to its own allowance and only with a valid note proof bound to that address; it does not bind a note to its original depositor. A deposit made by anything other than the user's own account would credit that address's allowance instead, and the user could not ragequit that value. It never pays a node or relay and is never in the spend path. A stablecoin bought this way is converted to ETH in the user's own account before `depositNote`. Settlement stays ETH. Coinbase's Layer 2 table lists ETH on Arbitrum, and the MoonPay and Transak currency listings include ETH on Arbitrum (evidence register §15, client UX research 2026-10-15, [V]; the Transak currencies API was not independently re-fetched). The Coinbase Guest Checkout, MoonPay and Transak terms each state that the buyer owns or controls the destination wallet (evidence register §16, client UX research 2026-10-15, [V]; the Coinbase Guest Checkout terms were not independently re-fetched). Each researched provider documents a KYC or identity step (evidence register §16, client UX research 2026-10-15, [V] per provider). These are provider statements, not a legal conclusion, and whether they apply is an open review item. Candidates are recorded, none selected. [ADR 0016](adr/0016-funding-edge-and-deposit-key.md) proposes this, and there is no adopting CIP yet.
+
 ### operator
 
 An operator is the person who runs a node and the Ethereum address that registers it, posts the bond and is paid for its sessions; the operator is the payee, and a pool is not. In standard mode the operator of the chosen node can read the prompt, because the node decrypts it.
@@ -197,7 +213,7 @@ A session binds one node, model, privacy mode and fresh session signer, and may 
 
 ### session signer
 
-The session signer is a fresh application key per session, never reused or derived from the wallet, recorded by `openSessionFromCredit`. It signs job envelopes, vouchers, credit-session close authorizations and `claimChange` authorizations. It signs no context grants and is never delegated to an orchestrator node. A stolen signer can authorize vouchers up to the cap or redirect change; closing does not stop vouchers before the close deadline. The wallet is not prompted for each session or chunk.
+The session signer is a fresh application key per session, never reused or derived from the wallet, recorded by `openSessionFromCredit`. It signs job envelopes, vouchers, credit-session close authorizations and `claimChange` authorizations. It signs no context grants and is never delegated to an orchestrator node. A stolen signer can authorize vouchers up to the cap or redirect change; closing does not stop vouchers before the close deadline. The wallet is not prompted for each session or chunk. It is not the deposit key of ADR 0016, which signs only depositNote.
 
 ### settlement layer
 
