@@ -34,7 +34,7 @@ People who write, review, or discuss Comuns pledge to treat one another as equal
 
 Until maintainers are seated, see MAINTAINERS.md; this repository has no private enforcement contact. [docs/cip/0003-bootstrap-first-maintainer-and-channels.md](docs/cip/0003-bootstrap-first-maintainer-and-channels.md) (Draft) proposes the contact. Enforcement is inactive until that CIP is Final. The contact and the maintainer are the same person, a known limitation.
 
-Enforcement is inactive until that CIP is Final. Before then, a person may describe conduct in a public issue on the Comuns-ai/documentation repository only when the issue contains no prompts, no keys, no seed phrases, and no other person's private information. The issue records what happened. It does not start a sanction, and it does not seat a maintainer.
+Enforcement is inactive until that CIP is Final. Before then, a person may describe conduct in a public issue on the Comuns-ai/comuns repository only when the issue contains no prompts, no keys, no seed phrases, and no other person's private information. The issue records what happened. It does not start a sanction, and it does not seat a maintainer.
 
 ## 5 Enforcement ladder
 

@@ -23,7 +23,7 @@ Training, fine-tuning and federated learning are non-goals. Other non-goals are 
 
 Decisions land as CIPs under [GOVERNANCE.md](../GOVERNANCE.md) and [docs/cip/README.md](cip/README.md). ADRs remain proposed until their adopting CIP is Final: CIP-0001 for ADRs 0001–0009, CIP-0002 for ADRs 0010–0012 and CIP-0005 for ADRs 0013–0015; a later contradictory decision requires a superseding ADR. The lifecycle is Draft → Review → **14-day Last Call** → Final. Substantive edits during Last Call return a CIP to Review and require a fresh full Last Call; a CIP in Last Call cannot become Stagnant. The governing documents own the inactivity rules. Seating and removal occur only through a Final CIP. No maintainers are seated and no private authority is implied by assigning work here. ADRs 0016–0018 are proposed with no adopting CIP yet.
 
-Issues and CIP comments on the Comuns-ai/documentation repository are the community channel. No private channel is created by this plan. Rough consensus is written down: specific objections, their disposition and the reason for accepting or deferring a change remain in the CIP. Review policy follows CONTRIBUTING.md. Working groups recommend and review; they cannot replace a CIP decision.
+Issues and CIP comments on the Comuns-ai/comuns repository are the community channel. No private channel is created by this plan. Rough consensus is written down: specific objections, their disposition and the reason for accepting or deferring a change remain in the CIP. Review policy follows CONTRIBUTING.md. Working groups recommend and review; they cannot replace a CIP decision.
 
 | Working group | Contribution paths |
 |---|---|
