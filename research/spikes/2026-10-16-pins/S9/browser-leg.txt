@@ -1,0 +1,15 @@
+S9 browser leg (patched ohttp 0.8.0): run by the orchestrator on 2026-10-16 in a Chromium-based desktop browser pane.
+
+Server: python3 -m http.server 8766 --bind 127.0.0.1 --directory <scratch>/spikes/S9/web (background task, stopped afterwards)
+Checks before loading: GET /index.html -> 200 (619 B); GET /comuns_crypto_spike_bg.wasm -> 200 (560900 B)
+URL: http://127.0.0.1:8766/index.html (tab-2)
+
+javascript_exec ({url, ua, secure, out}) after 1.5 s:
+  url:    http://127.0.0.1:8766/index.html
+  ua:     Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) <desktop-app> Chrome/152.0.7977.149 Safari/537.36
+  secure: true
+  out:    PASS a: RFC9458 ok (cfg 41B, req 144B, resp 83B); b[ChaCha20Poly1305]: chunked ok (req 164B, resp 124B, 3 frames + final, incremental first frame ok, truncation rejected); c: zero-length non-final chunk rejected (106 B response; positive control ok; buf 1024: rejected with error "an error was found in the format" after "one"; buf 8: rejected with error "an error was found in the format" after "one"); d: 4 empty writes (client req before/after data, gateway resp before/after data) returned Ok(0) and emitted 0 B; stream still decrypts (89 B resp); diagnostic b[Aes128Gcm]: chunked ok (req 164B, resp 108B, 3 frames + final, incremental first frame ok, truncation rejected)
+
+read_console_messages: [log] (the same string)
+
+Reading: with the patch, the fixed suite's chunked round trip (b), the zero-length-chunk rejection (c) and the empty-write rule (d) all pass inside wasm in a real browser.

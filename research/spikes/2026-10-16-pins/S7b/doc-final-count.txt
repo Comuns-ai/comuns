@@ -1,0 +1,15 @@
+docs/adr/0003-hpke-and-the-executor-plaintext-limit.md:1
+docs/adr/0004-sessions-vouchers-and-no-slashing.md:2
+docs/architecture/system-architecture.md:2
+docs/economics/cost-and-pricing.md:1
+docs/glossary.md:1
+docs/node/node-design.md:3
+docs/project-charter.md:1
+docs/project-plan.md:1
+docs/protocol/contracts-and-settlement.md:13
+docs/protocol/off-chain-api.md:6
+docs/requirements.md:1
+docs/review-report.md:2
+docs/security/inference-verification.md:1
+docs/security/privacy-and-contexts.md:7
+docs/security/threat-model.md:2

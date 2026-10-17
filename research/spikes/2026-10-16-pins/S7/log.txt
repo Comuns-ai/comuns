@@ -1,0 +1,517 @@
+$ node --version
+v24.22.0
+exit=0
+$ npm install --ignore-scripts (viem 2.57.7 exact)
+
+added 13 packages, and audited 14 packages in 12s
+
+10 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+exit=0
+$ npm ls viem
+s7-viem@ $SPIKE/S7/viem
+`-- viem@2.57.7
+
+exit=0
+$ node run.mjs > viem-out.json
+file://$SPIKE/S7/viem/run.mjs:3
+import { hashDomain, hashStruct } from 'viem/utils';
+         ^^^^^^^^^^
+SyntaxError: The requested module 'viem/utils' does not provide an export named 'hashDomain'
+    at #asyncInstantiate (node:internal/modules/esm/module_job:455:21)
+    at async ModuleJob.run (node:internal/modules/esm/module_job:553:5)
+    at async node:internal/modules/esm/loader:647:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.22.0
+exit=1
+# fix: hashDomain/hashStruct are root exports of viem
+$ node run.mjs > viem-out.json
+file://$SPIKE/S7/viem/run.mjs:1
+import { hashDomain, hashStruct, hashTypedData, signTypedData, recoverTypedDataAddress, keccak256, toHex } from 'viem';
+                                                ^^^^^^^^^^^^^
+SyntaxError: The requested module 'viem' does not provide an export named 'signTypedData'
+    at #asyncInstantiate (node:internal/modules/esm/module_job:455:21)
+    at async ModuleJob.run (node:internal/modules/esm/module_job:553:5)
+    at async node:internal/modules/esm/loader:647:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.22.0
+exit=1
+# fix: signTypedData is exported from viem/accounts
+$ node run.mjs > viem-out.json
+exit=0
+{
+  "signer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "typeHash": "0x8611af2f59eba3c07185bdfaa04289f9baad0b61f4d8c96a950d393db45fdd96",
+  "domainSeparator": "0x0919c99458ded79404eb9b887a4971d2bf9e493dcdd1fd9ab26116e66f767ef1",
+  "vouchers": [
+    {
+      "structHash": "0x018f50c547a39cb4f157bdc42a6a14b6d63445c559ea8bc37872b21f6549efe8",
+      "signingHash": "0xdd0bb382df4dcee52df022543b00ec9eac6e74c3052a961745e4355461e05afd",
+      "signature": "0x67b882f22b2cc7a1b038e0e0f2f579e12ba75b0d5c1cbcdc3916cdc790f6383e13bd55f3f4d4dd883ccafd8ebd67eeaa64a082fd61d9fbb160a403a3327f66701c",
+      "recovered": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      "recoveredMatches": true
+    },
+    {
+      "structHash": "0x5e3bca8aea480632fbe318b75066e7e1d9394ece554ebb8f300a7aa4fc6e9236",
+      "signingHash": "0x924da95b5a7d7862f192f74cf3e256c935e875eb87c300dd989e1daf2b045d48",
+      "signature": "0x410765badd1a7aba7f21bb4bec4f5de28da61042e927ed6dabe03eb690bd29bc27af8b5c5ef32fd0d6e8d0528530494a0b4b9edcd879d8f8b03ebf4a1d0e46271b",
+      "recovered": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      "recoveredMatches": true
+    },
+    {
+      "structHash": "0xdba51416a9fce5ec21e45d07f6017288df1b80dccdf84a622f19451475a3ba96",
+      "signingHash": "0x5085ae3724a67215d2678081759223dc2949e48d3ade17cc1da90e2360045ba4",
+      "signature": "0xf9bd7c35a6c2c4d8098b737cc08434614b0d7e587caf7628e489daa1058093645d9165d9f9ac9b3da6ce49a298ce0701363e980646ac5d496284d6e1aa59a1da1b",
+      "recovered": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      "recoveredMatches": true
+    }
+  ]
+}
+$ cargo +1.99.1 build --release (time)
+   Compiling alloy-sol-types v1.7.3
+   Compiling alloy-signer v2.5.0
+   Compiling alloy-eips v2.5.0
+   Compiling alloy-consensus v2.5.0
+   Compiling alloy-json-rpc v2.5.0
+   Compiling alloy-core v1.7.3
+   Compiling alloy-consensus-any v2.5.0
+   Compiling alloy-network-primitives v2.5.0
+   Compiling alloy-rpc-types-eth v2.5.0
+   Compiling alloy-rpc-types-any v2.5.0
+   Compiling alloy-network v2.5.0
+   Compiling alloy-signer-local v2.5.0
+   Compiling alloy v2.5.0
+   Compiling s7-alloy v0.0.0 ($SPIKE/S7/alloy)
+error: expected identifier, found reserved keyword `final`
+  --> src/main.rs:15:14
+   |
+ 8 |     struct Voucher {
+   |            ------- while parsing this struct
+...
+15 |         bool final;
+   |              ^^^^^ expected identifier, found reserved keyword
+   |
+help: escape `final` to use it as an identifier
+   |
+15 |         bool r#final;
+   |              ++
+
+error: expected identifier, found reserved keyword `final`
+  --> src/main.rs:15:14
+   |
+15 |         bool final;
+   |              ^^^^^ expected identifier, found reserved keyword
+   |
+help: escape `final` to use it as an identifier
+   |
+15 |         bool r#final;
+   |              ++
+
+error: could not compile `s7-alloy` (bin "s7-alloy") due to 2 previous errors
+
+real	0m56.124s
+user	0m57.192s
+sys	0m8.619s
+exit=101
+# fix1: Rust reserved keyword final -> r#final in sol!
+$ cargo +1.99.1 build --release (time)
+   Compiling s7-alloy v0.0.0 ($SPIKE/S7/alloy)
+    Finished `release` profile [optimized] target(s) in 0.41s
+
+real	0m0.449s
+user	0m0.434s
+sys	0m0.136s
+exit=0
+$ ./target/release/s7-alloy
+signer 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+encodeType Voucher(bytes32 sessionId,uint64 seq,uint256 cumulativeWei,uint64 inputTokens,uint64 outputTokens,bytes32 outputCommitment,bool r#final)
+typeHash 0xcbfb75fc33241dbd4b765fd2b41a2cb3ab2aaa3ba7490323267038144eb302e0
+domainSeparator 0x0919c99458ded79404eb9b887a4971d2bf9e493dcdd1fd9ab26116e66f767ef1
+structHash 0x069a34a957994e92630366602ab3592cdba1846d7b0abbf12af785604910fe30
+signingHash 0x55d3d16d9344d7167756c76865863f1252d24a2b43a6b9b7640d425f51f12530
+signature 0x7de9f145391c34744ea363aa6e8242be0f2679809bd8cbdedbd000b4d89c161509b029dcbfa30e790326c3fce320c62d6321f990f2b20b6b4a37e1981ecb08651c
+structHash 0xd0c18493bb799a1a11a7c7fd58200ada79fa1599dedd97f33c3899bd290ad24e
+signingHash 0xd04f2904f39d82a5d817fc5f2983f5a10edbb0b5fbc25868537e5dbe8f2e67c6
+signature 0xfcd91571d8b48f201ca87c48ae9218ea2870441e23077d955b1b7fe6bdfe27b23a765c495c04edd255c3bf73e575e94f0377238cbda0d4b4957f485a27264ca71b
+structHash 0x389a54b8dee66afe0cb280d7b8b38563d3b3719e8510f26ffb12e72d9a314f0a
+signingHash 0x4ce5dac1218291f031c169ea4f136395e5a05b80bb6358db8f449d6189596e29
+signature 0x35f2ed84725b8433f64462cba96e39f9570eb2b67ad6baed23f0b5cbf636e1e40907cdb85395d5e1496095655d0783b89263b4d05373e0326f122ea2c05a02771b
+exit=0
+$ cargo +1.99.1 tree -e normal --prefix none | sort -u
+alloy v2.5.0
+alloy-consensus v2.5.0
+alloy-consensus v2.5.0 (*)
+alloy-consensus-any v2.5.0
+alloy-consensus-any v2.5.0 (*)
+alloy-core v1.7.3
+alloy-eip2124 v0.2.0
+alloy-eip2930 v0.2.4
+alloy-eip7702 v0.6.3
+alloy-eip7928 v0.4.11
+alloy-eip8141 v0.1.1
+alloy-eips v2.5.0
+alloy-eips v2.5.0 (*)
+alloy-json-rpc v2.5.0
+alloy-network v2.5.0
+alloy-network-primitives v2.5.0
+alloy-network-primitives v2.5.0 (*)
+alloy-primitives v1.7.3
+alloy-primitives v1.7.3 (*)
+alloy-rlp v0.3.16
+alloy-rlp v0.3.16 (*)
+alloy-rlp-derive v0.3.16 (proc-macro)
+alloy-rpc-types-any v2.5.0
+alloy-rpc-types-eth v2.5.0
+alloy-rpc-types-eth v2.5.0 (*)
+alloy-serde v2.5.0
+alloy-serde v2.5.0 (*)
+alloy-signer v2.5.0
+alloy-signer v2.5.0 (*)
+alloy-signer-local v2.5.0
+alloy-sol-macro v1.7.3 (proc-macro)
+alloy-sol-macro-expander v1.7.3
+alloy-sol-macro-input v1.7.3
+alloy-sol-macro-input v1.7.3 (*)
+alloy-sol-types v1.7.3
+alloy-sol-types v1.7.3 (*)
+alloy-trie v0.9.8
+alloy-tx-macros v2.5.0 (proc-macro)
+arrayvec v0.7.8
+async-trait v0.1.92 (proc-macro)
+async-trait v0.1.92 (proc-macro) (*)
+auto_impl v1.4.0 (proc-macro)
+auto_impl v1.4.0 (proc-macro) (*)
+base16ct v0.2.0
+block-buffer v0.10.4
+block-buffer v0.12.1
+bytes v1.12.1
+bytes v1.12.1 (*)
+cfg-if v1.0.5
+const-hex v1.19.3
+const-hex v1.19.3 (*)
+const-oid v0.9.6
+convert_case v0.10.0
+cpufeatures v0.2.17
+cpufeatures v0.3.1
+crc v3.4.0
+crc-catalog v2.5.0
+crypto-bigint v0.5.5
+crypto-common v0.1.6
+crypto-common v0.2.2
+darling v0.23.0
+darling v0.24.1
+darling_core v0.23.0
+darling_core v0.23.0 (*)
+darling_core v0.24.1
+darling_core v0.24.1 (*)
+darling_macro v0.23.0 (proc-macro)
+darling_macro v0.24.1 (proc-macro)
+der v0.7.10
+der v0.7.10 (*)
+derive_more v2.1.1
+derive_more v2.1.1 (*)
+derive_more-impl v2.1.1 (proc-macro)
+digest v0.10.7
+digest v0.10.7 (*)
+digest v0.11.3
+dunce v1.0.5
+ecdsa v0.16.9
+either v1.19.0
+either v1.19.0 (*)
+elliptic-curve v0.13.8
+elliptic-curve v0.13.8 (*)
+equivalent v1.0.3
+ff v0.13.1
+ff v0.13.1 (*)
+foldhash v0.2.0
+futures-utils-wasm v0.1.0
+generic-array v0.14.9
+generic-array v0.14.9 (*)
+getrandom v0.2.17
+group v0.13.0
+hashbrown v0.17.1
+heck v0.5.0
+hmac v0.12.1
+http v1.5.0
+hybrid-array v0.4.15
+hybrid-array v0.4.15 (*)
+ident_case v1.0.1
+indexmap v2.14.2
+itertools v0.14.0
+itoa v1.0.18
+k256 v0.13.4
+k256 v0.13.4 (*)
+keccak v0.2.2
+libc v0.2.190
+macro-string v0.2.0
+memchr v2.8.3
+nybbles v0.4.8
+once_cell v1.21.4
+paste v1.0.15 (proc-macro)
+pin-project-lite v0.2.17
+ppv-lite86 v0.2.21
+proc-macro-error-attr3 v3.0.1 (proc-macro)
+proc-macro-error3 v3.0.1
+proc-macro-error3 v3.0.1 (*)
+proc-macro2 v1.0.107
+proc-macro2 v1.0.107 (*)
+quote v1.0.47
+quote v1.0.47 (*)
+rand v0.8.8
+rand_chacha v0.3.1
+rand_core v0.6.4
+rand_core v0.6.4 (*)
+rfc6979 v0.4.0
+ruint v1.20.1
+ruint v1.20.1 (*)
+ruint-macro v1.2.1 (proc-macro)
+s7-alloy v0.0.0 ($SPIKE/S7/alloy)
+sec1 v0.7.3
+serde v1.0.229
+serde v1.0.229 (*)
+serde_core v1.0.229
+serde_derive v1.0.229 (proc-macro)
+serde_json v1.0.154
+serde_json v1.0.154 (*)
+serde_with v3.24.0
+serde_with_macros v3.24.0 (proc-macro)
+sha2 v0.10.9
+sha2 v0.10.9 (*)
+sha3 v0.11.0
+sha3 v0.11.0 (*)
+signature v2.2.0
+smallvec v1.16.3
+smallvec v1.16.3 (*)
+spki v0.7.3
+strsim v0.11.1
+subtle v2.6.1
+syn v2.0.119
+syn v2.0.119 (*)
+syn v3.0.9
+syn v3.0.9 (*)
+syn-solidity v1.7.3
+syn-solidity v1.7.3 (*)
+thiserror v2.0.21
+thiserror v2.0.21 (*)
+thiserror-impl v2.0.21 (proc-macro)
+tracing v0.1.44
+tracing v0.1.44 (*)
+tracing-attributes v0.1.31 (proc-macro)
+tracing-core v0.1.36
+typenum v1.20.1
+unicode-ident v1.0.27
+unicode-segmentation v1.13.3
+unicode-xid v0.2.6
+zerocopy v0.8.63
+zeroize v1.9.1
+zmij v1.0.23
+$ cargo tree -e features (alloy)
+alloy v2.5.0
+├── alloy-core v1.7.3
+├── alloy-signer v2.5.0
+└── alloy-signer-local v2.5.0
+# fix2: sol! encodes r#final in type string (typeHash mismatch vs viem); try #[sol(rename = "final")]
+$ cargo +1.99.1 build --release (time)
+   Compiling s7-alloy v0.0.0 ($SPIKE/S7/alloy)
+error: cannot find attribute `sol` in this scope
+  --> src/main.rs:15:11
+   |
+15 |         #[sol(rename = "final")]
+   |           ^^^
+   |
+note: `sol` is imported here, but it is a function-like macro
+  --> src/main.rs:4:5
+   |
+ 4 | use alloy::sol;
+   |     ^^^^^^^^^^
+
+error: could not compile `s7-alloy` (bin "s7-alloy") due to 1 previous error
+
+real	0m0.170s
+user	0m0.090s
+sys	0m0.075s
+exit=101
+# fix2 failed: #[sol(rename)] is UNIMPLEMENTED in alloy-sol-macro-input 1.7.3 (attr.rs:100). Fallback: dyn-abi TypedData (JSON) in src/bin/dynabi.rs
+$ cargo +1.99.1 build --release (time)
+  Downloaded async-compression v0.4.50
+  Downloaded aws-sigv4 v1.5.1
+  Downloaded aws-smithy-types v1.6.1
+  Downloaded icu_properties v2.3.0
+  Downloaded mio v1.2.4
+  Downloaded aws-runtime v1.9.1
+  Downloaded http v0.2.12
+  Downloaded hyper-util v0.1.21
+  Downloaded aws-smithy-runtime v1.12.1
+  Downloaded aws-config v1.10.1
+  Downloaded idna v1.1.0
+  Downloaded axum v0.8.9
+  Downloaded hyper v1.12.0
+  Downloaded icu_properties_data v2.3.0
+  Downloaded h2 v0.4.20
+  Downloaded aws-sdk-sts v1.110.0
+  Downloaded aws-lc-rs v1.18.2
+  Downloaded hidapi-rusb v1.3.3
+  Downloaded libusb1-sys v0.7.0
+  Downloaded icu_normalizer v2.3.0
+  Downloaded aws-sdk-kms v1.114.0
+  Downloaded tokio v1.53.3
+  Downloaded ring v0.17.14
+  Downloaded aws-lc-sys v0.46.0
+  Downloaded gcloud-sdk v0.29.0
+   Compiling winnow v1.0.4
+   Compiling alloy-sol-types v1.7.3
+   Compiling alloy-sol-type-parser v1.7.3
+   Compiling alloy-json-abi v1.7.3
+   Compiling alloy-rpc-types-eth v2.5.0
+   Compiling alloy-json-rpc v2.5.0
+   Compiling alloy-dyn-abi v1.7.3
+   Compiling alloy-signer v2.5.0
+   Compiling alloy-core v1.7.3
+   Compiling alloy-rpc-types-any v2.5.0
+   Compiling alloy-network v2.5.0
+   Compiling alloy-signer-local v2.5.0
+   Compiling alloy v2.5.0
+   Compiling s7-alloy v0.0.0 ($SPIKE/S7/alloy)
+    Finished `release` profile [optimized] target(s) in 41.99s
+
+real	0m42.061s
+user	0m15.857s
+sys	0m3.469s
+exit=0
+$ cargo +1.99.1 build --release (time)
+   Compiling serde_json v1.0.154
+   Compiling alloy-serde v2.5.0
+   Compiling alloy-dyn-abi v1.7.3
+   Compiling alloy-json-rpc v2.5.0
+   Compiling alloy-eips v2.5.0
+   Compiling alloy-signer v2.5.0
+   Compiling alloy-core v1.7.3
+   Compiling alloy-consensus v2.5.0
+   Compiling alloy-network-primitives v2.5.0
+   Compiling alloy-consensus-any v2.5.0
+   Compiling alloy-rpc-types-eth v2.5.0
+   Compiling alloy-rpc-types-any v2.5.0
+   Compiling alloy-network v2.5.0
+   Compiling alloy-signer-local v2.5.0
+   Compiling alloy v2.5.0
+   Compiling s7-alloy v0.0.0 ($SPIKE/S7/alloy)
+    Finished `release` profile [optimized] target(s) in 5.10s
+
+real	0m5.146s
+user	0m17.877s
+sys	0m1.408s
+exit=0
+$ ./target/release/dynabi
+signer 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+encodeType Voucher(bytes32 sessionId,uint64 seq,uint256 cumulativeWei,uint64 inputTokens,uint64 outputTokens,bytes32 outputCommitment,bool final)
+typeHash 0x8611af2f59eba3c07185bdfaa04289f9baad0b61f4d8c96a950d393db45fdd96
+domainSeparator 0x0919c99458ded79404eb9b887a4971d2bf9e493dcdd1fd9ab26116e66f767ef1
+structHash 0x018f50c547a39cb4f157bdc42a6a14b6d63445c559ea8bc37872b21f6549efe8
+signingHash 0xdd0bb382df4dcee52df022543b00ec9eac6e74c3052a961745e4355461e05afd
+signature 0x67b882f22b2cc7a1b038e0e0f2f579e12ba75b0d5c1cbcdc3916cdc790f6383e13bd55f3f4d4dd883ccafd8ebd67eeaa64a082fd61d9fbb160a403a3327f66701c
+encodeType Voucher(bytes32 sessionId,uint64 seq,uint256 cumulativeWei,uint64 inputTokens,uint64 outputTokens,bytes32 outputCommitment,bool final)
+typeHash 0x8611af2f59eba3c07185bdfaa04289f9baad0b61f4d8c96a950d393db45fdd96
+domainSeparator 0x0919c99458ded79404eb9b887a4971d2bf9e493dcdd1fd9ab26116e66f767ef1
+structHash 0x5e3bca8aea480632fbe318b75066e7e1d9394ece554ebb8f300a7aa4fc6e9236
+signingHash 0x924da95b5a7d7862f192f74cf3e256c935e875eb87c300dd989e1daf2b045d48
+signature 0x410765badd1a7aba7f21bb4bec4f5de28da61042e927ed6dabe03eb690bd29bc27af8b5c5ef32fd0d6e8d0528530494a0b4b9edcd879d8f8b03ebf4a1d0e46271b
+encodeType Voucher(bytes32 sessionId,uint64 seq,uint256 cumulativeWei,uint64 inputTokens,uint64 outputTokens,bytes32 outputCommitment,bool final)
+typeHash 0x8611af2f59eba3c07185bdfaa04289f9baad0b61f4d8c96a950d393db45fdd96
+domainSeparator 0x0919c99458ded79404eb9b887a4971d2bf9e493dcdd1fd9ab26116e66f767ef1
+structHash 0xdba51416a9fce5ec21e45d07f6017288df1b80dccdf84a622f19451475a3ba96
+signingHash 0x5085ae3724a67215d2678081759223dc2949e48d3ade17cc1da90e2360045ba4
+signature 0xf9bd7c35a6c2c4d8098b737cc08434614b0d7e587caf7628e489daa1058093645d9165d9f9ac9b3da6ce49a298ce0701363e980646ac5d496284d6e1aa59a1da1b
+exit=0
+$ ./target/release/s7-alloy
+signer 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+encodeType Voucher(bytes32 sessionId,uint64 seq,uint256 cumulativeWei,uint64 inputTokens,uint64 outputTokens,bytes32 outputCommitment,bool r#final)
+typeHash 0xcbfb75fc33241dbd4b765fd2b41a2cb3ab2aaa3ba7490323267038144eb302e0
+domainSeparator 0x0919c99458ded79404eb9b887a4971d2bf9e493dcdd1fd9ab26116e66f767ef1
+structHash 0x069a34a957994e92630366602ab3592cdba1846d7b0abbf12af785604910fe30
+signingHash 0x55d3d16d9344d7167756c76865863f1252d24a2b43a6b9b7640d425f51f12530
+signature 0x7de9f145391c34744ea363aa6e8242be0f2679809bd8cbdedbd000b4d89c161509b029dcbfa30e790326c3fce320c62d6321f990f2b20b6b4a37e1981ecb08651c
+structHash 0xd0c18493bb799a1a11a7c7fd58200ada79fa1599dedd97f33c3899bd290ad24e
+signingHash 0xd04f2904f39d82a5d817fc5f2983f5a10edbb0b5fbc25868537e5dbe8f2e67c6
+signature 0xfcd91571d8b48f201ca87c48ae9218ea2870441e23077d955b1b7fe6bdfe27b23a765c495c04edd255c3bf73e575e94f0377238cbda0d4b4957f485a27264ca71b
+structHash 0x389a54b8dee66afe0cb280d7b8b38563d3b3719e8510f26ffb12e72d9a314f0a
+signingHash 0x4ce5dac1218291f031c169ea4f136395e5a05b80bb6358db8f449d6189596e29
+signature 0x35f2ed84725b8433f64462cba96e39f9570eb2b67ad6baed23f0b5cbf636e1e40907cdb85395d5e1496095655d0783b89263b4d05373e0326f122ea2c05a02771b
+exit=0
+# forge path NOT RUN: forge needs to download solc (no cached solc in ~/.svm; not in approved downloads)
+$ (alloy-min, features sol-types+signer-local only) cargo +1.99.1 build --release (time)
+   Compiling alloy-consensus-any v2.5.0
+   Compiling alloy-rpc-types-eth v2.5.0
+   Compiling alloy-rpc-types-any v2.5.0
+   Compiling alloy-network v2.5.0
+   Compiling alloy-signer-local v2.5.0
+   Compiling alloy v2.5.0
+   Compiling s7-alloy v0.0.0 ($SPIKE/S7/alloy-min)
+    Finished `release` profile [optimized] target(s) in 15.44s
+
+real	0m15.517s
+user	0m58.923s
+sys	0m7.792s
+exit=0
+$ alloy-min/target/release/s7-alloy
+signer 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+encodeType Voucher(bytes32 sessionId,uint64 seq,uint256 cumulativeWei,uint64 inputTokens,uint64 outputTokens,bytes32 outputCommitment,bool r#final)
+typeHash 0xcbfb75fc33241dbd4b765fd2b41a2cb3ab2aaa3ba7490323267038144eb302e0
+domainSeparator 0x0919c99458ded79404eb9b887a4971d2bf9e493dcdd1fd9ab26116e66f767ef1
+structHash 0x069a34a957994e92630366602ab3592cdba1846d7b0abbf12af785604910fe30
+signingHash 0x55d3d16d9344d7167756c76865863f1252d24a2b43a6b9b7640d425f51f12530
+signature 0x7de9f145391c34744ea363aa6e8242be0f2679809bd8cbdedbd000b4d89c161509b029dcbfa30e790326c3fce320c62d6321f990f2b20b6b4a37e1981ecb08651c
+structHash 0xd0c18493bb799a1a11a7c7fd58200ada79fa1599dedd97f33c3899bd290ad24e
+signingHash 0xd04f2904f39d82a5d817fc5f2983f5a10edbb0b5fbc25868537e5dbe8f2e67c6
+signature 0xfcd91571d8b48f201ca87c48ae9218ea2870441e23077d955b1b7fe6bdfe27b23a765c495c04edd255c3bf73e575e94f0377238cbda0d4b4957f485a27264ca71b
+structHash 0x389a54b8dee66afe0cb280d7b8b38563d3b3719e8510f26ffb12e72d9a314f0a
+signingHash 0x4ce5dac1218291f031c169ea4f136395e5a05b80bb6358db8f449d6189596e29
+signature 0x35f2ed84725b8433f64462cba96e39f9570eb2b67ad6baed23f0b5cbf636e1e40907cdb85395d5e1496095655d0783b89263b4d05373e0326f122ea2c05a02771b
+exit=0
+$ cargo tree -e normal --prefix none | sort -u | grep alloy
+alloy v2.5.0
+alloy-consensus v2.5.0
+alloy-consensus v2.5.0 (*)
+alloy-consensus-any v2.5.0
+alloy-consensus-any v2.5.0 (*)
+alloy-core v1.7.3
+alloy-eip2124 v0.2.0
+alloy-eip2930 v0.2.4
+alloy-eip7702 v0.6.3
+alloy-eip7928 v0.4.11
+alloy-eip8141 v0.1.1
+alloy-eips v2.5.0
+alloy-eips v2.5.0 (*)
+alloy-json-rpc v2.5.0
+alloy-network v2.5.0
+alloy-network-primitives v2.5.0
+alloy-network-primitives v2.5.0 (*)
+alloy-primitives v1.7.3
+alloy-primitives v1.7.3 (*)
+alloy-rlp v0.3.16
+alloy-rlp v0.3.16 (*)
+alloy-rlp-derive v0.3.16 (proc-macro)
+alloy-rpc-types-any v2.5.0
+alloy-rpc-types-eth v2.5.0
+alloy-rpc-types-eth v2.5.0 (*)
+alloy-serde v2.5.0
+alloy-serde v2.5.0 (*)
+alloy-signer v2.5.0
+alloy-signer v2.5.0 (*)
+alloy-signer-local v2.5.0
+alloy-sol-macro v1.7.3 (proc-macro)
+alloy-sol-macro-expander v1.7.3
+alloy-sol-macro-input v1.7.3
+alloy-sol-macro-input v1.7.3 (*)
+alloy-sol-types v1.7.3
+alloy-sol-types v1.7.3 (*)
+alloy-trie v0.9.8
+alloy-tx-macros v2.5.0 (proc-macro)
+s7-alloy v0.0.0 ($SPIKE/S7/alloy-min)
+$ cargo tree -e features -i alloy (alloy-min)
+s7-alloy v0.0.0 ($SPIKE/S7/alloy-min)
+├── alloy feature "signer-local"
+└── alloy feature "sol-types"

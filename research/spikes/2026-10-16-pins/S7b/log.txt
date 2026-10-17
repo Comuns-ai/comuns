@@ -1,0 +1,13 @@
+Compiling 1 files with Solc 0.8.37
+Solc 0.8.37 finished in 3.31ms
+Error: Compiler run failed:
+Error (2314): Expected identifier but got reserved keyword 'final'
+ --> src/V.sol:4:148:
+  |
+4 |  ... ns; bytes32 outputCommitment; bool final; }
+  |                                         ^^^^^
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.37;
+contract V {
+    struct Voucher { bytes32 sessionId; uint64 seq; uint256 cumulativeWei; uint64 inputTokens; uint64 outputTokens; bytes32 outputCommitment; bool final; }
+}

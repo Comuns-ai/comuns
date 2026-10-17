@@ -1,0 +1,18 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc_version = "0.8.37"
+evm_version = "cancun"
+optimizer = true
+remappings = [
+  "@semaphore-protocol/contracts/=../deps/sem/node_modules/@semaphore-protocol/contracts/",
+  "@zk-kit/=../deps/sem/node_modules/@zk-kit/",
+  "poseidon-solidity/=../deps/sem/node_modules/poseidon-solidity/",
+]
+allow_paths = ["../deps"]
+
+[profile.osaka]
+evm_version = "osaka"
+out = "out-osaka"
+cache_path = "cache-osaka"

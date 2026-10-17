@@ -1,0 +1,19 @@
+total_count=17
+100 open 2026-09-06 Add staged request header decoding
+85 open 2025-10-20 Compile issue
+11 open 2021-08-11 Validate HTTP fields
+87 open 2025-11-10 http-compat: add support for convert between bhttp binary and http crate
+88 open 2025-11-12 Support for multi-key servers and key rotation via early header decoding
+99 closed 2026-08-24 Expose replay metadata after decapsulation
+74 closed 2024-10-30 Streamed read for binary HTTP
+82 closed 2025-08-18 http-compat: add support for convert between bhttp binary and http crate
+71 closed 2024-09-25 Unused 'stream' feature flag causes build error in `bhttp`
+70 closed 2024-09-25 Arthig/chunked ohttp
+73 closed 2024-10-28 Delete OHTTP client and gateway code.
+60 closed 2024-01-11 Implement Clone for ClientResponse
+39 closed 2023-02-16 split_at can panic
+40 closed 2023-02-17 Truncation tests
+35 closed 2022-12-20 consider making it harder to cause the bhttp parser to allocate a massive amount of memory
+15 closed 2021-09-15 Add KeyConfig::derive API.
+2 closed 2021-01-18 Truncated messages
+out-of-range total_count=1

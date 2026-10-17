@@ -1,0 +1,6 @@
+Lookup 2026-10-16 (added after the S8 run, when llama-cpp-2/llama-cpp-sys-2 0.1.160 was chosen)
+$ curl -A comuns-spike https://crates.io/api/v1/crates/llama-cpp-2/0.1.160
+version.num=0.1.160 created_at=2026-10-15T21:26:10.706760Z yanked=False license=MIT OR Apache-2.0 checksum=b98e9f0971b7454a25a550f0bd4577f35b94570be32f8f8dc08d94f4cb2873fe
+$ curl -A comuns-spike https://crates.io/api/v1/crates/llama-cpp-2/0.1.160/dependencies
+dependency crate_id=llama-cpp-sys-2 req=^0.1.160 target=cfg(all(target_os = "macos", any(target_arch = "aarch64", target_arch = "arm64")))
+dependency crate_id=llama-cpp-sys-2 req=^0.1.160 target=None

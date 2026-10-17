@@ -1,0 +1,178 @@
+$ date -u
+Fri Oct 16 18:46:19 UTC 2026
+===== 1. llama.cpp commit =====
+$ curl -sS -A UA https://crates.io/api/v1/crates/llama-cpp-2/0.1.159/dependencies
+{"dependencies":[{"id":38823861,"version_id":3428551,"crate_id":"encoding_rs","req":"^0.8.35","optional":false,"default_features":true,"features":[],"target":null,"kind":"dev","downloads":0},{"id":38823854,"version_id":3428551,"crate_id":"enumflags2","req":"^0.7.12","optional":false,"default_features":true,"features":[],"target":null,"kind":"normal","downloads":0},{"id":38823864,"version_id":3428551,"crate_id":"llama-cpp-sys-2","req":"^0.1.159","optional":false,"default_features":true,"features":["metal"],"target":"cfg(all(target_os = \"macos\", any(target_arch = \"aarch64\", target_arch = \"arm64\")))","kind":"normal","downloads":0},{"id":38823855,"version_id":3428551,"crate_id":"llama-cpp-sys-2","req":"^0.1.159","optional":false,"default_features":true,"features":[],"target":null,"kind":"normal","downloads":0},{"id":38823862,"version_id":3428551,"crate_id":"static_assertions","req":"^1.1.0","optional":false,"default_features":true,"features":[],"target":null,"kind":"dev","downloads":0},{"id":38823857,"version_id":3428551,"crate_id":"thiserror","req":"^2","optional":false,"default_features":true,"features":[],"target":null,"kind":"normal","downloads":0},{"id":38823859,"version_id":3428551,"crate_id":"tracing","req":"^0.1","optional":false,"default_features":true,"features":[],"target":null,"kind":"normal","downloads":0},{"id":38823860,"version_id":3428551,"crate_id":"tracing-core","req":"^0.1","optional":false,"default_features":true,"features":[],"target":null,"kind":"normal","downloads":0},{"id":38823863,"version_id":3428551,"crate_id":"tracing-subscriber","req":"^0.3","optional":false,"default_features":true,"features":["json"],"target":null,"kind":"dev","downloads":0},{"id":38823856,"version_id":3428551,"crate_id":"llguidance","req":"^1.7.5","optional":true,"default_features":true,"features":[],"target":null,"kind":"normal","downloads":0},{"id":38823858,"version_id":3428551,"crate_id":"toktrie","req":"^1.7.5","optional":true,"default_features":true,"features":[],"target":null,"kind":"normal","downloads":0}]}
+$ curl -sS -A UA https://crates.io/api/v1/crates/llama-cpp-2/0.1.159
+{"version":{"id":3428551,"crate":"llama-cpp-2","num":"0.1.159","dl_path":"/api/v1/crates/llama-cpp-2/0.1.159/download","readme_path":"/api/v1/crates/llama-cpp-2/0.1.159/readme","updated_at":"2026-10-07T17:13:18.587647Z","created_at":"2026-10-07T17:13:18.587647Z","downloads":5821,"features":{"android-shared-stdcxx":["llama-cpp-sys-2/shared-stdcxx"],"android-static-stdcxx":["llama-cpp-sys-2/static-stdcxx"],"common":["llama-cpp-sys-2/common"],"cuda":["llama-cpp-sys-2/cuda"],"cuda-no-vmm":["cuda","llama-cpp-sys-2/cuda-no-vmm"],"default":["openmp","android-shared-stdcxx","common"],"dynamic-backends":["llama-cpp-sys-2/dynamic-backends"],"dynamic-link":["llama-cpp-sys-2/dynamic-link"],"llguidance":["dep:llguidance","dep:toktrie"],"metal":["llama-cpp-sys-2/metal"],"mkl":["llama-cpp-sys-2/mkl"],"mtmd":["llama-cpp-sys-2/mtmd"],"opencl":["llama-cpp-sys-2/opencl"],"openmp":["llama-cpp-sys-2/openmp"],"rocm":["llama-cpp-sys-2/rocm"],"sampler":[],"static-openmp":["llama-cpp-sys-2/static-openmp"],"static-stdcxx":["llama-cpp-sys-2/static-stdcxx"],"system-ggml":["llama-cpp-sys-2/system-ggml"],"system-ggml-static":["llama-cpp-sys-2/system-ggml-static"],"vulkan":["llama-cpp-sys-2/vulkan"]},"yanked":false,"yank_message":null,"lib_links":null,"license":"MIT OR Apache-2.0","links":{"dependencies":"/api/v1/crates/llama-cpp-2/0.1.159/dependencies","version_downloads":"/api/v1/crates/llama-cpp-2/0.1.159/downloads","authors":"/api/v1/crates/llama-cpp-2/0.1.159/authors"},"crate_size":223764,"published_by":null,"audit_actions":[],"checksum":"fab4a3cd6f539c1d658161c85390c18b1d3f67283275e1567b34417dca3dd8c9","rust_version":null,"has_lib":true,"bin_names":[],"edition":"2021","description":"llama.cpp bindings for Rust","homepage":null,"documentation":null,"repository":"https://github.com/utilityai/llama-cpp-rs","trustpub_data":{"provider":"github","repository":"utilityai/llama-cpp-rs","run_id":"37529207366","sha":"3cfdd729d65e35da407e5f820edf73201bfa54f6"},"linecounts":{"languages":{"Rust":{"code_lines":5383,"comment_lines":224,"files":27}},"total_code_lines":5383,"total_comment_lines":224}}}
+$ curl -sS -A UA https://crates.io/api/v1/crates/llama-cpp-sys-2
+max_stable 0.1.160
+0.1.160 2026-10-15T21:26:08.073188Z 912d8a0522acec022ae07d099366234067c8af6a18570a603f0749b7bb927e9a yanked=False
+0.1.159 2026-10-07T17:13:15.911570Z 1a96d43d9370ff79293fe9777c9a4bda9d3bacb7100b61ed1e3690df39e9ad9e yanked=False
+0.1.158 2026-09-30T20:37:35.494774Z 608edbeed8bcb8573d8e665f3f047e085202510b7b3d09e7fae2cfe3d80d6bec yanked=False
+0.1.157 2026-09-22T21:58:48.587697Z cdd0b39fc874267312983364d48379179a7945ad9d4c068c176304ae1cdca1ec yanked=False
+0.1.156 2026-09-02T23:58:38.527440Z aaeb4c4a83335b5e3f1ae87aaa3af447a249dac1b1f8b2249e33b1d74da104a3 yanked=False
+0.1.155 2026-08-31T15:34:45.181077Z d59ed2a770245cf16526a8643c79872701fc6115556e5d8e675d9248752a1394 yanked=False
+0.1.154 2026-08-05T00:04:39.920628Z 13a9ea2ce0cdc20bcb1870534022e340b391663f8fe09133951e2fe37fbc29cf yanked=False
+0.1.153 2026-07-28T16:06:56.245902Z f244dd304a9ef81b0875c6a7cc04bc84a022870623dd292736527d59645f9c55 yanked=False
+0.1.152 2026-07-21T20:08:26.911820Z 72cd06c8ec4fb02291dbdeac96fb9ecdbf339aa4c9929799aaa56e0362ea3eda yanked=False
+0.1.151 2026-07-06T01:44:20.463651Z 23c676b02f8f2bdd9d7df7bcca0bd176b27964440998e7aa31c6fe32552964d0 yanked=False
+0.1.150 2026-06-16T22:02:15.914757Z f67dab3ed2b68e4fc4a42471eac73e128ed2ee97bd10de66ddcc609dd5d838a0 yanked=False
+0.1.149 2026-06-16T16:35:00.577117Z 7fac388c86fb2f4150b0c51accbd35261763df3a847958b0e58046da51140fa8 yanked=False
+0.1.147 2026-06-16T15:11:07.794499Z 609174c2ce9d39374a97fcb7d01a4ed885f4ac22b28a3787566079b0c676971e yanked=False
+0.1.146 2026-04-30T16:21:02.191769Z 9b291e4bc2d10c43cd8dec16d49b6104cb3cb125f596ec380a753a5db1d965dd yanked=False
+0.1.145 2026-04-22T16:51:27.495794Z 9e1e5495433ca7487b9f8c7046f64e69937861d438b20f12ee3c524f35d55ad3 yanked=False
+0.1.144 2026-04-19T18:17:18.659986Z 0a2efa5c5675f4e2170c52c4418f71907d39b1e3931fd7566f8382cf9e166282 yanked=False
+0.1.143 2026-04-07T20:24:54.690939Z 2f2cf3435dbadb87817e0a95325c818cd89d43026e8ba1ddd32f1d980d96f33d yanked=False
+0.1.142 2026-04-06T19:47:29.167727Z 95ef4708a34c686a2686f9a57050df3b5384ff346dcbfb8ee47b5814f4dcfc90 yanked=False
+0.1.141 2026-03-29T19:29:14.029967Z ec26e2c8669ac39957505d725f1e06afc79f6f813b67b2b52c2736d65309dc1e yanked=False
+0.1.140 2026-03-23T16:04:49.163902Z cbdd3e2c06f3a9a47466a631735946e9ad47fef565b88bc8766a3794474a66f3 yanked=False
+0.1.139 2026-03-17T15:41:50.915617Z e762baca42996077c9b3e5af393d585ca5299977faacf8ac4391f2dbd013a5d5 yanked=False
+0.1.138 2026-03-04T15:03:57.446663Z 84a529006bf16af70c7485ba957820dc2bc9467d75697e97970c81d2da73c76f yanked=False
+0.1.137 2026-03-01T23:06:22.584454Z da365e84fbe4d10e849fa3bfd5a0d70b3b4a59e8c5adc8b7be5c189327566bdb yanked=False
+0.1.136 2026-02-23T19:25:06.820617Z c8536707545e27a8a889cb089fd5064a3a22fe0b7b9a71b23bf91e84b1a7a90d yanked=False
+0.1.135 2026-02-18T16:54:37.536152Z 95cf8be1ff000b531ac0523c66a9ffce3cef6d09a5d95b21cad745bedb115468 yanked=False
+0.1.134 2026-02-17T18:25:05.980740Z d8ffa84f4a50eee5eeb8e9efd5ff447a9d6cbed8e163a0db47ca64a3e1573db1 yanked=False
+0.1.133 2026-02-03T19:35:42.265895Z a180dfa6d6f9d1df1e031bcdf0464bbad4f9b326395bfd28f2fa539d8cbc9c2b yanked=False
+0.1.132 2026-01-15T17:07:19.902581Z 2fcb116a1a687f928484bcd257f811e6e0665dcb39b53a122725eca12324cf9e yanked=False
+0.1.131 2026-01-02T18:52:19.412170Z ff5b2268a06180a67d8a1d3dd9d1f1c70d52de7b6f40f967ec4eabd90d0417ae yanked=False
+0.1.130 2025-12-13T01:39:58.151266Z 041940ef51a1ec7ca1267958ff90efaa18ddd31cf07e937e0fd7521ad56acfea yanked=False
+0.1.129 2025-12-04T05:46:28.817434Z 85182a2831f6809f6c7cef123b9471e75ac04378f29364eaa43bb30d1ee398bd yanked=False
+0.1.128 2025-11-28T18:59:04.045544Z f2948859dc7b8fc50641d55afacdd134f30317959296dcefe00d06e8d244b382 yanked=False
+0.1.127 2025-11-26T01:02:21.746639Z 9d21452861e4de376fb30685a64e0a1fdefb4bfaaf53d1b3b0c5d8eb9e2fd490 yanked=False
+0.1.126 2025-11-20T23:37:48.828450Z fcf4f0b93f111d7cc2ae702b2dd20efb4a9a19297addb3e63c1cfb97e6a13c6f yanked=False
+0.1.125 2025-11-14T17:37:42.023569Z cc9443103277a9808b0e7055966a39fd2de14c7877fecdec4daf7b8770c46ec3 yanked=False
+0.1.124 2025-11-05T18:22:16.190389Z dea2c8ba38b170c6c6b208d568b86c063cef250e7d311c322e4c3efab900abff yanked=False
+0.1.123 2025-11-03T01:04:24.621318Z 5a6cc4b07426e0bb4dc4c65c5b026a820cc3446788b095c3df4e2aa0473f3f04 yanked=False
+0.1.122 2025-09-20T21:47:56.497794Z e09bdf53b6f486ecaeb96b08cd8a9d9df162f2aafa37efb5b40cf421a419c755 yanked=False
+0.1.121 2025-09-05T17:02:40.853653Z 29963419ccdedd54934ded0ddd9ba63c2056ad8d0b152f313f85d3cf481c1b49 yanked=False
+0.1.120 2025-09-05T15:43:20.963777Z db4432c6c0b79382cf1794a9b02a280cec15ad50990324b3b41faa4b36e9b8fe yanked=False
+0.1.119 2025-08-30T21:25:05.230519Z a157689b63f1cb8a5bd61ecc4607311e55b3fcbf246676cd73679f8ccfa79d1f yanked=False
+0.1.118 2025-08-18T15:52:29.264842Z 2c070e35e0cb58e7b4dfb7cd04a1cc7686ab0f04355076f2d5cdc284a1d8a0cf yanked=False
+0.1.117 2025-08-12T21:22:41.060296Z d92e8efb510a2820f9cfeffd1ebd686ac219f37aed49b1afc5a43acd0dab8fb2 yanked=False
+0.1.116 2025-08-07T21:53:03.922562Z 9c6207d8386b10b78a3921fb22d5c807af080e6499259417346b34782450b3bb yanked=False
+0.1.115 2025-08-07T21:27:18.724135Z 4c39a6d0bc2be6f071c72256563b140449581600ceed9b2a34851481127e51ee yanked=False
+0.1.114 2025-08-04T06:48:44.503050Z eba4565fc813890a8d13c53d608aab1e529f2b9e7a7d01971143e813781a2846 yanked=False
+0.1.113 2025-07-30T22:37:49.890154Z cacd8b3e90f4d9db8fdb554ef8f2006f7d82f539aa3879d2c40976955d037daa yanked=False
+0.1.112 2025-07-26T17:42:47.435464Z 64d960c3662adf16f50085a6c0e704a78069d730dfeff197b941272fa0da6cb9 yanked=False
+0.1.109 2025-07-09T19:09:18.984720Z 2050402c2beb7bfa15ac51e2fe1204cda649b89ece5e4c2e5ee0d2768f9de39f yanked=False
+0.1.108 2025-06-05T19:18:28.986270Z ba764a4fd6d6fd5c4f37036f40a9707b39ac5580c610c422dd57156d8e3ca260 yanked=False
+0.1.107 2025-05-26T21:01:41.397742Z abe6ca194d890f098b33b041f1c9f0efc9c7655f1bb8025f12b5221079be37b7 yanked=False
+0.1.103 2025-05-02T17:41:40.508903Z 8b4ae3037b7d9b9fab9fd7905aeb04e214acb300599fa1ee698d6f759ee530f9 yanked=False
+0.1.102 2025-02-25T20:47:58.495402Z 0522f9894e22dd988dd2e34222bda7acba53a0dcce744ca6d8ddce905ba33a4e yanked=False
+0.1.101 2025-02-25T19:52:54.436949Z 0f5948551cf811f38b9a74840388b9702188bc0ba78f6b0d6aa51e14dd3442db yanked=False
+0.1.100 2025-02-24T19:12:57.106704Z 65a743ffd9fc066ec01117e5b2fb3652b8f9d8a64694ec43952dfffb7dcda43b yanked=False
+0.1.19 2024-01-26T16:54:12.769032Z 124d035e47d2814a0efff0b9118c94d7a47a5e587aa092e66aa52f7a7ad7b3ed yanked=False
+0.1.18 2024-01-25T00:23:11.180188Z cad001be18136c97a83724e3277861470c200db21a648c5bdafe074d1cddad1a yanked=False
+0.1.17 2024-01-25T00:06:32.062384Z e527c2bc6132b319fdd9fc60d6677f82b1f66d2420b27343da0fe42b9cff0e04 yanked=False
+0.1.16 2024-01-24T22:54:07.461677Z 5a478211a9082dcbeda2b1ac8d616ad04a48539aeee5367aeb844f2bedd16e45 yanked=False
+0.1.15 2024-01-24T18:56:25.909121Z 97bb033918c7644834d5dadd752d53523d4c0add72a851f4e88828c931f4925c yanked=False
+0.1.14 2024-01-24T18:34:38.979219Z c4efd1bfac0f891b87c34e153bd65447b75eb9aa88de930c0ab265d6d79211cf yanked=False
+0.1.13 2024-01-24T18:22:05.277052Z fd98db77eb24967f92f27f0edafe888c5667f5f56aa11fed57d1f4584531e71d yanked=False
+0.1.12 2024-01-20T22:43:18.897610Z 7d121ef484788f86bafefcf07bc8b26f4bd594093ec36c9893e6d99f45b47520 yanked=False
+0.1.11 2024-01-19T22:45:27.445629Z c754d85f317eb9253ab9e46f6ce71aeb2f8781ab8a56aef9298b9d4588539fbe yanked=False
+0.1.10 2024-01-17T23:39:15.558565Z c95c87fd8bfe80ce8aa56af53435bd84dba47b067f992068f20237604a5664d8 yanked=False
+$ curl -sSL -A UA -o deps/llama-cpp-sys-2-0.1.159.crate https://static.crates.io/crates/llama-cpp-sys-2/llama-cpp-sys-2-0.1.159.crate
+http=200 size=5646385
+$ curl -sSL -A UA -o deps/llama-cpp-sys-2-0.1.160.crate https://static.crates.io/crates/llama-cpp-sys-2/llama-cpp-sys-2-0.1.160.crate
+http=200 size=5834277
+$ shasum -a 256 deps/llama-cpp-sys-2-0.1.159.crate deps/llama-cpp-sys-2-0.1.160.crate
+1a96d43d9370ff79293fe9777c9a4bda9d3bacb7100b61ed1e3690df39e9ad9e  deps/llama-cpp-sys-2-0.1.159.crate
+912d8a0522acec022ae07d099366234067c8af6a18570a603f0749b7bb927e9a  deps/llama-cpp-sys-2-0.1.160.crate
+$ tar -xzOf deps/llama-cpp-sys-2-0.1.159.crate llama-cpp-sys-2-0.1.159/.cargo_vcs_info.json
+{
+  "git": {
+    "sha1": "3cfdd729d65e35da407e5f820edf73201bfa54f6"
+  },
+  "path_in_vcs": "llama-cpp-sys-2"
+}$ tar -xzOf deps/llama-cpp-sys-2-0.1.160.crate llama-cpp-sys-2-0.1.160/.cargo_vcs_info.json
+{
+  "git": {
+    "sha1": "0dd5814c9b061930965d144c1653cd4d05054873"
+  },
+  "path_in_vcs": "llama-cpp-sys-2"
+}$ gh api repos/utilityai/llama-cpp-rs/contents/llama-cpp-sys-2/llama.cpp?ref=3cfdd729d65e35da407e5f820edf73201bfa54f6
+{"path":"llama-cpp-sys-2/llama.cpp","sha":"26394b4e6749a41c3633db040e0987500a5f7013","type":"submodule","url":"https://api.github.com/repos/utilityai/llama-cpp-rs/contents/llama-cpp-sys-2/llama.cpp?ref=3cfdd729d65e35da407e5f820edf73201bfa54f6"}
+$ gh api repos/utilityai/llama-cpp-rs/contents/llama-cpp-sys-2/llama.cpp?ref=0dd5814c9b061930965d144c1653cd4d05054873
+{"path":"llama-cpp-sys-2/llama.cpp","sha":"d81235049384534c167caea52b85a694f6103d14","type":"submodule","url":"https://api.github.com/repos/utilityai/llama-cpp-rs/contents/llama-cpp-sys-2/llama.cpp?ref=0dd5814c9b061930965d144c1653cd4d05054873"}
+$ gh api repos/utilityai/llama-cpp-rs/contents/.gitmodules?ref=3cfdd729d65e35da407e5f820edf73201bfa54f6 (content, base64-decoded)
+[submodule "llama-cpp-sys-2/llama.cpp"]
+	path = llama-cpp-sys-2/llama.cpp
+	url = https://github.com/ggml-org/llama.cpp
+$ gh api repos/ggml-org/llama.cpp/commits/26394b4e6749a41c3633db040e0987500a5f7013
+{"date":"2026-09-21T08:32:07Z","message":"json: Fixed json enum handling (#28518)","sha":"26394b4e6749a41c3633db040e0987500a5f7013"}
+$ gh api repos/ggml-org/llama.cpp/commits/d81235049384534c167caea52b85a694f6103d14
+{"date":"2026-10-05T15:13:51Z","message":"llama.cpp : bump version to 0.6.0 (#29997)","sha":"d81235049384534c167caea52b85a694f6103d14"}
+$ gh api repos/ggml-org/llama.cpp/git/refs/tags/v0.7.0
+{"ref":"refs/tags/v0.7.0","sha":"757cad021b357f417065ddbc41a6e8f87c1f8136","type":"tag"}
+$ gh api repos/ggml-org/llama.cpp/git/tags/757cad021b357f417065ddbc41a6e8f87c1f8136
+{"tag":"v0.7.0","tagger":"2026-10-15T17:13:13Z","target":"620d2225cc436ab0b001e3200e590e3b286ef9ab","type":"commit"}
+$ gh api repos/ggml-org/llama.cpp/commits/620d2225cc436ab0b001e3200e590e3b286ef9ab
+{"date":"2026-10-15T13:48:22Z","message":"llama.cpp : bump version to 0.7.0 (#30603)","sha":"620d2225cc436ab0b001e3200e590e3b286ef9ab"}
+$ gh api repos/ggml-org/llama.cpp/compare/26394b4e...620d2225
+{"ahead_by":595,"behind_by":0,"status":"ahead","total_commits":595}
+$ gh api repos/ggml-org/llama.cpp/compare/d812350...620d2225
+{"ahead_by":240,"behind_by":0,"status":"ahead"}
+===== 2. names =====
+$ gh api repos/Comuns-ai/comuns
+{"message":"Not Found","documentation_url":"https://docs.github.com/rest/repos/repos#get-a-repository","status":"404"}gh: Not Found (HTTP 404)
+$ gh api orgs/Comuns-ai/repos?per_page=100
+Comuns-ai/documentation
+Comuns-ai/.github
+$ gh api orgs/Comuns-ai
+{"id":341979546,"login":"Comuns-ai","public_repos":2}
+$ gh api search/repositories?q=org:Comuns-ai
+{"names":["Comuns-ai/documentation","Comuns-ai/.github"],"total":2}
+$ curl -sS -w HTTP https://registry.npmjs.org/-/org/comuns/package
+{"error":"Scope not found"}
+HTTP=404
+$ curl -sS -w HTTP https://registry.npmjs.org/-/org/comuns-ai/package
+{"error":"Scope not found"}
+HTTP=404
+$ curl -sS -w HTTP https://registry.npmjs.org/-/user/org.comuns/package
+{"error":"Scope not found"}
+HTTP=404
+$ curl -sS -w HTTP https://registry.npmjs.org/-/user/org.comuns-ai/package
+{"error":"Scope not found"}
+HTTP=404
+$ curl -sS -w HTTP https://registry.npmjs.org/@comuns%2fsdk
+HTTP=404
+$ curl -sS -w HTTP https://registry.npmjs.org/@comuns-ai%2fsdk
+HTTP=404
+$ curl crates.io comuns-node, comuns-relay, comuns
+comuns-node HTTP=404
+comuns-relay HTTP=404
+comuns HTTP=404
+===== 3. integrity =====
+$ curl -sS https://nodejs.org/dist/v24.22.0/SHASUMS256.txt | grep darwin-arm64/linux-x64 tarballs
+6a9724d9b50a5f22b4816cded441b5a8d9ddae546191a5e5b7efa5a5e2ee26d5  node-v24.22.0-darwin-arm64.tar.gz
+28ea0a438de9a13bd7891fd758eee6c7819ee8af5442dfd8d45bd65e56d4228c  node-v24.22.0-linux-x64.tar.gz
+$ curl -sS https://registry.npmjs.org/pnpm/12.14.0 (dist fields)
+pnpm 12.14.0 integrity=sha512-wYum2HmT09Fky16JSPMrLAbuhUSH4GzY2GeBNC+z5btGNDZwNHEehoArqpw3vqkGzhkprQjXCITJfYAd8TOJpg== shasum=b589f9374f009fa90d07b42e803ef0ac646dffb5 tarball=https://registry.npmjs.org/pnpm/-/pnpm-12.14.0.tgz
+$ curl -sS https://registry.npmjs.org/viem/2.57.7 (dist fields)
+viem 2.57.7 integrity=sha512-x3UqqrcQuESaRVK6a0BvNmoNP0SVhu913uxEAxYLJx1lNYnj6ylTntfUdakCUKjk1+T+63gkdwFGJQ2O5C/nRw== shasum=31c62217c90b937f7f8aa39cc3459d21811e5d8f tarball=https://registry.npmjs.org/viem/-/viem-2.57.7.tgz
+$ curl -sS https://registry.npmjs.org/typescript/7.0.2 (dist fields)
+typescript 7.0.2 integrity=sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA== shasum=9ec773d7954a8c182c17cc5bbd575aa28bc51582 tarball=https://registry.npmjs.org/typescript/-/typescript-7.0.2.tgz
+$ curl -sS https://registry.npmjs.org/@semaphore-protocol%2fproof/4.14.3 (dist fields)
+@semaphore-protocol/proof 4.14.3 integrity=sha512-Zu7vIA161+jieo1DzhKoGB/UgTnG6cGMJtAN1/O6o4yKXKBkq7ly7JC3RZ0SbayfdN4TpTJyfO27i1USQ51eyw== shasum=b5d0d7faed4fe5cfa1d8009a0dc0d4453029afe2 tarball=https://registry.npmjs.org/@semaphore-protocol/proof/-/proof-4.14.3.tgz
+$ curl -sS https://registry.npmjs.org/@semaphore-protocol%2fcontracts/4.14.3 (dist fields)
+@semaphore-protocol/contracts 4.14.3 integrity=sha512-N6UdFINfvDbpsIRSGuvOXZbKczDTrJATQQN5ToFI+oAVAO8s9TuBrFxDIsATnGnP8q/Dz/j7ZBEE6ypAU5Zebw== shasum=d1cd78d62f2050ff21c5237c1269f24c8c607663 tarball=https://registry.npmjs.org/@semaphore-protocol/contracts/-/contracts-4.14.3.tgz
+$ curl -sS -A UA https://crates.io/api/v1/crates/hpke/0.14.1 (checksum)
+hpke 0.14.1 cksum=a5324110b02044183df000f0bd7d2d7e61f1000631508627e77f63983b6fdffb yanked=False
+$ curl -sS -A UA https://crates.io/api/v1/crates/ohttp/0.8.0 (checksum)
+ohttp 0.8.0 cksum=cc53603e4bf77342fe8409611972078761604e4370330c4ee5abac49f079b464 yanked=False
+$ curl -sS -A UA https://crates.io/api/v1/crates/bhttp/0.8.0 (checksum)
+bhttp 0.8.0 cksum=b60d03ddf90ae9569b5f5397900b9838f92bd1004e13114f82ebfba0dead6582 yanked=False
+$ curl -sS -A UA https://crates.io/api/v1/crates/alloy/2.5.0 (checksum)
+alloy 2.5.0 cksum=f5a08ebfa51fdc243e0c6a662f5cf3428f04d1ad858e3fe77238cc78063eb86d yanked=False
+$ curl -sS -A UA https://crates.io/api/v1/crates/wasm-bindgen/0.2.129 (checksum)
+wasm-bindgen 0.2.129 cksum=9bb54f33acc68fd454578d9820b0bde1a1a3d17aa17bb7b6595806d02886d409 yanked=False
+$ curl -sS -A UA https://crates.io/api/v1/crates/llama-cpp-2/0.1.159 (checksum)
+llama-cpp-2 0.1.159 cksum=fab4a3cd6f539c1d658161c85390c18b1d3f67283275e1567b34417dca3dd8c9 yanked=False
+$ gh api repos/foundry-rs/foundry-toolchain/releases/latest
+{"published":"2026-07-28T23:39:38Z","tag":"v1.9.1","target":"master"}
+$ gh api repos/foundry-rs/foundry-toolchain/git/refs/tags/v1.9.1
+{"sha":"908c540300062bd5a7e473851cdb4282204cee09","type":"commit"}
+$ gh api repos/foundry-rs/foundry-toolchain/commits/v1.9.1
+{"date":"2026-07-20T15:41:14Z","message":"chore(deps): bump the npm-weekly group with 3 updates (#158)","sha":"908c540300062bd5a7e473851cdb4282204cee09"}
+===== done =====

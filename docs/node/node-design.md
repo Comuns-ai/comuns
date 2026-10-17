@@ -425,7 +425,7 @@ The reference client fails closed when no relay is available and never connects 
 
 1. **Process isolation for backends.** Whether each adapter should run in a separate unprivileged process with a narrow IPC surface, trading memory and latency for containment of C/C++ faults.
 2. **Receipt key.** Whether the receipt-signing key is distinct from the HPKE identity, and how both are bound in the registration's proof of possession. Proposed resolution: ADR 0015 (separate key, bound by the client's key probe; no registration-time proof).
-3. **Chain-client library.** Which Rust library implements EIP-712, Groth16 verification, event following and the delayed-inbox path, pinned in CIP-0005.
+3. **Chain-client library.** CIP-0005 pins alloy 2.5.0 for EIP-712, whose `TypedData` hashing agrees byte for byte with viem (evidence register §15, measured 2026-10-16, [V]). Groth16 verification, event following and the delayed-inbox path stay open.
 4. **Concurrency limits.** Whether per-class concurrency is a protocol recommendation or purely operator configuration, and how it interacts with `CHUNK_TOKENS`.
 5. **Capability document.** The exact fields of the off-chain capability document (roles, supported quantizations, deterministic profile ids), owned by docs/protocol/off-chain-api.md.
 6. **Deterministic profile demonstration.** What test set and how many runs demonstrate byte-identical output before a node may advertise mode 2, owned by docs/security/inference-verification.md.

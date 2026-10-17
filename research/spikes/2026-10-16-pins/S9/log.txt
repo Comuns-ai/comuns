@@ -1,0 +1,378 @@
+$ (cwd=$SPIKE/S9) diff -ruN -x target ohttp-0.8.0-orig ohttp-0.8.0-patched > ohttp-0.8.0-chunked-fixes.patch; echo diff-exit=$? "(1 = files differ)"; cat ohttp-0.8.0-chunked-fixes.patch | head -3; diffstat ohttp-0.8.0-chunked-fixes.patch 2>/dev/null || echo "added: $(grep -c "^+[^+]" ohttp-0.8.0-chunked-fixes.patch) removed: $(grep -c "^-[^-]" ohttp-0.8.0-chunked-fixes.patch)"
+diff-exit=1 (1 = files differ)
+diff -ruN -x target ohttp-0.8.0-orig/src/stream.rs ohttp-0.8.0-patched/src/stream.rs
+--- ohttp-0.8.0-orig/src/stream.rs	2026-10-16 16:18:58
++++ ohttp-0.8.0-patched/src/stream.rs	2026-10-16 16:20:23
+ stream.rs |   24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
+exit=0
+$ (cwd=$SPIKE/S9/crate) cargo +1.99.1 --version; rustc +1.99.1 --version; cargo +1.99.1 build 2>&1 | tail -40
+cargo 1.99.1 (5f94df478 2026-08-27)
+rustc 1.99.1 (58cf8f9c3 2026-10-13)
+   Compiling inout v0.2.3
+   Compiling crypto-bigint v0.7.5
+   Compiling sec1 v0.8.1
+   Compiling module-lattice v0.2.3
+   Compiling futures-executor v0.3.34
+   Compiling futures v0.3.34
+   Compiling bhttp v0.8.0
+   Compiling digest v0.11.3
+   Compiling cipher v0.5.2
+   Compiling universal-hash v0.6.1
+   Compiling kem v0.3.0
+   Compiling aead v0.6.1
+   Compiling polyval v0.7.3
+   Compiling poly1305 v0.9.1
+   Compiling hmac v0.13.0
+   Compiling sha3 v0.11.0
+   Compiling sha3 v0.12.0
+   Compiling shake v0.1.0
+   Compiling sha2 v0.11.1
+   Compiling turboshake v0.7.1
+   Compiling chacha20 v0.10.2
+   Compiling ghash v0.6.0
+   Compiling ctr v0.10.1
+   Compiling aes v0.9.3
+   Compiling hkdf v0.13.0
+   Compiling chacha20poly1305 v0.11.0
+   Compiling rand v0.10.3
+   Compiling ml-kem v0.3.2
+   Compiling aes-gcm v0.11.1
+   Compiling primefield v0.14.0
+   Compiling elliptic-curve v0.14.1
+   Compiling wnaf v0.14.1
+   Compiling x-wing v0.1.1
+   Compiling primeorder v0.14.0
+   Compiling p384 v0.14.0
+   Compiling p256 v0.14.0
+   Compiling p521 v0.14.0
+   Compiling hpke v0.14.1
+   Compiling comuns-crypto-spike v0.0.0 ($SPIKE/S9/crate)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 7.70s
+exit=0
+$ (cwd=$SPIKE/S9/crate) grep -A3 "^name = \"ohttp\"" Cargo.lock; cargo +1.99.1 tree -i ohttp -e normal | head -3; cargo +1.99.1 pkgid ohttp
+name = "ohttp"
+version = "0.8.0"
+dependencies = [
+ "aead",
+ohttp v0.8.0 ($SPIKE/S9/ohttp-0.8.0-patched)
+└── comuns-crypto-spike v0.0.0 ($SPIKE/S9/crate)
+path+file://$SPIKE/S9/ohttp-0.8.0-patched#ohttp@0.8.0
+exit=0
+$ (cwd=$SPIKE/S9/crate) cargo +1.99.1 test -- --nocapture --test-threads=1 2>&1 | grep -v "^   Compiling"
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.34s
+     Running unittests src/lib.rs (target/debug/deps/comuns_crypto_spike-d512d5c37d74a6ea)
+
+running 7 tests
+test tests::test_a_rfc9458_roundtrip ... a: RFC9458 ok (cfg 41B, req 144B, resp 83B)
+ok
+test tests::test_all_summary ... PASS a: RFC9458 ok (cfg 41B, req 144B, resp 83B); b[ChaCha20Poly1305]: chunked ok (req 164B, resp 124B, 3 frames + final, incremental first frame ok, truncation rejected); c: zero-length non-final chunk rejected (106 B response; positive control ok; buf 1024: rejected with error "an error was found in the format" after "one"; buf 8: rejected with error "an error was found in the format" after "one"); d: 4 empty writes (client req before/after data, gateway resp before/after data) returned Ok(0) and emitted 0 B; stream still decrypts (89 B resp); diagnostic b[Aes128Gcm]: chunked ok (req 164B, resp 108B, 3 frames + final, incremental first frame ok, truncation rejected)
+ok
+test tests::test_b_aes128gcm_diagnostic ... b[Aes128Gcm]: chunked ok (req 164B, resp 108B, 3 frames + final, incremental first frame ok, truncation rejected)
+ok
+test tests::test_b_chunked_roundtrip ... b[ChaCha20Poly1305]: chunked ok (req 164B, resp 124B, 3 frames + final, incremental first frame ok, truncation rejected)
+ok
+test tests::test_c_empty_nonfinal_chunk_rejected ... c: zero-length non-final chunk rejected (106 B response; positive control ok; buf 1024: rejected with error "an error was found in the format" after "one"; buf 8: rejected with error "an error was found in the format" after "one")
+ok
+test tests::test_d_empty_write_emits_nothing ... d: 4 empty writes (client req before/after data, gateway resp before/after data) returned Ok(0) and emitted 0 B; stream still decrypts (89 B resp)
+ok
+test tests::test_s3_empty_nonfinal_chunk ... S3 empty non-final chunk: sender wrote 0 pt bytes as a 0-byte framed chunk; receiver result=Ok(6) plaintext="onetwo"
+ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running unittests src/bin/interop.rs (target/debug/deps/interop-e90eb2121478ece4)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests comuns_crypto_spike
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+exit=0
+$ (cwd=$SPIKE/S9/crate) cargo +1.99.1 clippy --all-targets -- -D warnings 2>&1 | grep -v "^   Compiling\|^    Checking"
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.30s
+exit=0
+$ (cwd=$SPIKE/S9/negctl) sed -i "" -e "s/nonce: \[0; 16\],/nonce: [0; 32],/" -e "s/nonce: \[u8; 16\],/nonce: [u8; 32],/" ohttp-noncefix-only/src/stream.rs && diff -ru ../ohttp-0.8.0-orig ohttp-noncefix-only; sed -i "" "s#../ohttp-0.8.0-patched#../ohttp-noncefix-only#" crate/Cargo.toml && grep -A1 "patch.crates-io" crate/Cargo.toml
+diff -ru ../ohttp-0.8.0-orig/src/stream.rs ohttp-noncefix-only/src/stream.rs
+--- ../ohttp-0.8.0-orig/src/stream.rs	2026-10-16 16:18:58
++++ ohttp-noncefix-only/src/stream.rs	2026-10-16 16:23:18
+@@ -241,7 +241,7 @@
+             state: ClientResponseState::Header {
+                 enc,
+                 secret,
+-                nonce: [0; 16],
++                nonce: [0; 32],
+                 read: 0,
+             },
+         })
+@@ -740,7 +740,7 @@
+     Header {
+         enc: Vec<u8>,
+         secret: SymKey,
+-        nonce: [u8; 16],
++        nonce: [u8; 32],
+         read: usize,
+     },
+     Body {
+[patch.crates-io]
+ohttp = { path = "../ohttp-noncefix-only" }
+exit=0
+$ (cwd=$SPIKE/S9/negctl/crate) cargo +1.99.1 test --lib -- --nocapture --test-threads=1 test_c test_d test_s3 2>&1 | grep -v "^   Compiling"
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.34s
+     Running unittests src/lib.rs (target/debug/deps/comuns_crypto_spike-6b2a0be8dda2274c)
+
+running 3 tests
+test tests::test_c_empty_nonfinal_chunk_rejected ... 
+thread 'tests::test_c_empty_nonfinal_chunk_rejected' (14524581) panicked at src/lib.rs:521:31:
+called `Result::unwrap()` on an `Err` value: "c: zero-length non-final chunk ACCEPTED (buf 1024): read ended cleanly with plaintext \"one\""
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test tests::test_d_empty_write_emits_nothing ... 
+thread 'tests::test_d_empty_write_emits_nothing' (14524584) panicked at src/lib.rs:527:31:
+called `Result::unwrap()` on an `Err` value: "d: request mismatch"
+FAILED
+test tests::test_s3_empty_nonfinal_chunk ... S3 empty non-final chunk: sender wrote 0 pt bytes as a 17-byte framed chunk; receiver result=Ok(3) plaintext="one"
+ok
+
+failures:
+
+failures:
+    tests::test_c_empty_nonfinal_chunk_rejected
+    tests::test_d_empty_write_emits_nothing
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `--lib`
+exit=0
+$ (cwd=$SPIKE/S9/selftest) cargo +1.99.1 test --no-default-features --features client,server,rust-hpke,stream 2>&1 | grep -v "^   Compiling" | tail -40
+  Downloaded serde_core v1.0.228
+  Downloaded aes-gcm v0.11.0
+  Downloaded memchr v2.8.0
+  Downloaded serde v1.0.228
+  Downloaded indexmap v2.14.0
+  Downloaded polyval v0.7.2
+  Downloaded rand v0.10.2
+  Downloaded x-wing v0.1.0
+  Downloaded aes v0.9.1
+  Downloaded der v0.8.1
+  Downloaded typenum v1.20.0
+  Downloaded futures-util v0.3.32
+  Downloaded winnow v1.0.3
+  Downloaded syn v2.0.117
+  Downloaded libc v0.2.186
+  Downloaded hpke v0.14.0
+error[E0432]: unresolved import `sync_async`
+   --> src/stream.rs:834:9
+    |
+834 |     use sync_async::{Dribble, Pipe, SplitAt, Stutter, SyncRead, SyncResolve, Unadapt};
+    |         ^^^^^^^^^^ use of unresolved module or unlinked crate `sync_async`
+    |
+    = help: if you wanted to use a crate named `sync_async`, use `cargo add sync_async` to add it to your `Cargo.toml`
+
+error[E0223]: ambiguous associated type
+   --> src/stream.rs:967:29
+    |
+967 |         fn unadapt(self) -> Self::S {
+    |                             ^^^^^^^
+    |
+help: if there were a trait named `Example` with associated type `S` implemented for `StutterDribble<S>`, you could use the fully-qualified path
+    |
+967 -         fn unadapt(self) -> Self::S {
+967 +         fn unadapt(self) -> <StutterDribble<S> as Example>::S {
+    |
+
+Some errors have detailed explanations: E0223, E0432.
+For more information about an error, try `rustc --explain E0223`.
+error: could not compile `ohttp` (lib test) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+exit=0
+$ (cwd=$SPIKE/S9/selftest) cargo +1.99.1 test --no-default-features --features client,server,rust-hpke 2>&1 | grep -v "^   Compiling" | tail -60
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.17s
+     Running unittests src/lib.rs (target/debug/deps/ohttp-51c304db8e0de870)
+
+running 30 tests
+test config::test::empty_config_list ... ok
+test config::test::bad_config_list_length ... ok
+test rh::aead::test::quic_retry ... ok
+test rh::aead::test::quic_server_initial ... ok
+test rh::hkdf::test::example2 ... ok
+test rh::hkdf::test::example1 ... ok
+test rh::aead::test::seal_open_many ... ok
+test rh::hkdf::test::example3 ... ok
+test rh::aead::test::quic_chacha ... ok
+test config::test::decode_bad_config ... ok
+test config::test::truncate_kdf_aead_list ... ok
+test test::derive_key_pair ... ok
+test config::test::encode_decode_config_list ... ok
+test rh::hpke::test::make ... ok
+test rh::hpke::test::seal_open_chacha ... ok
+test test::request_from_config_list ... ok
+test rh::hpke::test::seal_open_gcm ... ok
+test test::request_response ... ok
+test test::request_truncated_enc ... ok
+test test::request_truncated_ct ... ok
+test test::response_truncated_ct ... ok
+test test::response_truncated_nonce ... ok
+test test::request_truncated_header ... ok
+test test::two_requests ... ok
+test rh::hpke::test::seal_open_gcm_xwing ... ok
+test rh::hpke::test::seal_open_chacha_xwing ... ok
+test test::request_response_xwing ... ok
+test rh::hpke::test::seal_open_gcm_p256 ... ok
+test rh::hpke::test::seal_open_chacha_p256 ... ok
+test test::request_response_p256 ... ok
+
+test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+   Doc-tests ohttp
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+exit=0
+$ (cwd=$SPIKE/S9/crate) set -o pipefail; cargo +1.99.1 build --target wasm32-unknown-unknown --release 2>&1 | grep -v "^   Compiling"; ls -l target/wasm32-unknown-unknown/release/*.wasm; echo RUSTFLAGS=$RUSTFLAGS; ls .cargo 2>&1
+    Finished `release` profile [optimized] target(s) in 9.00s
+-rwxr-xr-x@ 1 user  wheel  578675 Oct 16 16:24 target/wasm32-unknown-unknown/release/comuns_crypto_spike.wasm
+-rwxr-xr-x@ 1 user  wheel   26080 Oct 16 16:24 target/wasm32-unknown-unknown/release/interop.wasm
+RUSTFLAGS=
+ls: .cargo: No such file or directory
+exit=1
+$ (cwd=$SPIKE/S9/deps) set -o pipefail; cargo +1.99.1 install wasm-bindgen-cli --version 0.2.129 --locked --root $SPIKE/S9/deps 2>&1 | tail -5
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+  Installing $SPIKE/S9/deps/bin/wasm-bindgen
+  Installing $SPIKE/S9/deps/bin/wasm-bindgen-test-runner
+  Installing $SPIKE/S9/deps/bin/wasm2es6js
+   Installed package `wasm-bindgen-cli v0.2.129` (executables `wasm-bindgen`, `wasm-bindgen-test-runner`, `wasm2es6js`)
+exit=0
+$ (cwd=$SPIKE/S9) set -o pipefail; node --version; wasm-bindgen --version; rm -rf pkg-node; wasm-bindgen --target nodejs --out-dir pkg-node crate/target/wasm32-unknown-unknown/release/comuns_crypto_spike.wasm && ls -l pkg-node && node node-run.cjs raw
+v24.22.0
+wasm-bindgen 0.2.129
+total 1120
+-rw-r--r--@ 1 user  wheel     192 Oct 16 16:24 comuns_crypto_spike.d.ts
+-rw-r--r--@ 1 user  wheel    2997 Oct 16 16:24 comuns_crypto_spike.js
+-rw-r--r--@ 1 user  wheel  560900 Oct 16 16:24 comuns_crypto_spike_bg.wasm
+-rw-r--r--@ 1 user  wheel     464 Oct 16 16:24 comuns_crypto_spike_bg.wasm.d.ts
+node v24.22.0
+roundtrip(): PASS a: RFC9458 ok (cfg 41B, req 144B, resp 83B); b[ChaCha20Poly1305]: chunked ok (req 164B, resp 124B, 3 frames + final, incremental first frame ok, truncation rejected); c: zero-length non-final chunk rejected (106 B response; positive control ok; buf 1024: rejected with error "an error was found in the format" after "one"; buf 8: rejected with error "an error was found in the format" after "one"); d: 4 empty writes (client req before/after data, gateway resp before/after data) returned Ok(0) and emitted 0 B; stream still decrypts (89 B resp); diagnostic b[Aes128Gcm]: chunked ok (req 164B, resp 108B, 3 frames + final, incremental first frame ok, truncation rejected)
+roundtrip_b_raw(): PASS b[ChaCha20Poly1305]: chunked ok (req 164B, resp 124B, 3 frames + final, incremental first frame ok, truncation rejected)
+exit=0
+$ (cwd=$SPIKE/S9) set -o pipefail; wasm-bindgen --target web --out-dir web crate/target/wasm32-unknown-unknown/release/comuns_crypto_spike.wasm && ls -l web; echo "-- sizes (bytes): raw, gzip -9"; for f in crate/target/wasm32-unknown-unknown/release/comuns_crypto_spike.wasm web/comuns_crypto_spike_bg.wasm pkg-node/comuns_crypto_spike_bg.wasm; do echo "$f $(wc -c < $f) $(gzip -9c $f | wc -c)"; done; grep -c "roundtrip" web/comuns_crypto_spike.js
+total 1136
+-rw-r--r--@ 1 user  wheel    1599 Oct 16 16:24 comuns_crypto_spike.d.ts
+-rw-r--r--@ 1 user  wheel    6252 Oct 16 16:24 comuns_crypto_spike.js
+-rw-r--r--@ 1 user  wheel  560900 Oct 16 16:24 comuns_crypto_spike_bg.wasm
+-rw-r--r--@ 1 user  wheel     464 Oct 16 16:24 comuns_crypto_spike_bg.wasm.d.ts
+-rw-r--r--@ 1 user  wheel     619 Oct 16 16:20 index.html
+-- sizes (bytes): raw, gzip -9
+crate/target/wasm32-unknown-unknown/release/comuns_crypto_spike.wasm   578675   171045
+web/comuns_crypto_spike_bg.wasm   560900   156385
+pkg-node/comuns_crypto_spike_bg.wasm   560900   156385
+4
+exit=0
+$ (cwd=$SPIKE/S9/crate) set -o pipefail; cargo +1.99.1 build --bin interop 2>&1 | tail -3
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.10s
+exit=0
+$ (cwd=$SPIKE/S9/interop) set -o pipefail; node --version; npm --version; npm ci --ignore-scripts 2>&1 | tail -3; npm ls --all
+v24.22.0
+11.19.1
+  run `npm fund` for details
+
+found 0 vulnerabilities
+interop@1.0.0 $SPIKE/S9/interop
++-- hpke@1.1.7
+`-- ohttp-ts@0.6.1
+  +-- bhttp-ts@0.6.1
+  | `-- quicvarint@0.2.1 deduped
+  +-- hpke@1.1.7 deduped
+  `-- quicvarint@0.2.1
+
+exit=0
+$ (cwd=$SPIKE/S9/interop) node interop.mjs ../crate/target/debug/interop plain dir1; echo "plain-dir1-exit=$?"; echo ======; node interop.mjs ../crate/target/debug/interop plain dir2; echo "plain-dir2-exit=$?"
+node v24.22.0 mode=plain dir=dir1 suite AEAD=ChaCha20Poly1305 id=0x3 (from panva hpke)
+rust server-config 41B 010020ae3bf1cd87c2d2ed25af4a1a239eed04a990f00e7403e4c8065927de010fd17a000400010003
+(node:35495) ExperimentalWarning: The ChaCha20-Poly1305 Web Crypto API algorithm is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+ohttp-ts client wrote 1079B request, header=01002000010003
+rust server got 1079B header=01002000010003
+rust server decapsulated: POST https://gateway.example/v1/infer body="{\"prompt\":\"hello from ohttp-ts\"}"
+rust server wrote 101B response
+ohttp-ts client decapsulated: status=200 body="hello from rust gateway"
+INTEROP plain dir1 PASS
+plain-dir1-exit=0
+======
+node v24.22.0 mode=plain dir=dir2 suite AEAD=ChaCha20Poly1305 id=0x3 (from panva hpke)
+ohttp-ts server-config 41B 01002096239f70ca81b45929982527483637ca411983db6a428761ccd3b468d0433160000400010003
+(node:35504) ExperimentalWarning: The ChaCha20-Poly1305 Web Crypto API algorithm is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+ohttp-ts server decapsulated: POST https://gateway.example/v1/infer body="{\"prompt\":\"hello\"}"
+ohttp-ts server wrote 1072B response
+rust client config 41B 01002096239f70ca81b45929982527483637ca411983db6a428761ccd3b468d0433160000400010003
+rust client wrote 144B request
+rust client decapsulated: status=200 body="hello from ohttp-ts gateway"
+rust client exit code=0 signal=null
+INTEROP plain dir2 PASS
+plain-dir2-exit=0
+exit=0
+$ (cwd=$SPIKE/S9/interop) node interop.mjs ../crate/target/debug/interop chunked dir1; echo "chunked-dir1-exit=$?"; echo ======; node interop.mjs ../crate/target/debug/interop chunked dir2; echo "chunked-dir2-exit=$?"
+node v24.22.0 mode=chunked dir=dir1 suite AEAD=ChaCha20Poly1305 id=0x3 (from panva hpke)
+rust server-config 41B 010020ae3bf1cd87c2d2ed25af4a1a239eed04a990f00e7403e4c8065927de010fd17a000400010003
+(node:35515) ExperimentalWarning: The ChaCha20-Poly1305 Web Crypto API algorithm is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+ohttp-ts client wrote 1080B request, header=01002000010003
+rust server got 1080B header=01002000010003
+rust server decapsulated (chunked): POST https://gateway.example/v1/infer body="{\"prompt\":\"hello from ohttp-ts\"}"
+rust server wrote 137B response
+ohttp-ts client decapsulated: status=200 body="hello from rust gateway"
+INTEROP chunked dir1 PASS
+chunked-dir1-exit=0
+======
+node v24.22.0 mode=chunked dir=dir2 suite AEAD=ChaCha20Poly1305 id=0x3 (from panva hpke)
+ohttp-ts server-config 41B 010020431f23a3ab89ad2b19b9ddc74f9819fa211e3bfc19b91578afef18f57a51c44c000400010003
+(node:35521) ExperimentalWarning: The ChaCha20-Poly1305 Web Crypto API algorithm is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+ohttp-ts server decapsulated: POST https://gateway.example/v1/infer body="{\"prompt\":\"hello\"}"
+ohttp-ts server wrote 1073B response
+rust client config 41B 010020431f23a3ab89ad2b19b9ddc74f9819fa211e3bfc19b91578afef18f57a51c44c000400010003
+rust client wrote 164B chunked request
+rust client decapsulated (chunked): status=200 body="hello from ohttp-ts gateway"
+rust client exit code=0 signal=null
+INTEROP chunked dir2 PASS
+chunked-dir2-exit=0
+exit=0
+$ (cwd=$SPIKE/S9/crate) grep -A1 -E "^name = \"(hpke|ohttp|bhttp|wasm-bindgen|getrandom|futures|chacha20poly1305|hkdf|sha2|js-sys)\"" Cargo.lock
+name = "bhttp"
+version = "0.8.0"
+--
+name = "chacha20poly1305"
+version = "0.11.0"
+--
+name = "futures"
+version = "0.3.34"
+--
+name = "getrandom"
+version = "0.4.3"
+--
+name = "hkdf"
+version = "0.13.0"
+--
+name = "hpke"
+version = "0.14.1"
+--
+name = "js-sys"
+version = "0.3.106"
+--
+name = "ohttp"
+version = "0.8.0"
+--
+name = "sha2"
+version = "0.11.1"
+--
+name = "wasm-bindgen"
+version = "0.2.129"
+exit=0

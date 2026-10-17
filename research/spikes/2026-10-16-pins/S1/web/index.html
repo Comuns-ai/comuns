@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>S1 wasm roundtrip</title>
+</head>
+<body>
+  <pre id="out">running…</pre>
+  <script type="module">
+    import init, { roundtrip } from "./comuns_crypto_spike.js";
+    const out = document.getElementById("out");
+    try {
+      await init();
+      const r = roundtrip();
+      out.textContent = r;
+      console.log(r);
+    } catch (e) {
+      const msg = "ERROR " + (e && e.stack || e);
+      out.textContent = msg;
+      console.log(msg);
+    }
+  </script>
+</body>
+</html>
