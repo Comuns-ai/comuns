@@ -34,7 +34,7 @@ The bootstrap CIP that seats maintainers names the channel and the people who mo
 
 Never include prompts, keys or seed phrases in a report. That ban covers a public issue, a private report, a CIP comment, and a commit. Describe the flaw by document path, CIP number, component, and behavior. Say what an attacker could cause, and stop before the secret, the prompt text, or the raw key material.
 
-If you have already put that material in a public issue, say so in a follow-up that does not repeat the secret, and treat the material as exposed. This draft has no seated maintainer who can purge history. Whether the host of the Comuns-ai/documentation repository can purge a commit is UNVERIFIED. Host product behaviour not in the evidence register is UNVERIFIED.
+If you have already put that material in a public issue, say so in a follow-up that does not repeat the secret, and treat the material as exposed. This draft has no seated maintainer who can purge history. Whether the host of the Comuns-ai/comuns repository can purge a commit is UNVERIFIED. Host product behaviour not in the evidence register is UNVERIFIED.
 
 ## 5 Scope
 
@@ -66,7 +66,7 @@ No maintainers are seated, so no one monitors a private channel. A documentation
 
 ### R2 — A public issue can leak secrets **[RISK] · High**
 
-A public issue is readable by anyone who can read the Comuns-ai/documentation repository. Prompts, keys, or seed phrases in that issue would be exposed. Section 4 forbids that content. Nothing in the current document set can claw a pasted secret back, because no maintainers are seated.
+A public issue is readable by anyone who can read the Comuns-ai/comuns repository. Prompts, keys, or seed phrases in that issue would be exposed. Section 4 forbids that content. Nothing in the current document set can claw a pasted secret back, because no maintainers are seated.
 
 ### R3 — No bounty and no awarded audit **[RISK] · Medium**
 

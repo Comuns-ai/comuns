@@ -118,7 +118,7 @@ A person who is temporarily excluded from discussion under CODE_OF_CONDUCT.md ke
 
 Any substantive edit made during Last Call returns the CIP to Review and stops the unfinished 14-day period. A new, full 14-day Last Call must then start from the edited text. A substantive edit is any change to normative text, to names of people or roles (including bootstrap maintainer names), to parameters, numbers or addresses, or to the decision itself. The only non-substantive edits are typo, formatting and link fixes that change no meaning; each such edit made during Last Call must be listed in the CIP's change log.
 
-While no shared repository history is the public record, the dates the author writes on the CIP are the start of Last Call and the mark of activity. Which hosted timestamp should replace those written dates is an open question. The public repository is Comuns-ai/documentation on GitHub. Host product behaviour not in the evidence register is UNVERIFIED.
+While no shared repository history is the public record, the dates the author writes on the CIP are the start of Last Call and the mark of activity. Which hosted timestamp should replace those written dates is an open question. The public repository is Comuns-ai/comuns on GitHub (first named Comuns-ai/documentation). Host product behaviour not in the evidence register is UNVERIFIED.
 
 ### 4.4 Reviews before Last Call
 
@@ -132,7 +132,7 @@ Architecture decision records live under docs/adr/, in files named docs/adr/NNNN
 
 Working groups review documents and recommend changes. A working group does not decide. A CIP decides. A working group has no token weight, no separate vote, and no chair. This draft seats no working-group chairs and sets no meeting schedule.
 
-Anyone may join a working group. Hardware class, stake, and holdings do not affect joining. To join, a person writes in public, on a relevant CIP or in an issue on the Comuns-ai/documentation repository, which group they are taking part in, and then reviews that group's documents in public.
+Anyone may join a working group. Hardware class, stake, and holdings do not affect joining. To join, a person writes in public, on a relevant CIP or in an issue on the Comuns-ai/comuns repository, which group they are taking part in, and then reviews that group's documents in public.
 
 | Working group | What it reviews |
 | --- | --- |
@@ -264,7 +264,7 @@ An author could replace substantive text near the end of Last Call and claim Fin
 - Is 90 days the right maximum for temporary exclusion from discussion (CODE_OF_CONDUCT.md section 5.2)? This draft proposes 90 days; a longer sanction is a removal CIP, not a longer exclusion.
 - Should a Stagnant CIP ever be revived by comments alone? This draft says no: only a substantive edit returns it to Review, so that the status of a Stagnant CIP can be read from the file.
 - Should a working group have to concur before the author enters Last Call? This draft lets the author enter Last Call when blocking objections are addressed.
-- Which public timestamp should start the 14-day Last Call on the Comuns-ai/documentation repository? While none is specified, the date written on the CIP is the record. Host product behaviour not in the evidence register is UNVERIFIED. [docs/cip/0003-bootstrap-first-maintainer-and-channels.md](docs/cip/0003-bootstrap-first-maintainer-and-channels.md) (Draft) proposes an answer.
+- Which public timestamp should start the 14-day Last Call on the Comuns-ai/comuns repository? While none is specified, the date written on the CIP is the record. Host product behaviour not in the evidence register is UNVERIFIED. [docs/cip/0003-bootstrap-first-maintainer-and-channels.md](docs/cip/0003-bootstrap-first-maintainer-and-channels.md) (Draft) proposes an answer.
 - Should an author be able to close their own CIP before the 6-month clock runs out? This draft has no status for that, and a Draft or Review CIP goes Stagnant when the one clock expires.
 - Can the protocol fee ever move above 0, and where would value sit if it did? Today the fee is 0 and no treasury exists.
 - Should section 8 grow narrower once docs/security/threat-model.md is accepted?

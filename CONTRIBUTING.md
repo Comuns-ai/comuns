@@ -11,11 +11,11 @@ Created: 2026-10-12
 Comuns is a document-phase proposal. Nothing runs yet, and no protocol implementation exists. `scripts/` holds documentation checkers, which are not a node, relay, client or contract. You can take part now in four ways.
 
 1. Read GOVERNANCE.md, this file, MAINTAINERS.md, SECURITY.md, and docs/cip/README.md.
-2. Open issues on the Comuns-ai/documentation repository. Use issues for document comments and for documentation flaws. SECURITY.md says what a public issue may contain once the subject is a vulnerability in code.
+2. Open issues on the Comuns-ai/comuns repository. Use issues for document comments and for documentation flaws. SECURITY.md says what a public issue may contain once the subject is a vulnerability in code.
 3. Comment on CIPs. None are Final. The template is docs/cip/0000-template.md.
 4. Join a working group: Protocol, Node, Cryptography, Contracts, Applications, or Documentation. Write in a public issue, or on a relevant CIP, which group you are joining, and review that group's documents in public.
 
-This draft sets no meeting schedule and names no discussion channel beyond issues and CIP comments on the Comuns-ai/documentation repository. MAINTAINERS.md records that no maintainers are seated. You do not need a hardware class, a stake, or a holding to do any of the four steps above. A class S operator has the same rights.
+This draft sets no meeting schedule and names no discussion channel beyond issues and CIP comments on the Comuns-ai/comuns repository. MAINTAINERS.md records that no maintainers are seated. You do not need a hardware class, a stake, or a holding to do any of the four steps above. A class S operator has the same rights.
 
 ## 2 Developer Certificate of Origin
 
@@ -99,7 +99,7 @@ A commit without `Signed-off-by: Name <email>` is not offered under this policy.
 
 ### R2 — Secrets land in a public issue **[RISK] · High**
 
-Issues on the Comuns-ai/documentation repository are public. Prompts, keys, and seed phrases in an issue would be exposed. Section 5 forbids that content. There is no private issue channel in this draft.
+Issues on the Comuns-ai/comuns repository are public. Prompts, keys, and seed phrases in an issue would be exposed. Section 5 forbids that content. There is no private issue channel in this draft.
 
 ### R3 — Review counts are treated as optional **[RISK] · Medium**
 

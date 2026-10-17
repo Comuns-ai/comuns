@@ -47,7 +47,7 @@ Rejected. A credit that is burned to buy inference and minted to pay nodes is a 
 
 ### Using ARB votes
 
-Rejected. ARB balances are not this project's votes. The Arbitrum DAO has its own quorum, timelock and council (evidence register §1, [V]). Importing that machinery would let an unrelated holding decide Comuns parameters, including bands and the license. Comuns governance stays in CIPs on the Comuns-ai/documentation repository. Holding ARB confers no extra right to file, to block or to merge.
+Rejected. ARB balances are not this project's votes. The Arbitrum DAO has its own quorum, timelock and council (evidence register §1, [V]). Importing that machinery would let an unrelated holding decide Comuns parameters, including bands and the license. Comuns governance stays in CIPs on the Comuns-ai/comuns repository. Holding ARB confers no extra right to file, to block or to merge.
 
 ## Consequences
 
