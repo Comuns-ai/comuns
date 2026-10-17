@@ -66,7 +66,7 @@ Upstream report: <link to be added>
 
 ## Large artifacts are not committed
 
-Build outputs (`target/`, `node_modules/`, `deps/`, `pkg-node/`), `.wasm` files, downloaded tarballs, test-vector binaries and the unpacked ohttp trees are not committed. `S5/artifacts-sha256.txt` holds the SHA-256 of all 100 files in the Semaphore artifacts package, so a fresh download can be checked. `S5/semaphore-*.hex` and `S5/verifier-*.hex` are the compiled runtime bytecodes used for the `cancun` and `osaka` comparison.
+Build outputs (`target/`, `node_modules/`, `deps/`, `pkg-node/`), `.wasm` files, downloaded tarballs, test-vector binaries and the unpacked ohttp trees are not committed. `S5/artifacts-sha256.txt` holds the SHA-256 of all 100 files in the Semaphore artifacts package, so a fresh download can be checked. `S5/semaphore-*.hex` and `S5/verifier-*.hex` are the compiled runtime bytecodes used for the `cancun` and `osaka` comparison. Two large generated listings from S1 are also left out and can be regenerated from `S1/crate` with its lockfile: the full dependency metadata (`cargo +1.99.1 metadata --format-version 1 > ../metadata.json`, used for the licence list in `S1/licences.cjs`) and the feature tree (`cargo +1.99.1 tree -e features --target all > ../feature-tree-all.txt`); the parts the results rely on are quoted in `S1/log.txt`.
 
 ## Test key
 
