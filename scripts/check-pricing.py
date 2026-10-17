@@ -114,10 +114,10 @@ def session(fixture):
         equal(amount, integer(voucher["cumulativeWei"]), "cumulative voucher")
         require(current_in >= last_in and current_out >= last_out and amount >= last_amount,
                 "voucher decreases a cumulative field")
-        require(type(voucher["final"]) is bool, "final must be boolean")
+        require(type(voucher["isFinal"]) is bool, "isFinal must be boolean")
         action = voucher["action"]
         require(action in ("sign", "redeemVoucher", "closeWithVoucher"), "unknown action")
-        equal(voucher["final"], action == "closeWithVoucher", "closing flag")
+        equal(voucher["isFinal"], action == "closeWithVoucher", "closing flag")
         payout = 0
         if action != "sign":
             payout = min(amount, cap) - settled

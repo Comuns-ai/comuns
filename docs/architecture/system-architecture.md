@@ -257,9 +257,9 @@ sequenceDiagram
         C->>R: cumulative voucher (seq n, outputCommitment = keccak256(commitKey ‖ sessionId ‖ n ‖ transcriptHash))
         R->>N: forwards the voucher
     end
-    N-->>C: last frame, endOfJob = true (never copied into final)
+    N-->>C: last frame, endOfJob = true (never copied into isFinal)
     Note over C,N: later jobs reuse the session one at a time, counts never fall below a signed voucher; when the cap is used up the client spends a new note in a new session
-    C->>R: closing voucher, final = true
+    C->>R: closing voucher, isFinal = true
     R->>N: forwards the closing voucher
     N->>E: closeWithVoucher: payout = min(cumulativeWei, cap) − settledWei, relayDelta to balances[relay], nodeDelta = payout − relayDelta to balances[node]
     E->>E: pendingWei = depositWei − settledWei (the full denomination when nothing was used), status settled, no user refund, no leaf inserted
@@ -277,7 +277,7 @@ Rules the diagram relies on, all owned by the referenced documents:
 
 - `openSessionFromCredit` reverts if the node's current offer differs from the expected prices bound in the proof's message, so an offer change can never lock a note: a reverted transaction consumes no nullifier. The client still re-reads the copied prices through a relay as defence in depth, and prices a node reports in `welcome` never trigger a close. The contract recomputes scope and message itself and never trusts caller-supplied values; `relay` must be a registered, non-deregistering relay other than `node`.
 - A note has exactly one nullifier per group, so it is spent once; a note secret exists only on the client, and a node that accepts a proof and never submits it costs the client a timeout, after which the client may re-prove the same note elsewhere (docs/protocol/off-chain-api.md §13, R9).
-- The voucher is the one canonical EIP-712 type `Voucher(bytes32 sessionId,uint64 seq,uint256 cumulativeWei,uint64 inputTokens,uint64 outputTokens,bytes32 outputCommitment,bool final)`; counts are cumulative for the session; `seq` starts at 1 and strictly increases; a later voucher never lowers what is owed; `final` means only "the client closes the session"; `redeemVoucher` rejects `final == true`.
+- The voucher is the one canonical EIP-712 type `Voucher(bytes32 sessionId,uint64 seq,uint256 cumulativeWei,uint64 inputTokens,uint64 outputTokens,bytes32 outputCommitment,bool isFinal)`; counts are cumulative for the session; `seq` starts at 1 and strictly increases; a later voucher never lowers what is owed; `isFinal` means only "the client closes the session"; `redeemVoucher` rejects `isFinal == true`.
 - The node starts prefill only after the input voucher, streams at most one chunk ahead of the highest voucher it holds, and accepts a voucher that covers the acknowledged prefix even if one more chunk was already sent. Unsigned receipts bind nobody. A resent identical voucher or frame is a no-op.
 - Effective cap = the note's denomination (`depositWei = maxSpendWei`); the client never signs above it; `topUp` reverts on a credit session.
 - A credit session can be closed without the node: `closeSession` is callable by the node or by any broadcaster presenting a `sessionSigner` signature, and the reference client submits it through a relay or broadcaster, never from the deposit wallet. If both the node and the `sessionSigner` key are gone, the session stays open; close is not made permissionless.
@@ -297,7 +297,7 @@ sequenceDiagram
     participant CR as ContextRegistry (optional anchor)
     participant A as Node A (old session)
     participant B as Node B (new session)
-    O->>R: closing voucher final = true to A, or a broadcaster calls closeSession with the sessionSigner signature; A keeps only what it already decrypted
+    O->>R: closing voucher isFinal = true to A, or a broadcaster calls closeSession with the sessionSigner signature; A keeps only what it already decrypted
     O->>O: write version 7 locally under a fresh K_7, wrap K_7 to the identity key, store the wrap record, sign the head record (contextId, 7, contentHash, prevContentHash) with the context key
     O->>H: store ciphertext v7, its head record and its key-wrap record beside the v6 blob already held there, compare-and-swap on version == head + 1
     opt a globally consistent multi-device head is promised
@@ -436,10 +436,10 @@ sequenceDiagram
     C->>C: structural completeness check, optional verifiable mode only with a verifier already on sheet v2
     C-->>U: merged result, critiques and every disagreement, never presented as verified
     par cooperative close, one final voucher per session
-        C->>A: voucher final = true
-        C->>B: voucher final = true
-        C->>M: voucher final = true
-        C->>P: voucher final = true
+        C->>A: voucher isFinal = true
+        C->>B: voucher isFinal = true
+        C->>M: voucher isFinal = true
+        C->>P: voucher isFinal = true
     end
     Note over C,E: each node calls closeWithVoucher, node payout and relay fee credited and pendingWei recorded per session, change claimed into fresh notes, later one withdraw() per address for its whole balance
 ```
@@ -495,7 +495,7 @@ In every case a signed voucher is never reversed (docs/protocol/contracts-and-se
 | One sub-task node offline mid-wave | A task fails after `reconnectWindow` | Retry **only on a node that was on the confirmed sheet** (a pre-confirmed fallback), with a new credit session; otherwise stop the plan and show partial results. The client closes the failed session itself with `closeSession` (a `sessionSigner` signature through a broadcaster) and calls `finalize` after `closeDeadline`: the offline node cannot run the abandoned-client procedure and nothing closes a session by itself | Signed vouchers on the failed session are not reversed and pay the node if it returns and redeems them before `closeDeadline`; the unredeemed remainder is claimed back as change; the fallback is a new note with its own cap |
 | Contested collective answer | The splits list is non-empty or the agreement level is `low` (docs/protocol/collective-answers.md §7) | Show the result as **contested**, with the agreement level beside it and every original answer and critique available on request. Critiques that conflict while the splits list is empty do **not** add the label: an empty splits list is valid, so the merged answer is shown as returned with the conflict surfaced beside it. A synthesis is incomplete only when required fields are missing or malformed; then the raw answers and critiques are shown instead | **No refund**; every session's signed total stands; disagreement has no payment consequence |
 | Empty or thin pool | No node offers the model, or no quote lies inside a band the user accepts | **The client says so** — "no node offers this model" or "only n nodes offer this model" — and **never silently picks another model**; a substitution is a new sheet | None |
-| Multi-node request cannot fill its confirmed set | A sheet node left the pool, deregistered or refused admission and no pre-confirmed fallback exists | **Fails closed** for the whole request; every session already opened is closed — cooperatively with a `final` voucher where its node delivered something, otherwise unilaterally and reclaimed with `claimChange` after `closeDeadline` | Node spend gas for the opened sessions; each denomination stays locked until its `closeWithVoucher`, or until `closeDeadline` and `finalize`, and the remainder returns as change notes |
+| Multi-node request cannot fill its confirmed set | A sheet node left the pool, deregistered or refused admission and no pre-confirmed fallback exists | **Fails closed** for the whole request; every session already opened is closed — cooperatively with a final voucher where its node delivered something, otherwise unilaterally and reclaimed with `claimChange` after `closeDeadline` | Node spend gas for the opened sessions; each denomination stays locked until its `closeWithVoucher`, or until `closeDeadline` and `finalize`, and the remainder returns as change notes |
 | Lost voucher log | The device loses the session's records | Sign nothing more on that session; never resume from the node's totals; unilateral close; a new session needs a new note and a new sheet version | Vouchers the node holds pay it if redeemed before `closeDeadline`; the remainder, including any voucher not redeemed in time, returns as change at `claimChange` |
 | Lost note secret or lost `sessionSigner` key | The client can no longer prove the note, or can no longer sign `claimChange` or a close | None possible for that note or remainder; the client says so | The note is gone, or the unclaimed `pendingWei` stays in the contract; there is no recovery and no admin |
 | Abandoned session | Neither party closes | Either the node, or a broadcaster with the `sessionSigner` signature, may `closeSession` at any time; nothing closes automatically; if both the node and the `sessionSigner` key are gone the session stays open | Small denominations are the only mitigation; an anyone-can-close idle timeout is an open question |

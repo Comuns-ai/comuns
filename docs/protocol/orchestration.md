@@ -231,10 +231,10 @@ sequenceDiagram
     M-->>C: merged result (via the session relay)
     C->>C: structural completeness check; optional verifiable-mode session on the final result, only with the verifier already on sheet v2
     par cooperative close of each session with a final voucher
-        C->>A: voucher final = true (via the session relay)
-        C->>B: voucher final = true (via the session relay)
-        C->>M: voucher final = true (via the session relay)
-        C->>P: voucher final = true (via the session relay)
+        C->>A: voucher isFinal = true (via the session relay)
+        C->>B: voucher isFinal = true (via the session relay)
+        C->>M: voucher isFinal = true (via the session relay)
+        C->>P: voucher isFinal = true (via the session relay)
     end
     A->>E: closeWithVoucher
     B->>E: closeWithVoucher

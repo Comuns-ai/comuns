@@ -245,7 +245,7 @@ Verifiable mode (mode 2) is opt-in re-execution by a user-chosen second node und
 
 ### voucher
 
-A voucher is the EIP-712 typed data `Voucher(bytes32 sessionId,uint64 seq,uint256 cumulativeWei,uint64 inputTokens,uint64 outputTokens,bytes32 outputCommitment,bool final)`, signed by the session signer, with cumulative token counts and a `seq` that starts at 1 and strictly increases. `final` means only that the client closes the session; `redeemVoucher` rejects a final voucher, and `closeWithVoucher` or `finalize` record unused credit-session value in `pendingWei` for a later `claimChange`; only legacy wallet sessions credit a user refund. A signed voucher is not reversed; `outputCommitment` is keccak256 of the session's random 32-byte commit key, the session id, that voucher's seq and the transcript hash, it is not checked on-chain, and opening the commit key discloses that session's output.
+A voucher is the EIP-712 typed data `Voucher(bytes32 sessionId,uint64 seq,uint256 cumulativeWei,uint64 inputTokens,uint64 outputTokens,bytes32 outputCommitment,bool isFinal)`, signed by the session signer, with cumulative token counts and a `seq` that starts at 1 and strictly increases. `isFinal` means only that the client closes the session; `redeemVoucher` rejects a final voucher, and `closeWithVoucher` or `finalize` record unused credit-session value in `pendingWei` for a later `claimChange`; only legacy wallet sessions credit a user refund. A signed voucher is not reversed; `outputCommitment` is keccak256 of the session's random 32-byte commit key, the session id, that voucher's seq and the transcript hash, it is not checked on-chain, and opening the commit key discloses that session's output.
 
 ### wallet owner
 

@@ -71,7 +71,7 @@ No cookies, no persistent client identifiers and no wallet address appear in any
 | final voucher | the voucher covering the last chunk | an acknowledgment with no further output |
 | cancel | `cancel` | the last frame with `finishReason = cancelled` and `endOfJob = true`; if it is not in this response, the node retains it for the client's next exchange for that job (section 10) |
 
-`hello` is sent as its own exchange before the job exchange, and again on a resume (section 5). Timeout, cancellation and error frames are terminal frames: the node retains them and delivers them on the client's next exchange for that job, or after `welcome` on a resume `hello`, under their original frame `seq`. A response that ends at the input receipt, or after a released chunk, ends at a payment boundary; that is not truncation (section 7). The closing voucher with `final = true` (section 8) is likewise answered with an acknowledgment and no output.
+`hello` is sent as its own exchange before the job exchange, and again on a resume (section 5). Timeout, cancellation and error frames are terminal frames: the node retains them and delivers them on the client's next exchange for that job, or after `welcome` on a resume `hello`, under their original frame `seq`. A response that ends at the input receipt, or after a released chunk, ends at a payment boundary; that is not truncation (section 7). The closing voucher with `isFinal = true` (section 8) is likewise answered with an acknowledgment and no output.
 
 **Version negotiation.** The capability document lists the protocol versions the node accepts as `protocolVersions`, newest first; the identifier format is `comuns/<major>.<minor>`. The client sends the version it wants in the credit spend and in the handshake. A node that does not accept it answers `unsupported_version`. There is no fallback to an older cipher suite: the cipher suite is fixed by docs/security/privacy-and-contexts.md §4 and is not part of version negotiation, and the OHTTP key configuration is fixed by the registry, not negotiated.
 
@@ -336,7 +336,7 @@ sequenceDiagram
     N-->>C: frame seq k, endOfJob = true (receipt sealed inside)
     C->>N: voucher seq k+2 via R
     Note over C,N: more jobs on the same session, one at a time; cumulative counts never fall below a signed voucher
-    C->>N: voucher final = true via R (cooperative close)
+    C->>N: voucher isFinal = true via R (cooperative close)
     N->>E: closeWithVoucher — credits node and relay (relay fee first), records pendingWei; no user balance
     C->>R: claimChange(sessionId, changeCommitments, denominationIndexes, sessionSigner signature) via relay or broadcaster
     R->>E: forward; fresh change notes enter their groups, dust to the node
@@ -688,7 +688,7 @@ The node streams the completion as HPKE frames sealed to `clientJobPublicKey`, o
 | `enc` | HPKE encapsulated key for this frame's sender context (one per frame, or one per job with per-frame AEAD nonces — the reference choice is an open question, section 14) |
 | `ciphertext` | AEAD output over the frame plaintext (shown below): the chunk `text`, `tokenCount`, for the last frame `finishReason` (`stop`, `length`, `cancelled`, `error`), the node-signed `receipt`, and `padding` |
 | `aad` | The AAD tuple |
-| `endOfJob` | Last-frame flag, also in the AAD. Never copied into a voucher's `final` |
+| `endOfJob` | Last-frame flag, also in the AAD. Never copied into a voucher's `isFinal` |
 
 The frame plaintext, before sealing:
 
@@ -772,15 +772,15 @@ Payment and delivery alternate in steps of one chunk. The node's unpaid exposure
 
 **Voucher (client → node).** The one canonical EIP-712 type of docs/protocol/contracts-and-settlement.md §8, signed by `sessionSigner` under the `SessionEscrow` domain:
 
-`Voucher(bytes32 sessionId,uint64 seq,uint256 cumulativeWei,uint64 inputTokens,uint64 outputTokens,bytes32 outputCommitment,bool final)`
+`Voucher(bytes32 sessionId,uint64 seq,uint256 cumulativeWei,uint64 inputTokens,uint64 outputTokens,bytes32 outputCommitment,bool isFinal)`
 
 - `seq` starts at 1 and strictly increases per session.
 - `inputTokens` and `outputTokens` are cumulative for the whole session, across all its jobs; they never fall.
 - `cumulativeWei = (priceInPerMillion × inputTokens + priceOutPerMillion × outputTokens) / 1000000` with the session's copied prices, integer floor division, recomputed on-chain. With the illustrative prices of section 4 (20,000,000,000 and 40,000,000,000 wei per million), 1,200 input tokens and 236 output tokens give 24,000,000 + 9,440,000 = 33,440,000 wei.
 - `outputCommitment = keccak256(commitKey ‖ sessionId ‖ seq ‖ transcriptHash)`, computed with this same voucher's `seq`, with `commitKey` the random 32-byte session key the client sent sealed in the session's first envelope; not checked on-chain; opening it to anyone discloses the session's output to them.
-- `final` is true only on the closing voucher ("the client closes the session"). It is never the frame flag `endOfJob`. `redeemVoucher` rejects a `final` voucher; only `closeWithVoucher` accepts it.
+- `isFinal` is true only on the closing voucher ("the client closes the session"). It is never the frame flag `endOfJob`. `redeemVoucher` rejects a final voucher; only `closeWithVoucher` accepts it.
 
-**Two ways to close.** The **cooperative close** is the client signing a `final` voucher from its own log and the node calling `closeWithVoucher`, which credits the node (and the relay's share) and records `pendingWei = depositWei − settledWei` in one transaction. The **unilateral close** is `closeSession(sessionId, signature)` with a `sessionSigner` EIP-712 signature over `(chainId, escrow, sessionId, "close")`, submitted through a relay or broadcaster — no voucher, never a transaction from the deposit wallet — and `finalize` by anyone after `closeDeadline`; the node may still redeem its highest non-final voucher until then. Either way the client then reclaims `pendingWei` as change notes with `claimChange` (section 12). A client that has lost its voucher log uses only the unilateral close and signs nothing (section 11).
+**Two ways to close.** The **cooperative close** is the client signing a final voucher from its own log and the node calling `closeWithVoucher`, which credits the node (and the relay's share) and records `pendingWei = depositWei − settledWei` in one transaction. The **unilateral close** is `closeSession(sessionId, signature)` with a `sessionSigner` EIP-712 signature over `(chainId, escrow, sessionId, "close")`, submitted through a relay or broadcaster — no voucher, never a transaction from the deposit wallet — and `finalize` by anyone after `closeDeadline`; the node may still redeem its highest non-final voucher until then. Either way the client then reclaims `pendingWei` as change notes with `claimChange` (section 12). A client that has lost its voucher log uses only the unilateral close and signs nothing (section 11).
 
 ```json
 {
@@ -791,7 +791,7 @@ Payment and delivery alternate in steps of one chunk. The node's unpaid exposure
   "inputTokens": 1200,
   "outputTokens": 236,
   "outputCommitment": "0x0000000000000000000000000000000000000000000000000000000000000c05",
-  "final": false,
+  "isFinal": false,
   "signature": "SESSION_SIGNER_EIP712_SIGNATURE_PLACEHOLDER"
 }
 ```
@@ -800,7 +800,7 @@ Payment and delivery alternate in steps of one chunk. The node's unpaid exposure
 
 **Vouchers cover the acknowledged prefix.** A voucher — a chunk voucher, a closing voucher or a resend — may cover only the prefix of the transcript the client has acknowledged, and the node checks it against that prefix: it accepts a voucher whose counts and `outputCommitment` match the acknowledged prefix even when it has already sent one more chunk, and that unacknowledged chunk is simply unpaid — the node's one-chunk exposure, nothing more. A voucher whose `seq` equals the last accepted `seq` and whose content is identical is a no-op, never an error; a chunk in flight when such a resend arrives is covered by the next voucher. A voucher with an already-accepted `seq` and different content is rejected as not retryable, and the client treats the disagreement as it treats any unexplained mismatch (R4): it stops signing and closes.
 
-**Cap and allowance; no top-up.** The effective cap is `min(depositWei, maxSpendWei)`, which on a credit session is the denomination. The client's **remaining allowance** is the effective cap minus the highest `cumulativeWei` it has signed in that session, redeemed or not — never the cap minus `settledWei`, which would count unredeemed vouchers as available. The client **never signs a voucher above the effective cap**: when the next chunk would take the running total past it, the client stops signing (`cap_exhausted`, section 10) and the node, which holds no voucher above the cap, pauses. `topUp` reverts on a credit session; the client closes with a `final` voucher and opens a new session with a new note (a new sheet version if anything else changed). The contract's rule that a voucher above the cap is paid only up to the cap, and the "re-sign the same cumulative totals under a new `seq`" recovery of docs/protocol/contracts-and-settlement.md §8, apply only if a voucher above the cap had been signed and was only partly paid — a situation the reference client never creates.
+**Cap and allowance; no top-up.** The effective cap is `min(depositWei, maxSpendWei)`, which on a credit session is the denomination. The client's **remaining allowance** is the effective cap minus the highest `cumulativeWei` it has signed in that session, redeemed or not — never the cap minus `settledWei`, which would count unredeemed vouchers as available. The client **never signs a voucher above the effective cap**: when the next chunk would take the running total past it, the client stops signing (`cap_exhausted`, section 10) and the node, which holds no voucher above the cap, pauses. `topUp` reverts on a credit session; the client closes with a final voucher and opens a new session with a new note (a new sheet version if anything else changed). The contract's rule that a voucher above the cap is paid only up to the cap, and the "re-sign the same cumulative totals under a new `seq`" recovery of docs/protocol/contracts-and-settlement.md §8, apply only if a voucher above the cap had been signed and was only partly paid — a situation the reference client never creates.
 
 **What the client checks and does not check.** Automatic voucher signing verifies token counts against receipts and against what the client decrypted, and that the node declared the session's `modelId`. It does not judge answer quality. The chat view therefore has a Stop control (docs/product/dapp-and-sdk.md) that stops signing; the user then owes at most the chunks already received.
 
@@ -922,7 +922,7 @@ Error catalogue. The sender column says who raises it in the normal case; a clie
 | `band_mismatch` | client | The node's current prices are outside the band for (model tier, node class), so `openSessionFromCredit` would revert; shown before any spend | request | no session opened |
 | `price_mismatch` | client | Prices copied into the session **on-chain** (session record or the open event) differ from the confirmed sheet (handshake step 5); prices a node reports in `welcome` never raise it | session | `closeSession` with the `sessionSigner` signature; nothing signed |
 | `no_offer_for_model` | client or node | The node has no offer (zero `modelBenchmarkHash`) for the model, so it is not in the pool | request | no session opened |
-| `pool_cannot_fill_confirmed_set` | client | A node on the confirmed sheet is no longer in the pool, is deregistering, or refused admission, and no pre-confirmed fallback exists; the whole request fails closed | request | sessions already opened are closed with `closeSession` or a `final` voucher |
+| `pool_cannot_fill_confirmed_set` | client | A node on the confirmed sheet is no longer in the pool, is deregistering, or refused admission, and no pre-confirmed fallback exists; the whole request fails closed | request | sessions already opened are closed with `closeSession` or a final voucher |
 | `cap_exhausted` | client or node | The next chunk would take the signed total past `min(depositWei, maxSpendWei)`; the client signs nothing above the cap and the node pauses; `topUp` reverts on a credit session, so the client closes and opens a new session with a new note | session | every signed voucher stands |
 | `model_not_loaded` | node | The node's offer exists but the process does not have the model loaded now (stale offer) | session | nothing charged if no input receipt was signed for; otherwise the input voucher stands |
 | `context_key_mismatch` | node | `keccak256(contextPubKey) ≠ contextId`, or a grant or head-record signature does not verify under `contextPubKey` | job | no input receipt, nothing charged |

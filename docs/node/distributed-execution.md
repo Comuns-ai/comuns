@@ -147,8 +147,8 @@ sequenceDiagram
         C->>D: round frame with the accepted tokens, the correction token and the rollback point (no new job, no new input receipt); D rolls its KV cache back to the accepted prefix
     end
     C-->>U: output stream; receipts show acceptance rate α and both sessions' spend
-    C->>D: closing voucher, final = true
-    C->>T: closing voucher, final = true
+    C->>D: closing voucher, isFinal = true
+    C->>T: closing voucher, isFinal = true
 ```
 
 **Who reads what.** The draft node sees the prompt and its own drafts; the target node sees everything — the prompt, the drafts and the accepted output. **Both are full-prompt readers** on the sheet, by distinct node and distinct operator.

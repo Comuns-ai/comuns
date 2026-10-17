@@ -62,7 +62,7 @@ Test vectors under `S1/interop` and `S9/interop` (the `data-*` directories) are 
 
 ohttp 0.8.0 is carried with a small patch (`S9/ohttp-0.8.0-chunked-fixes.patch`, `src/stream.rs` only), applied through `[patch.crates-io]` until an upstream release fixes it. The patch sizes the client response-nonce buffer to max(Nn, Nk) and enforces the draft-08 rule on zero-length chunks. ohttp is published under "MIT OR Apache-2.0" (github.com/martinthomson/ohttp); the patch modifies its `src/stream.rs`, quotes a few lines of it as context, and is offered under the same licences.
 
-Upstream report: <link to be added>
+Upstream report: https://github.com/martinthomson/ohttp/issues/102 (filed 2026-10-17).
 
 ## Large artifacts are not committed
 
